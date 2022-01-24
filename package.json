@@ -7,7 +7,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest --watch",
-    "ci:test": "jest --ci",
+    "ci:test": "jest --ci --passWithNoTests",
     "prisma:generate": "prisma generate"
   },
   "dependencies": {
