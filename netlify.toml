@@ -1,2 +1,2 @@
 [context.deploy-preview.environment]
-   NEXTAUTH_URL = '$DEPLOY_URL'
+   NEXTAUTH_URL = '$DEPLOY_URL' 
