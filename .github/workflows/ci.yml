@@ -1,16 +1,17 @@
 name: CI
 on: [push]
 jobs:
-  nextlint:
-    name: Lint code base
+  standard-checks:
+    name: Lint and Test
     runs-on: ubuntu-latest
     
     steps:
      - name: Checkout code
        uses: actions/checkout@v2
-
      - name: Install packages
        run: npm ci
      - name: Run Next Lint
        run: npm run lint 
+     - name: Run Tests
+       run: npm run ci:test
   
