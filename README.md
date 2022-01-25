@@ -13,10 +13,37 @@ Node 16.13.0 (you can use ```nvm``` to alter this)
 
 ## Set up
 ### Clone the repository and install necessary packages
-* ```git clone``` the repo onto your local machine and run ```npm i``` or ```yarn i```
+```git clone``` the repo onto your local machine and run ```npm i``` or ```yarn i```
 
 ### Set up Local PostgreSQL Database
-* Installation will vary by machine OS. For brevity, I linked resources below. Make sure you have the ```psql``` command available from your terminal.
+#### MacOS (brew required)
+1. If you don't have brew, install it using the command below in your terminal. Brew is a package manager that makes installing applications *much easier*
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+2. Make sure to update brew and that it is healthy by running the commands below. ```brew doctor``` should report no errors.
+```
+brew update
+brew doctor
+```
+3. Run the command below to install PostgreSQL.
+```
+brew install postgresql
+```
+4. If postgres is installed correct, the following command below should work. Please contact Manu if it doesn't work.
+```
+psql --version
+```
+5. By default a database called ```postgres``` will be created. Type the following command to start ```psql```.
+```
+psql postgres
+```
+6. Now, we will create a database called ```fair_districts```, so run the following
+```
+CREATE DATABASE fair_districts;
+```
+#### 
+
 * Installation will vary by machine, however I recommend this resource
 * https://blog.timescale.com/blog/how-to-install-psql-on-mac-ubuntu-debian-windows/
 * Set up prisma by running npm install prisma --save-dev
