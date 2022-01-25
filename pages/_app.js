@@ -8,6 +8,6 @@ export default function App({
   return (
     <SessionProvider session={session}>
       <Component {...pageProps} />
-    </SessionProvider>
+    </SessionProvider> 
   )
 }  
