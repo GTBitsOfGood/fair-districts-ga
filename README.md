@@ -12,17 +12,18 @@ The platform we will build will automate this assignment process. Recently, Fair
 Node 16.13.0 (you can use ```nvm``` to alter this)
 
 ## Set up
-### Git Clone Repo to Local Machine
+### Clone the repository and install necessary packages
 * ```git clone``` the repo onto your local machine and run ```npm i``` or ```yarn i```
 
 ### Set up Local PostgreSQL Database
+* Installation will vary by machine OS. For brevity, I linked resources below. Make sure you have the ```psql``` command available from your terminal.
 * Installation will vary by machine, however I recommend this resource
 * https://blog.timescale.com/blog/how-to-install-psql-on-mac-ubuntu-debian-windows/
 * Set up prisma by running npm install prisma --save-dev
 
-## Set up local env
+### Set up local env
 
-## Other stuff
+### Other stuff
 
 
 ## How to Contribute
