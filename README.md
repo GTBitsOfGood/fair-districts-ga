@@ -9,13 +9,21 @@ The platform we will build will automate this assignment process. Recently, Fair
 * Prisma (ORM on top of Postgres)
 
 ## Environment
-Node 16.13.0 (important for prisma to work, you can use nvm to change node versions)
+Node 16.13.0 (you can use ```nvm``` to alter this)
 
 ## Set up
+### Git Clone Repo to Local Machine
 * ```git clone``` the repo onto your local machine and run ```npm i``` or ```yarn i```
-* 
-* Need to set up psql and prisma
-*( Need to set up other stuff
+
+### Set up Local PostgreSQL Database
+* Installation will vary by machine, however I recommend this resource
+* https://blog.timescale.com/blog/how-to-install-psql-on-mac-ubuntu-debian-windows/
+* Set up prisma by running npm install prisma --save-dev
+
+## Set up local env
+
+## Other stuff
+
 
 ## How to Contribute
 
