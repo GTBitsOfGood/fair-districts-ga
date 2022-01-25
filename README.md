@@ -58,7 +58,9 @@ Node 16.13.0 (you can use ```nvm``` to alter this)
 
 ### Set up local env
 
-### Other stuff
+### Set up Prisma
+
+### Optional) Set up google prisma
 
 
 ## How to Contribute
