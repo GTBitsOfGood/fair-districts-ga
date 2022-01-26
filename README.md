@@ -93,7 +93,7 @@ Run ```git clone https://github.com/bitsofgood/fair-districts-ga.git``` to clone
     ```
 
 ## You should be done at this point. 
-Please contact Manu if you have any issues. Don't worry about email authentication for now. You will be using Google OAuth to sign in to your localhost repos whenever you are building out features. On Vercel previews, I'm working to make email authentication working, because Google OAuth is *annoying*. I'll be setting up an SMTP server soon and update you accordingly. You can use ```yarn dev``` or ```npm dev```.
+Please contact Manu if you have any issues. Don't worry about email authentication for now. You will be using Google OAuth to sign in to your localhost repos whenever you are building out features. On Vercel previews, I'm working to make email authentication working, because Google OAuth is *annoying*. I'll be setting up an SMTP server soon and update you accordingly. You can use ```yarn dev``` or ```npm dev``` to run the application.
   
 
 ## How to Contribute
