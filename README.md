@@ -51,17 +51,47 @@ Node 16.13.0 (you can use ```nvm``` to alter this)
     ```
 4. To ensure the database is created, type ```\l``` and see if it appears in your terminal as a database.
 #### Linux
+1. Run the following commands.
+    ```
+    sudo apt-get update
+    sudo apt-get install postgresql
+    ```
+2. Run this command to access the postgres user
+    ```
+    sudo -i -u postgres
+    ```
+3. Run the following command
+   ```
+   psql
+   ```
+4. Now, we will create a database called ```fair_districts```, so run the following
+    ```
+    CREATE DATABASE fair_districts;
+    ```
+5. To ensure the database is created, type ```\l``` and see if it appears in your terminal as a database.
 
-* Installation will vary by machine, however I recommend this resource
-* https://blog.timescale.com/blog/how-to-install-psql-on-mac-ubuntu-debian-windows/
-* Set up prisma by running npm install prisma --save-dev
-
-### Set up local env
-
-### Set up Prisma
-
-### Optional) Set up google prisma
-
+### Set up Prisma and Google OAuth
+1. Navigate to the repository you clone and run the following command
+    ```
+    npm install prisma --save-dev
+    ```
+2. Create a .env file and for your repo and type the following
+    ```
+    DATABASE_URL="postgresql://{USER}:{PASSWORD}@localhost:5432/fair_districts"
+    NEXTAUTH_URL="http://localhost:3000"
+    GOOGLE_CLIENT_ID="651451308980-n2ucut2m4sk6sqecs7ap6q0j43b79bv0.apps.googleusercontent.com"
+    GOOGLE_CLIENT_SECRET="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"
+    ```
+3. Run the following command (make sure your .env is working). This will make our database have the appropriate schemas and tables.
+    ```
+    npx prisma migrate dev
+    ```
+4. You can verify this by accessing the database and running the following command
+    ```
+    \c fair_district
+    \dt
+    ```
+  
 
 ## How to Contribute
 
