@@ -100,9 +100,9 @@ You will be using Google OAuth to sign in to your localhost repos whenever you a
 
 To contribute to the repo, we will be using a rather simple system. For each issue that you work on, all you need to do is create a new branch in the following format [your-name]/[brief title of issue] (ex: manu/analytics-integration). You should make all your changes in that branch. 
 
-As you make changes to your branch, because other developers will be working on the repository, I HIGHLY recommend running git stash to stash your local copy in memory and run git pull whenever you develop. This way in case there is an issue with git pull, you can always run git stash pop to return back locally.
+As you make changes to your branch, because other developers will be working on the repository, I HIGHLY recommend running ```git stash``` to stash your local copy in memory and run ```git pull``` whenever you develop. This way in case there is an issue with git pull, you can always run git stash pop to return back locally.
 
-Once you feel like your work is done, submit a pull request to merge your branch into the master branch, and I will review it. Please link it to the issue you are assigned and 
+Once you feel like your work is done, submit a pull request to merge your branch into the master branch, and I will review it. Please link it to the issue you are assigned.
 
 
 ## Why SQL over NoSQL
