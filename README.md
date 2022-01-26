@@ -13,7 +13,7 @@ Node 16.13.0 (you can use ```nvm``` to alter this)
 
 ## Set up
 ### Clone the repository and install necessary packages
-```git clone``` the repo onto your local machine and run ```npm i``` or ```yarn i```
+Run ```git clone https://github.com/bitsofgood/fair-districts-ga.git``` to clone the repo onto your local machine and then run ```npm i``` or ```yarn i```
 
 ### Set up Local PostgreSQL Database
 #### MacOS (brew required)
@@ -92,8 +92,8 @@ Node 16.13.0 (you can use ```nvm``` to alter this)
     \dt
     ```
 
-## You should be done at this point. Please contact Manu if you have any issues. Don't worry about email authentication for now.
-You will be using Google OAuth to sign in to your localhost repos whenever you are building out features. On Vercel previews, I'm working to make email authentication working, because Google OAuth is *annoying*. I'll be setting up an SMTP server soon and update you accordingly.
+## You should be done at this point. 
+Please contact Manu if you have any issues. Don't worry about email authentication for now. You will be using Google OAuth to sign in to your localhost repos whenever you are building out features. On Vercel previews, I'm working to make email authentication working, because Google OAuth is *annoying*. I'll be setting up an SMTP server soon and update you accordingly. You can use ```yarn dev``` or ```npm dev```.
   
 
 ## How to Contribute
