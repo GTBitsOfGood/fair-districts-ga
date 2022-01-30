@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Box,
   Modal,
@@ -36,7 +35,7 @@ const validateReq = (value) => {
   return error;
 };
 
-const NewspaperModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
+const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -62,6 +61,10 @@ const NewspaperModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
               const res = await axios.post("/api/newspaper", prunedVals);
               const status = await res.status;
               const data = await res.data;
+              console.log(data);
+              data.counties = data.counties
+                .map((county) => county.name)
+                .join(", ");
               if (status === 200) {
                 setNewspapers([...newspapers, data]);
                 onClose();
@@ -133,7 +136,9 @@ const NewspaperModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
                       <FormControl>
                         <FormLabel htmlFor="instagram">Instagram</FormLabel>
                         <InputGroup>
-                          <InputLeftElement children="@" color="gray.400" />
+                          <InputLeftElement color="gray.400">
+                            @
+                          </InputLeftElement>
                           <Input {...field} id="instagram" />
                         </InputGroup>
                       </FormControl>
@@ -144,7 +149,9 @@ const NewspaperModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
                       <FormControl>
                         <FormLabel htmlFor="twitter">Twitter</FormLabel>
                         <InputGroup>
-                          <InputLeftElement children="@" color="gray.400" />
+                          <InputLeftElement color="gray.400">
+                            @
+                          </InputLeftElement>
                           <Input {...field} id="twitter" />
                         </InputGroup>
                       </FormControl>
@@ -211,4 +218,4 @@ const NewspaperModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
   );
 };
 
-export default NewspaperModal;
+export default NewspaperAddModal;
