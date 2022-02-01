@@ -166,7 +166,7 @@ export async function getServerSideProps() {
   const res = await axios.get(
     `http://${
       process.env.NODE_ENV === "production"
-        ? process.env.VERCEL_URL
+        ? process.env.NEXT_PUBLIC_VERCEL_URL
         : "localhost:3000"
     }/api/newspaper`
   );
