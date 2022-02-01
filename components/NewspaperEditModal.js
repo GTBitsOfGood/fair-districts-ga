@@ -27,7 +27,6 @@ import {
 import { Field, FieldArray, Form, Formik } from "formik";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import axios from "axios";
-import { useEffect, useState } from "react";
 
 const validateReq = (value) => {
   let error;
@@ -40,19 +39,23 @@ const validateReq = (value) => {
 const NewspaperEditModal = ({
   isOpen,
   onClose,
-  newspaper,
+  newspaperMeta,
   newspapers,
   setNewspapers,
 }) => {
-  const prunedNewspaper = newspaper && {
-    ...newspaper,
-    counties: newspaper.counties.map((c) => c.name),
-  };
-  console.log(prunedNewspaper);
+  const prunedNewspaper = useMemo(() => {
+    if (newspaperMeta === undefined) return;
+    return {
+      ...newspaperMeta.newspaper,
+      counties: newspaperMeta.newspaper.counties.map((c) => c.name),
+    };
+  }, [newspaperMeta]);
+
+  const { newspaper, index } = newspaperMeta;
 
   return (
     <>
-      {newspaper ? (
+      {newspaperMeta ? (
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
@@ -65,15 +68,20 @@ const NewspaperEditModal = ({
                   const prunedVals = { ...values };
                   prunedVals.counties = prunedVals.counties.filter((e) => e);
                   prunedVals.rating = parseInt(prunedVals.rating);
-                  const res = await axios.post("/api/newspaper", prunedVals);
+                  const res = await axios.post("/api/newspaper", {
+                    type: "edit",
+                    id: newspaper.id,
+                    formData: prunedVals,
+                    original: newspaper,
+                  });
                   const status = await res.status;
                   const data = await res.data;
                   console.log(data);
-                  data.counties = data.counties
-                    .map((county) => county.name)
-                    .join(", ");
+
                   if (status === 200) {
-                    setNewspapers([...newspapers, data]);
+                    const clonedNewspapers = [...newspapers];
+                    clonedNewspapers[index] = data;
+                    setNewspapers(clonedNewspapers);
                     onClose();
                   }
                 }}
@@ -178,29 +186,25 @@ const NewspaperEditModal = ({
                                 <FormLabel htmlFor="counties">
                                   Counties
                                 </FormLabel>
-                                <Stack direction="row" spacing={1}>
-                                  <IconButton
-                                    size="xs"
-                                    icon={<MinusIcon />}
-                                    onClick={() =>
-                                      arrayHelpers.remove(
-                                        arrayHelpers.length - 1
-                                      )
-                                    }
-                                  />
-                                  <IconButton
-                                    size="xs"
-                                    icon={<AddIcon />}
-                                    onClick={() => arrayHelpers.push("")}
-                                  />
-                                </Stack>
+                                <IconButton
+                                  size="xs"
+                                  icon={<AddIcon />}
+                                  onClick={() => arrayHelpers.push("")}
+                                />
                               </Flex>
-
                               <Stack direction="column" spacing={2}>
                                 {props.values.counties.map((county, i) => (
                                   <Field key={i} name={`counties.${i}`}>
                                     {({ field, form }) => (
-                                      <Input {...field} id={`county-${i}`} />
+                                      <Flex direction="row" alignItems="center">
+                                        <Input {...field} id={`county-${i}`} />
+                                        <IconButton
+                                          m={1}
+                                          size="xs"
+                                          icon={<MinusIcon />}
+                                          onClick={() => arrayHelpers.remove(i)}
+                                        />
+                                      </Flex>
                                     )}
                                   </Field>
                                 ))}
@@ -212,18 +216,31 @@ const NewspaperEditModal = ({
                     </Stack>
                     <Box mt={6} mb={4}>
                       <Divider color="gray.400" mb={4} />
-                      <Flex justifyContent="right">
+                      <Flex justifyContent="space-between">
                         <Button
                           colorScheme="red"
-                          variant="ghost"
-                          mr={3}
-                          onClick={onClose}
+                          onClick={async () => {
+                            const res = await axios.post("/api/newspaper", {
+                              type: "delete",
+                              id: newspaper.id,
+                            });
+                          }}
                         >
-                          Cancel
+                          Delete
                         </Button>
-                        <Button colorScheme="teal" type="submit">
-                          Submit
-                        </Button>
+                        <Box>
+                          <Button
+                            colorScheme="red"
+                            variant="ghost"
+                            mr={3}
+                            onClick={onClose}
+                          >
+                            Cancel
+                          </Button>
+                          <Button colorScheme="teal" type="submit">
+                            Save
+                          </Button>
+                        </Box>
                       </Flex>
                     </Box>
                   </Form>

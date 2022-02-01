@@ -58,13 +58,12 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
               const prunedVals = { ...values };
               prunedVals.counties = prunedVals.counties.filter((e) => e);
               prunedVals.rating = parseInt(prunedVals.rating);
-              const res = await axios.post("/api/newspaper", prunedVals);
+              const res = await axios.post("/api/newspaper", {
+                type: "add",
+                formData: prunedVals,
+              });
               const status = await res.status;
               const data = await res.data;
-              console.log(data);
-              data.counties = data.counties
-                .map((county) => county.name)
-                .join(", ");
               if (status === 200) {
                 setNewspapers([...newspapers, data]);
                 onClose();
@@ -166,13 +165,6 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
                             <Stack direction="row" spacing={1}>
                               <IconButton
                                 size="xs"
-                                icon={<MinusIcon />}
-                                onClick={() =>
-                                  arrayHelpers.remove(arrayHelpers.length - 1)
-                                }
-                              />
-                              <IconButton
-                                size="xs"
                                 icon={<AddIcon />}
                                 onClick={() => arrayHelpers.push("")}
                               />
@@ -183,7 +175,15 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
                             {props.values.counties.map((county, i) => (
                               <Field key={i} name={`counties.${i}`}>
                                 {({ field, form }) => (
-                                  <Input {...field} id={`county-${i}`} />
+                                  <Flex direction="row" alignItems="center">
+                                    <Input {...field} id={`county-${i}`} />
+                                    <IconButton
+                                      m={1}
+                                      size="xs"
+                                      icon={<MinusIcon />}
+                                      onClick={() => arrayHelpers.remove(i)}
+                                    />
+                                  </Flex>
                                 )}
                               </Field>
                             ))}

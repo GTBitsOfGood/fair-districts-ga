@@ -30,11 +30,13 @@ const Newspaper = () => {
       {
         Header: "",
         accessor: "edit",
-        Cell: ({ row: { original } }) => (
+        Cell: ({ row }) => (
           <IconButton
             onClick={() => {
-              console.log(original);
-              setNewspaperToEdit(original);
+              setNewspaperToEdit({
+                index: row.index,
+                newspaper: row.original,
+              });
               onEditOpen();
             }}
             icon={<EditIcon />}
@@ -146,12 +148,14 @@ const Newspaper = () => {
       <NewspaperEditModal
         isOpen={isEditOpen}
         onClose={onEditClose}
-        newspaper={newspaperToEdit}
+        newspaperMeta={newspaperToEdit}
         newspapers={newspapers}
         setNewspapers={setNewspapers}
       />
     </Box>
   );
 };
+
+// SSR newspapers
 
 export default Newspaper;

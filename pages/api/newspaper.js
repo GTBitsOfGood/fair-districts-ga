@@ -4,10 +4,12 @@ async function handler(req, res) {
   if (req.method === "GET") {
     getNewspapers(req, res);
   } else if (req.method === "POST") {
-    if (req.body.id) {
-      getNewspaper(req, res);
-    } else {
+    if (req.body.type === "add") {
       addNewspaper(req, res);
+    } else if (req.body.type === "edit") {
+      editNewspaper(req, res);
+    } else if (req.body.type === "delete") {
+      deleteNewspaper(req, res);
     }
   }
 }
@@ -18,26 +20,25 @@ async function getNewspapers(req, res) {
       counties: true,
     },
   });
-  // await prisma.newspaper.deleteMany();
   res.status(200).json(allNewspapers);
 }
 
-async function getNewspaper(req, res) {
-  const newspaper = await prisma.newspaper.findUnique({
-    where: {
-      id: req.body.id,
-    },
-    include: {
-      counties: true,
-    },
-  });
-  newspaper.counties = newspaper.counties.map((county) => county.name);
-  console.log(newspaper);
-  res.status(200).json(newspaper);
-}
+// async function getNewspaper(req, res) {
+//   const newspaper = await prisma.newspaper.findUnique({
+//     where: {
+//       id: req.body.id,
+//     },
+//     include: {
+//       counties: true,
+//     },
+//   });
+//   newspaper.counties = newspaper.counties.map((county) => county.name);
+//   console.log(newspaper);
+//   res.status(200).json(newspaper);
+// }
 
 async function addNewspaper(req, res) {
-  const { counties, ...formData } = req.body;
+  const { counties, ...formData } = req.body.formData;
   try {
     const newspaper = await prisma.newspaper.create({
       data: {
@@ -53,8 +54,6 @@ async function addNewspaper(req, res) {
             create: {
               name: county,
             },
-            // volunteers: [],
-            // legislators: [],
           })),
         },
       },
@@ -70,5 +69,46 @@ async function addNewspaper(req, res) {
     res.status(400).json({});
   }
 }
+
+async function editNewspaper(req, res) {
+  const { id, formData, original } = req.body;
+  const { counties } = formData;
+
+  const originalCounties = original.counties.map((c) => c.name);
+  const removedCounties = originalCounties.filter((x) => !counties.includes(x));
+
+  try {
+    const newspaper = await prisma.newspaper.update({
+      where: {
+        id: id,
+      },
+      data: {
+        ...formData,
+        counties: {
+          disconnect: removedCounties.map((c) => ({ name: c })),
+          connectOrCreate: counties.map((county) => ({
+            where: {
+              name: county,
+            },
+            create: {
+              name: county,
+            },
+          })),
+        },
+      },
+      include: {
+        counties: true,
+      },
+    });
+    res.status(200).json({
+      ...newspaper,
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({});
+  }
+}
+
+async function deleteNewspaper(req, res) {}
 
 export default handler;
