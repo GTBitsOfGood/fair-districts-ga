@@ -23,20 +23,6 @@ async function getNewspapers(req, res) {
   res.status(200).json(allNewspapers);
 }
 
-// async function getNewspaper(req, res) {
-//   const newspaper = await prisma.newspaper.findUnique({
-//     where: {
-//       id: req.body.id,
-//     },
-//     include: {
-//       counties: true,
-//     },
-//   });
-//   newspaper.counties = newspaper.counties.map((county) => county.name);
-//   console.log(newspaper);
-//   res.status(200).json(newspaper);
-// }
-
 async function addNewspaper(req, res) {
   const { counties, ...formData } = req.body.formData;
   try {
@@ -61,9 +47,7 @@ async function addNewspaper(req, res) {
         counties: true,
       },
     });
-    res.status(200).json({
-      ...newspaper,
-    });
+    res.status(200).json(newspaper);
   } catch (e) {
     console.log(e);
     res.status(400).json({});
@@ -100,15 +84,26 @@ async function editNewspaper(req, res) {
         counties: true,
       },
     });
-    res.status(200).json({
-      ...newspaper,
-    });
+    res.status(200).json(newspaper);
   } catch (e) {
     console.log(e);
     res.status(400).json({});
   }
 }
 
-async function deleteNewspaper(req, res) {}
+async function deleteNewspaper(req, res) {
+  const { id } = req.body;
+  try {
+    const deletedNewspaper = await prisma.newspaper.delete({
+      where: {
+        id: id,
+      },
+    });
+    res.status(200).json(deletedNewspaper);
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({});
+  }
+}
 
 export default handler;

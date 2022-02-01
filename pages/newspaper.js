@@ -118,22 +118,37 @@ const Newspaper = () => {
       </Flex>
       <Table {...getTableProps()} variant="striped" size="md">
         <Thead>
-          {headerGroups.map((headerGroup) => (
-            <Tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((col) => (
-                <Th {...col.getHeaderProps()}>{col.render("Header")}</Th>
-              ))}
-            </Tr>
-          ))}
+          {headerGroups.map((headerGroup) => {
+            const { key, ...restHeaderGroupProps } =
+              headerGroup.getHeaderGroupProps();
+            return (
+              <Tr key={key} {...restHeaderGroupProps}>
+                {headerGroup.headers.map((col) => {
+                  const { key, ...restColumn } = col.getHeaderProps();
+                  return (
+                    <Th key={key} {...restColumn}>
+                      {col.render("Header")}
+                    </Th>
+                  );
+                })}
+              </Tr>
+            );
+          })}
         </Thead>
         <Tbody {...getTableProps()}>
           {rows.map((row) => {
             prepareRow(row);
+            const { key, ...restRowProps } = row.getRowProps();
             return (
-              <Tr {...row.getRowProps()}>
-                {row.cells.map((cell) => (
-                  <Td {...cell.getCellProps()}>{cell.render("Cell")}</Td>
-                ))}
+              <Tr key={key} {...restRowProps}>
+                {row.cells.map((cell) => {
+                  const { key, ...restCellProps } = cell.getCellProps();
+                  return (
+                    <Td key={key} {...restCellProps}>
+                      {cell.render("Cell")}
+                    </Td>
+                  );
+                })}
               </Tr>
             );
           })}
