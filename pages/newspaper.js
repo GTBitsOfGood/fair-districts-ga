@@ -1,22 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Box,
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
-  TableCaption,
-  Editable,
-  EditableInput,
-  EditablePreview,
   Heading,
   Flex,
   IconButton,
   useDisclosure,
-  chakra,
 } from "@chakra-ui/react";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import NewspaperAddModal from "../components/NewspaperAddModal";

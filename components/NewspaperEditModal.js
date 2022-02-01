@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef, isValidElement } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Box,
   Modal,
