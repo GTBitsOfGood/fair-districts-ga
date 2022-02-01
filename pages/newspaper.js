@@ -24,7 +24,7 @@ import axios from "axios";
 import { useTable, useRowSelect } from "react-table";
 import NewspaperEditModal from "../components/NewspaperEditModal";
 
-const Newspaper = () => {
+const Newspaper = ({ data }) => {
   const tableCols = useMemo(
     () => [
       {
@@ -86,7 +86,7 @@ const Newspaper = () => {
     ],
     []
   );
-  const [newspapers, setNewspapers] = useState([]);
+  const [newspapers, setNewspapers] = useState(data);
   const [newspaperToEdit, setNewspaperToEdit] = useState();
   const {
     isOpen: isAddOpen,
@@ -100,15 +100,6 @@ const Newspaper = () => {
   } = useDisclosure();
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: tableCols, data: newspapers }, useRowSelect);
-
-  useEffect(() => {
-    async function fetchNewspapers() {
-      const res = await axios.get("/api/newspaper");
-      const data = await res.data;
-      setNewspapers(data);
-    }
-    fetchNewspapers();
-  }, []);
 
   return (
     <Box p={8}>
@@ -171,6 +162,16 @@ const Newspaper = () => {
   );
 };
 
-// SSR newspapers
+export async function getServerSideProps() {
+  const res = await axios.get(
+    `http://${
+      process.env.NODE_ENV === "production"
+        ? process.env.VERCEL_URL
+        : "localhost:3000"
+    }/api/newspaper`
+  );
+  const data = await res.data;
+  return { props: { data } };
+}
 
 export default Newspaper;
