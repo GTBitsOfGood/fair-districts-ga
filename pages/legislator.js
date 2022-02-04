@@ -61,10 +61,10 @@ const Legislator = () => {
       />
       <Table {...getTableProps()}>
         <Thead>
-          {headerGroups.map((headerGroup) => (
-            <Tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <Th
+          {headerGroups.map((headerGroup, ind) => (
+            <Tr key={ind} {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column, ind2) => (
+                <Th key={ind2}
                   {...column.getHeaderProps()}
                 >
                   {column.render('Header')}
@@ -74,12 +74,12 @@ const Legislator = () => {
           ))}
         </Thead>
         <Tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
+          {rows.map((row, ind) => {
             prepareRow(row)
             return (
-              <Tr {...row.getRowProps()}>
-                {row.cells.map((cell) => (
-                  <Td {...cell.getCellProps()}>
+              <Tr key={ind} {...row.getRowProps()}>
+                {row.cells.map((cell, ind2) => (
+                  <Td key={ind2} {...cell.getCellProps()}>
                     {cell.render('Cell')}
                   </Td>
                 ))}
