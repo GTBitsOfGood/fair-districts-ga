@@ -15,6 +15,8 @@ import {
 import { FiHome, FiLogIn, FiLogOut } from "react-icons/fi";
 import { BsNewspaper } from "react-icons/bs";
 import { VscLaw } from "react-icons/vsc";
+import Link from 'next/link'
+
 
 const NavBar = ({ session }) => {
     return (
@@ -33,35 +35,45 @@ const NavBar = ({ session }) => {
                     variant="ghost"
                     justifyContent="flex-start"
                 >
-                    Home
+                    <Link href="/">
+                        Home
+                    </Link>
                 </Button>
                 <Button 
                     leftIcon={<MdOutlineCampaign />} 
                     variant="ghost" 
                     justifyContent="flex-start"
                 >
-                    Campaign
+                    <Link href="/campaign">
+                        Campaign
+                    </Link>
                 </Button>
                 <Button 
                     leftIcon={<MdOutlinePeople />}
                     variant="ghost"
                     justifyContent="flex-start"
                 >
-                    Volunteers
+                    <Link href="/volunteer">
+                        Volunteer
+                    </Link>
                 </Button>
                 <Button
                     leftIcon={<BsNewspaper />}
                     variant="ghost"
                     justifyContent="flex-start"
                 >
-                    Newspapers
+                    <Link href="/newspaper">
+                        Newspapers
+                    </Link>
                 </Button>
                 <Button
                     leftIcon={<VscLaw />}
                     variant="ghost"
                     justifyContent="flex-start"
                 >
-                    Legislators
+                    <Link href="/legislator">
+                        Legislators
+                    </Link>
                 </Button>
             </Stack>
             <Box color="white" paddingTop={250} />
