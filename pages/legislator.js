@@ -33,7 +33,7 @@ const Legislator = () => {
         accessor: "edit",
         Cell: ({ row }) => (
           <Center>
-            <HStack>
+            <HStack spacing='24px'>
               <IconButton
                 onClick={() => {
                   setLegislatorIndex(row.index);
@@ -52,7 +52,7 @@ const Legislator = () => {
                 icon={<DeleteIcon />}
                 size="sm"
                 variant="outline"
-                colorScheme="black"
+                colorScheme="red"
               />
             </HStack>
           </Center>
