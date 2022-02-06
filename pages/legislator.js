@@ -75,7 +75,7 @@ const Legislator = () => {
         accessor: 'counties'
       }
     ],
-    [],
+    [onDeleteOpen, onEditOpen],
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
