@@ -33,7 +33,10 @@ import {
       const prunedVals = { ...values };
       prunedVals.counties = prunedVals.counties.filter((e) => e);
 
-      const res = await axios.post("/api/legislator", prunedVals);
+      const res = await axios.post("/api/legislator", {
+        type: "add",
+        formData: prunedVals,
+      });
       const newLegislator = res.data;
       
       if (res.status === 200) {
@@ -44,7 +47,6 @@ import {
         // onClose();
         actions.resetForm();
       } else {
-        console.log('errored when submitting');
         actions.setErrors({api: 'There was an error when adding to the database.'});
       }
     };

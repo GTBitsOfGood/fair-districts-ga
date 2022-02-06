@@ -1,13 +1,43 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Table, Thead, Tbody, Tr, Th, Td, useDisclosure, Flex, Heading, IconButton, Box } from '@chakra-ui/react'
-import { AddIcon } from '@chakra-ui/icons'
+import { AddIcon, EditIcon } from '@chakra-ui/icons'
 import { useTable } from 'react-table'
 import LegislatorAddModal from "../components/LegislatorAddModal";
+import LegislatorEditModal from "../components/LegislatorEditModal";
 import axios from "axios";
 
 const Legislator = () => {
+  const [ legislators, setLegislators ] = useState([]);
+  const [ legislatorIndex, setLegislatorIndex ] = useState(0);
+  const {
+    isOpen: isAddOpen,
+    onOpen: onAddOpen,
+    onClose: onAddClose,
+  } = useDisclosure();
+  const {
+    isOpen: isEditOpen,
+    onOpen: onEditOpen,
+    onClose: onEditClose,
+  } = useDisclosure();
+
   const columns = useMemo(
     () => [
+      {
+        Header: "",
+        accessor: "edit",
+        Cell: ({ row }) => (
+          <IconButton
+            onClick={() => {
+              setLegislatorIndex(row.index);
+              onEditOpen();
+            }}
+            icon={<EditIcon />}
+            size="sm"
+            variant="outline"
+            colorScheme="black"
+          />
+        ),
+      },
       {
         Header: 'First Name',
         accessor: 'firstName',
@@ -28,12 +58,6 @@ const Legislator = () => {
     [],
   );
 
-  const [ legislators, setLegislators ] = useState([]);
-  const {
-    isOpen: isAddOpen,
-    onOpen: onAddOpen,
-    onClose: onAddClose,
-  } = useDisclosure();
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: columns, data: legislators });
 
@@ -58,6 +82,13 @@ const Legislator = () => {
           onClose={onAddClose}
           legislators={legislators}
           setLegislators={setLegislators}
+      />
+      <LegislatorEditModal
+        isOpen={isEditOpen}
+        onClose={onEditClose}
+        legislatorIndex={legislatorIndex}
+        legislators={legislators}
+        setLegislators={setLegislators}
       />
       <Table {...getTableProps()}>
         <Thead>
