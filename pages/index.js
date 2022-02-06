@@ -1,19 +1,11 @@
-import {useSession, signIn, signOut} from "next-auth/react"
+import React from "react";
+import { useSession } from "next-auth/react"
+import NavBar from "../components/NavBar";
 
 export default function Component() {
-  const { data: session } = useSession()
-  if (session) {
-    return (
-      <> 
-        Signed in as {session.user.email} <br />
-        <button onClick={() => signOut()}>Sign out</button>
-      </>
-    )
-  }
+  const { data: session } = useSession();
+
   return (
-    <>
-      Not signed in. <br />
-      <button onClick={() => signIn()}>Sign in</button>
-    </>
-  )
-}
+    <NavBar session={session} />
+  );
+};
