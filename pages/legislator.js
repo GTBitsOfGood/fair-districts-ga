@@ -6,8 +6,11 @@ import LegislatorAddModal from "../components/LegislatorAddModal";
 import LegislatorEditModal from "../components/LegislatorEditModal";
 import axios from "axios";
 import LegislatorDeleteDialog from "../components/LegislatorDeleteDialog";
+import NavBar from "../components/NavBar";
+import { useSession } from "next-auth/react"
 
 const Legislator = () => {
+  const { data: session } = useSession();
   const [ legislators, setLegislators ] = useState([]);
   const [ legislatorIndex, setLegislatorIndex ] = useState(0);
   const {
@@ -91,62 +94,69 @@ const Legislator = () => {
     initLegislators();
   }, []);
 
+  if (!session) {
+    return <p>Access Denied...</p>
+  }
+
   return (
-    <Box p={8}>
-      <Flex direction="row" justifyContent="space-between">
-        <Heading>Legislators</Heading>
-        <IconButton colorScheme="teal" icon={<AddIcon />} onClick={onAddOpen} />
-      </Flex>
-      <LegislatorAddModal
-          isOpen={isAddOpen}
-          onClose={onAddClose}
+    <Flex direction="row">
+      <NavBar session={session}/>
+      <Box p={8} flex="1">
+        <Flex direction="row" justifyContent="space-between">
+          <Heading>Legislators</Heading>
+          <IconButton colorScheme="teal" icon={<AddIcon />} onClick={onAddOpen} />
+        </Flex>
+        <LegislatorAddModal
+            isOpen={isAddOpen}
+            onClose={onAddClose}
+            legislators={legislators}
+            setLegislators={setLegislators}
+        />
+        <LegislatorEditModal
+          isOpen={isEditOpen}
+          onClose={onEditClose}
+          legislatorIndex={legislatorIndex}
           legislators={legislators}
           setLegislators={setLegislators}
-      />
-      <LegislatorEditModal
-        isOpen={isEditOpen}
-        onClose={onEditClose}
-        legislatorIndex={legislatorIndex}
-        legislators={legislators}
-        setLegislators={setLegislators}
-      />
-      <LegislatorDeleteDialog
-        alertOpen={isDeleteOpen}
-        onClose={onDeleteClose}
-        legislatorIndex={legislatorIndex}
-        legislators={legislators}
-        setLegislators={setLegislators}
-      />
-      <Table {...getTableProps()}>
-        <Thead>
-          {headerGroups.map((headerGroup, ind) => (
-            <Tr key={ind} {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column, ind2) => (
-                <Th key={ind2}
-                  {...column.getHeaderProps()}
-                >
-                  {column.render('Header')}
-                </Th>
-              ))}
-            </Tr>
-          ))}
-        </Thead>
-        <Tbody {...getTableBodyProps()}>
-          {rows.map((row, ind) => {
-            prepareRow(row)
-            return (
-              <Tr key={ind} {...row.getRowProps()}>
-                {row.cells.map((cell, ind2) => (
-                  <Td key={ind2} {...cell.getCellProps()}>
-                    {cell.render('Cell')}
-                  </Td>
+        />
+        <LegislatorDeleteDialog
+          alertOpen={isDeleteOpen}
+          onClose={onDeleteClose}
+          legislatorIndex={legislatorIndex}
+          legislators={legislators}
+          setLegislators={setLegislators}
+        />
+        <Table {...getTableProps()}>
+          <Thead>
+            {headerGroups.map((headerGroup, ind) => (
+              <Tr key={ind} {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column, ind2) => (
+                  <Th key={ind2}
+                    {...column.getHeaderProps()}
+                  >
+                    {column.render('Header')}
+                  </Th>
                 ))}
               </Tr>
-            )
-          })}
-        </Tbody>
-      </Table>
-    </Box>
+            ))}
+          </Thead>
+          <Tbody {...getTableBodyProps()}>
+            {rows.map((row, ind) => {
+              prepareRow(row)
+              return (
+                <Tr key={ind} {...row.getRowProps()}>
+                  {row.cells.map((cell, ind2) => (
+                    <Td key={ind2} {...cell.getCellProps()}>
+                      {cell.render('Cell')}
+                    </Td>
+                  ))}
+                </Tr>
+              )
+            })}
+          </Tbody>
+        </Table>
+      </Box>
+    </Flex>
   )
 }
 
