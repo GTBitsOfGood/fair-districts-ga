@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   Box,
   Modal,
@@ -13,11 +13,6 @@ import {
   Stack,
   Button,
   Input,
-  InputGroup,
-  InputLeftElement,
-  NumberInput,
-  NumberInputField,
-  Textarea,
   Flex,
   IconButton,
   Divider,
@@ -25,7 +20,6 @@ import {
 import { Field, FieldArray, Form, Formik } from "formik";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import axios from "axios";
-// import LegislatorAlertDialog from "./LegislatorAlertDialog";
 
 const validateReq = (value) => {
   let error = value ? undefined : "Required field";
@@ -163,14 +157,6 @@ const LegislatorEditModal = ({
                       <Box mt={6} mb={4}>
                         <Divider color="gray.400" mb={4} />
                         <Flex justifyContent="right">
-                          {/* <Button
-                            colorScheme="red"
-                            onClick={() => {
-                              setAlertOpen(true);
-                            }}
-                          >
-                            Delete
-                          </Button> */}
                           <Box>
                             <Button
                               colorScheme="red"
