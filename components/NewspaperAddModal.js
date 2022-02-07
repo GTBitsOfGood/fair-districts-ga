@@ -27,10 +27,21 @@ import { Field, FieldArray, Form, Formik } from "formik";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import axios from "axios";
 
-const validateReq = (value) => {
+const validateName = (value) => {
   let error;
   if (!value) {
     error = "Required field";
+  }
+  return error;
+};
+
+const validateEmail = (value) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  let error;
+  if (!value) {
+    error = "Required field";
+  } else if (!re.test(value)) {
+    error = "Not a valid email";
   }
   return error;
 };
@@ -73,7 +84,7 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
             {(props) => (
               <Form>
                 <Stack direction="column" spacing={4}>
-                  <Field name="name" validate={validateReq}>
+                  <Field name="name" validate={validateName}>
                     {({ field, form }) => (
                       <FormControl
                         isInvalid={form.errors.name && form.touched.name}
@@ -85,7 +96,7 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
                       </FormControl>
                     )}
                   </Field>
-                  <Field name="email" validate={validateReq}>
+                  <Field name="email" validate={validateEmail}>
                     {({ field, form }) => (
                       <FormControl
                         isInvalid={form.errors.email && form.touched.email}

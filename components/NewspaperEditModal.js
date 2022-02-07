@@ -28,10 +28,21 @@ import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import NewspaperAlertDialog from "./NewspaperAlertDialog";
 
-const validateReq = (value) => {
+const validateName = (value) => {
   let error;
   if (!value) {
     error = "Required field";
+  }
+  return error;
+};
+
+const validateEmail = (value) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  let error;
+  if (!value) {
+    error = "Required field";
+  } else if (!re.test(value)) {
+    error = "Not a valid email";
   }
   return error;
 };
@@ -44,11 +55,6 @@ const NewspaperEditModal = ({
   setNewspapers,
 }) => {
   const [alertOpen, setAlertOpen] = useState(false);
-  const [descriptionVal, setDescriptionVal] = useState("");
-
-  const handleDescriptionChange = (e) => {
-    e.target.value.length <= 500 && setDescriptionVal(e.target.value);
-  };
 
   const prunedNewspaper = useMemo(() => {
     if (newspaperMeta === undefined) return;
@@ -105,7 +111,7 @@ const NewspaperEditModal = ({
                   {(props) => (
                     <Form>
                       <Stack direction="column" spacing={4}>
-                        <Field name="name" validate={validateReq}>
+                        <Field name="name" validate={validateName}>
                           {({ field, form }) => (
                             <FormControl
                               isInvalid={form.errors.name && form.touched.name}
@@ -119,7 +125,7 @@ const NewspaperEditModal = ({
                             </FormControl>
                           )}
                         </Field>
-                        <Field name="email" validate={validateReq}>
+                        <Field name="email" validate={validateEmail}>
                           {({ field, form }) => (
                             <FormControl
                               isInvalid={
