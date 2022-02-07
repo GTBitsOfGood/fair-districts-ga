@@ -17,9 +17,8 @@ import NewspaperAddModal from "../components/NewspaperAddModal";
 import axios from "axios";
 import { useTable, useRowSelect } from "react-table";
 import NewspaperEditModal from "../components/NewspaperEditModal";
-import { useSession } from "next-auth/react"
+import { getSession, useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
-
 
 const Newspaper = ({ data }) => {
   const { data: session } = useSession();
@@ -60,6 +59,15 @@ const Newspaper = ({ data }) => {
       {
         Header: "Description",
         accessor: "description",
+        Cell: ({
+          row: {
+            values: { description },
+          },
+        }) => (
+          <div style={{ whiteSpace: "break-spaces", overflowWrap: "anywhere" }}>
+            {description}
+          </div>
+        ),
       },
       {
         Header: "Website",
@@ -101,16 +109,20 @@ const Newspaper = ({ data }) => {
     useTable({ columns: tableCols, data: newspapers }, useRowSelect);
 
   if (!session) {
-    return <p>Access Denied...</p>
+    return <p>Access Denied...</p>;
   }
-  
+
   return (
     <Flex direction="row">
-      <NavBar session={session}/>
-      <Box p={8} flex = "1">
+      <NavBar session={session} />
+      <Box p={8} flex="1">
         <Flex direction="row" justifyContent="space-between">
           <Heading>Newspapers</Heading>
-          <IconButton colorScheme="teal" icon={<AddIcon />} onClick={onAddOpen} />
+          <IconButton
+            colorScheme="teal"
+            icon={<AddIcon />}
+            onClick={onAddOpen}
+          />
         </Flex>
         <Table {...getTableProps()} variant="striped" size="md">
           <Thead>
@@ -168,7 +180,7 @@ const Newspaper = ({ data }) => {
   );
 };
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context) {
   const res = await axios.get(
     `http://${
       process.env.NODE_ENV === "production"
@@ -177,7 +189,12 @@ export async function getServerSideProps() {
     }/api/newspaper`
   );
   const data = await res.data;
-  return { props: { data } };
+  return {
+    props: {
+      session: await getSession(context),
+      data,
+    },
+  };
 }
 
 export default Newspaper;

@@ -2,14 +2,14 @@ import prisma from "../../prisma/prisma";
 
 async function handler(req, res) {
   if (req.method === "GET") {
-    getNewspapers(req, res);
+    await getNewspapers(req, res);
   } else if (req.method === "POST") {
     if (req.body.type === "add") {
-      addNewspaper(req, res);
+      await addNewspaper(req, res);
     } else if (req.body.type === "edit") {
-      editNewspaper(req, res);
+      await editNewspaper(req, res);
     } else if (req.body.type === "delete") {
-      deleteNewspaper(req, res);
+      await deleteNewspaper(req, res);
     }
   }
 }

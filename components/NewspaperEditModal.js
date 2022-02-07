@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Modal,
@@ -21,16 +21,28 @@ import {
   Flex,
   IconButton,
   Divider,
+  Text,
 } from "@chakra-ui/react";
 import { Field, FieldArray, Form, Formik } from "formik";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import NewspaperAlertDialog from "./NewspaperAlertDialog";
 
-const validateReq = (value) => {
+const validateName = (value) => {
   let error;
   if (!value) {
     error = "Required field";
+  }
+  return error;
+};
+
+const validateEmail = (value) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  let error;
+  if (!value) {
+    error = "Required field";
+  } else if (!re.test(value)) {
+    error = "Not a valid email";
   }
   return error;
 };
@@ -87,7 +99,6 @@ const NewspaperEditModal = ({
                     });
                     const status = await res.status;
                     const data = await res.data;
-                    console.log(data);
 
                     if (status === 200) {
                       const clonedNewspapers = [...newspapers];
@@ -100,7 +111,7 @@ const NewspaperEditModal = ({
                   {(props) => (
                     <Form>
                       <Stack direction="column" spacing={4}>
-                        <Field name="name" validate={validateReq}>
+                        <Field name="name" validate={validateName}>
                           {({ field, form }) => (
                             <FormControl
                               isInvalid={form.errors.name && form.touched.name}
@@ -114,7 +125,7 @@ const NewspaperEditModal = ({
                             </FormControl>
                           )}
                         </Field>
-                        <Field name="email" validate={validateReq}>
+                        <Field name="email" validate={validateEmail}>
                           {({ field, form }) => (
                             <FormControl
                               isInvalid={
@@ -153,7 +164,22 @@ const NewspaperEditModal = ({
                               <FormLabel htmlFor="description">
                                 Description
                               </FormLabel>
-                              <Textarea {...field} id="description" />
+                              <Textarea
+                                {...field}
+                                onChange={(e) => {
+                                  e.target.value.length <= 500 &&
+                                    form.setFieldValue(
+                                      field.name,
+                                      e.target.value
+                                    );
+                                }}
+                                id="description"
+                              />
+                              <Flex justifyContent="right">
+                                <Text fontSize="sm" textColor="gray.600">
+                                  {field.value.length}/500
+                                </Text>
+                              </Flex>
                             </FormControl>
                           )}
                         </Field>
