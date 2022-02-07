@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Modal,
@@ -21,6 +21,7 @@ import {
   Flex,
   IconButton,
   Divider,
+  Text,
 } from "@chakra-ui/react";
 import { Field, FieldArray, Form, Formik } from "formik";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
@@ -43,6 +44,11 @@ const NewspaperEditModal = ({
   setNewspapers,
 }) => {
   const [alertOpen, setAlertOpen] = useState(false);
+  const [descriptionVal, setDescriptionVal] = useState("");
+
+  const handleDescriptionChange = (e) => {
+    e.target.value.length <= 500 && setDescriptionVal(e.target.value);
+  };
 
   const prunedNewspaper = useMemo(() => {
     if (newspaperMeta === undefined) return;
@@ -152,7 +158,22 @@ const NewspaperEditModal = ({
                               <FormLabel htmlFor="description">
                                 Description
                               </FormLabel>
-                              <Textarea {...field} id="description" />
+                              <Textarea
+                                {...field}
+                                onChange={(e) => {
+                                  e.target.value.length <= 500 &&
+                                    form.setFieldValue(
+                                      field.name,
+                                      e.target.value
+                                    );
+                                }}
+                                id="description"
+                              />
+                              <Flex justifyContent="right">
+                                <Text fontSize="sm" textColor="gray.600">
+                                  {field.value.length}/500
+                                </Text>
+                              </Flex>
                             </FormControl>
                           )}
                         </Field>
