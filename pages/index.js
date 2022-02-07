@@ -1,5 +1,7 @@
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import React from 'react';
+import NavBar from '../components/NavBar';
 
 const MainButton = (props) => {
   return (
@@ -31,6 +33,7 @@ export default function Component() {
   if (session) {
     return (
       <div>
+        <NavBar session={session} />
         <div className="flex flex-row items-center justify-end h-16 w-full">
           <SignInOrOutButton signIn={signOut}>Sign Out</SignInOrOutButton>
         </div>
