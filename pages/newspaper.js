@@ -59,6 +59,11 @@ const Newspaper = ({ data }) => {
       {
         Header: "Description",
         accessor: "description",
+        Cell: ({
+          row: {
+            values: { description },
+          },
+        }) => <div style={{ wordBreak: "break-all" }}>{description}</div>,
       },
       {
         Header: "Website",
