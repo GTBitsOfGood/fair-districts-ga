@@ -63,7 +63,11 @@ const Newspaper = ({ data }) => {
           row: {
             values: { description },
           },
-        }) => <div style={{ wordBreak: "break-all" }}>{description}</div>,
+        }) => (
+          <div style={{ whiteSpace: "break-spaces", overflowWrap: "anywhere" }}>
+            {description}
+          </div>
+        ),
       },
       {
         Header: "Website",
