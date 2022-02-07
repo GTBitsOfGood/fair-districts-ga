@@ -17,8 +17,13 @@ import NewspaperAddModal from "../components/NewspaperAddModal";
 import axios from "axios";
 import { useTable, useRowSelect } from "react-table";
 import NewspaperEditModal from "../components/NewspaperEditModal";
+import { useSession } from "next-auth/react"
+import NavBar from "../components/NavBar";
+
 
 const Newspaper = ({ data }) => {
+  const { data: session } = useSession();
+
   const tableCols = useMemo(
     () => [
       {
@@ -95,64 +100,71 @@ const Newspaper = ({ data }) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: tableCols, data: newspapers }, useRowSelect);
 
+  if (!session) {
+    return <p>Access Denied...</p>
+  }
+  
   return (
-    <Box p={8}>
-      <Flex direction="row" justifyContent="space-between">
-        <Heading>Newspapers</Heading>
-        <IconButton colorScheme="teal" icon={<AddIcon />} onClick={onAddOpen} />
-      </Flex>
-      <Table {...getTableProps()} variant="striped" size="md">
-        <Thead>
-          {headerGroups.map((headerGroup) => {
-            const { key, ...restHeaderGroupProps } =
-              headerGroup.getHeaderGroupProps();
-            return (
-              <Tr key={key} {...restHeaderGroupProps}>
-                {headerGroup.headers.map((col) => {
-                  const { key, ...restColumn } = col.getHeaderProps();
-                  return (
-                    <Th key={key} {...restColumn}>
-                      {col.render("Header")}
-                    </Th>
-                  );
-                })}
-              </Tr>
-            );
-          })}
-        </Thead>
-        <Tbody {...getTableProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            const { key, ...restRowProps } = row.getRowProps();
-            return (
-              <Tr key={key} {...restRowProps}>
-                {row.cells.map((cell) => {
-                  const { key, ...restCellProps } = cell.getCellProps();
-                  return (
-                    <Td key={key} {...restCellProps}>
-                      {cell.render("Cell")}
-                    </Td>
-                  );
-                })}
-              </Tr>
-            );
-          })}
-        </Tbody>
-      </Table>
-      <NewspaperAddModal
-        isOpen={isAddOpen}
-        onClose={onAddClose}
-        newspapers={newspapers}
-        setNewspapers={setNewspapers}
-      />
-      <NewspaperEditModal
-        isOpen={isEditOpen}
-        onClose={onEditClose}
-        newspaperMeta={newspaperToEdit}
-        newspapers={newspapers}
-        setNewspapers={setNewspapers}
-      />
-    </Box>
+    <Flex direction="row">
+      <NavBar session={session}/>
+      <Box p={8} flex = "1">
+        <Flex direction="row" justifyContent="space-between">
+          <Heading>Newspapers</Heading>
+          <IconButton colorScheme="teal" icon={<AddIcon />} onClick={onAddOpen} />
+        </Flex>
+        <Table {...getTableProps()} variant="striped" size="md">
+          <Thead>
+            {headerGroups.map((headerGroup) => {
+              const { key, ...restHeaderGroupProps } =
+                headerGroup.getHeaderGroupProps();
+              return (
+                <Tr key={key} {...restHeaderGroupProps}>
+                  {headerGroup.headers.map((col) => {
+                    const { key, ...restColumn } = col.getHeaderProps();
+                    return (
+                      <Th key={key} {...restColumn}>
+                        {col.render("Header")}
+                      </Th>
+                    );
+                  })}
+                </Tr>
+              );
+            })}
+          </Thead>
+          <Tbody {...getTableProps()}>
+            {rows.map((row) => {
+              prepareRow(row);
+              const { key, ...restRowProps } = row.getRowProps();
+              return (
+                <Tr key={key} {...restRowProps}>
+                  {row.cells.map((cell) => {
+                    const { key, ...restCellProps } = cell.getCellProps();
+                    return (
+                      <Td key={key} {...restCellProps}>
+                        {cell.render("Cell")}
+                      </Td>
+                    );
+                  })}
+                </Tr>
+              );
+            })}
+          </Tbody>
+        </Table>
+        <NewspaperAddModal
+          isOpen={isAddOpen}
+          onClose={onAddClose}
+          newspapers={newspapers}
+          setNewspapers={setNewspapers}
+        />
+        <NewspaperEditModal
+          isOpen={isEditOpen}
+          onClose={onEditClose}
+          newspaperMeta={newspaperToEdit}
+          newspapers={newspapers}
+          setNewspapers={setNewspapers}
+        />
+      </Box>
+    </Flex>
   );
 };
 
