@@ -87,7 +87,6 @@ const NewspaperEditModal = ({
                     });
                     const status = await res.status;
                     const data = await res.data;
-                    console.log(data);
 
                     if (status === 200) {
                       const clonedNewspapers = [...newspapers];
