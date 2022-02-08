@@ -32,16 +32,18 @@ export default function Component() {
 
   if (session) {
     return (
-      <div>
+      <div className="flex flex-row">
         <NavBar session={session} />
-        <div className="flex flex-row items-center justify-end h-16 w-full">
-          <SignInOrOutButton signIn={signOut}>Sign Out</SignInOrOutButton>
-        </div>
-        <div className="flex flex-col items-center justify-center">
-          <MainButton href="/campaigns" message="Manage Campaigns" />
-          <MainButton href="/volunteers" message="Manage Volunteers" />
-          <MainButton href="/legislators" message="Manage Legislators" />
-          <MainButton href="/counties" message="Manage Counties" />
+        <div className="flex flex-col w-full">
+          <div className="flex flex-row items-center justify-end h-16 w-full">
+            <SignInOrOutButton signIn={signOut}>Sign Out</SignInOrOutButton>
+          </div>
+          <div className="flex flex-col items-center justify-center">
+            <MainButton href="/campaigns" message="Manage Campaigns" />
+            <MainButton href="/volunteers" message="Manage Volunteers" />
+            <MainButton href="/legislators" message="Manage Legislators" />
+            <MainButton href="/counties" message="Manage Counties" />
+          </div>
         </div>
       </div>
     );
