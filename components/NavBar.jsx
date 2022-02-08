@@ -30,51 +30,51 @@ const NavBar = ({ session }) => {
             />
             <Divider />
             <Stack direction="column" spacing={3} paddingTop={2}>
-                <Button 
-                    leftIcon={<FiHome />}
-                    variant="ghost"
-                    justifyContent="flex-start"
-                >
-                    <Link href="/">
-                        Home
-                    </Link>
-                </Button>
-                <Button 
-                    leftIcon={<MdOutlineCampaign />} 
-                    variant="ghost" 
-                    justifyContent="flex-start"
-                >
-                    <Link href="/campaign">
-                        Campaign
-                    </Link>
-                </Button>
-                <Button 
-                    leftIcon={<MdOutlinePeople />}
-                    variant="ghost"
-                    justifyContent="flex-start"
-                >
-                    <Link href="/volunteer">
-                        Volunteer
-                    </Link>
-                </Button>
-                <Button
-                    leftIcon={<BsNewspaper />}
-                    variant="ghost"
-                    justifyContent="flex-start"
-                >
-                    <Link href="/newspaper">
-                        Newspapers
-                    </Link>
-                </Button>
-                <Button
-                    leftIcon={<VscLaw />}
-                    variant="ghost"
-                    justifyContent="flex-start"
-                >
-                    <Link href="/legislator">
-                        Legislators
-                    </Link>
-                </Button>
+            <   Link href="/">
+                    <Button 
+                        leftIcon={<FiHome />}
+                        variant="ghost"
+                        justifyContent="flex-start"
+                    >
+                            Home
+                    </Button>
+                </Link>
+                <Link href="/campaign">
+                    <Button 
+                        leftIcon={<MdOutlineCampaign />} 
+                        variant="ghost" 
+                        justifyContent="flex-start"
+                    >
+                            Campaign
+                    </Button>
+                </Link>
+                <Link href="/volunteer">
+                    <Button 
+                        leftIcon={<MdOutlinePeople />}
+                        variant="ghost"
+                        justifyContent="flex-start"
+                    >
+                            Volunteer
+                    </Button>
+                </Link>
+                <Link href="/newspaper">
+                    <Button
+                        leftIcon={<BsNewspaper />}
+                        variant="ghost"
+                        justifyContent="flex-start"
+                    >
+                            Newspapers
+                    </Button>
+                </Link>
+                <Link href="/legislator">
+                      <Button
+                        leftIcon={<VscLaw />}
+                        variant="ghost"
+                        justifyContent="flex-start"
+                    >
+                            Legislators
+                    </Button>
+                </Link>
             </Stack>
             <Box color="white" paddingTop={250} />
             <Divider />
