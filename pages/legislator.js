@@ -13,10 +13,12 @@ import adminEmails from "./api/auth/adminEmails";
 import TableHeader from "../components/TableHeader";
 import useDebounce from "../components/hooks/useDebounce";
 
-const Legislator = () => {
+
+const Legislator = ({ data }) => {
   const { data: session } = useSession();
   const [ legislators, setLegislators ] = useState([]);
   const [ legislatorIndex, setLegislatorIndex ] = useState(0);
+  const [ searchInput, setSearchInput ] = useState("");
   const [ isLoading,  setLoading ] = useState(true);
   const [ activeSort, setActiveSort ] = useState('');
   const [ specialUsers, setSpecialUsers] = useState([]);
@@ -34,11 +36,44 @@ const Legislator = () => {
     } else setActiveSort(`${target}.desc`)
   }
 
+  const fetchLegislators = async () => {
+    const res = await axios.get(
+      `http://${
+        process.env.NODE_ENV === "production"
+          ? process.env.NEXT_PUBLIC_VERCEL_URL
+          : "localhost:3000"
+      }/api/legislator`
+    );
+
+    const data = await res.data;
+    return data;
+  }    
+
+  const searchLegislators = async (event) => {
+    // Empty search input
+    if (!event.target.value) {
+      setSearchInput("");
+      const data = await fetchLegislators();
+      setLegislators(data);
+
+    } else {
+      setSearchInput(event.target.value);
+      const filteredLegislators = data.filter((legislator) => {
+        return (
+          legislator.firstName.toLowerCase().includes(searchInput.toLowerCase()) ||
+          legislator.lastName.toLowerCase().includes(searchInput.toLowerCase())
+        );
+      });
+      setLegislators(filteredLegislators);
+    }
+  };
+
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
     onClose: onAddClose,
   } = useDisclosure();
+
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
@@ -122,13 +157,21 @@ const Legislator = () => {
       <Box p={8} flex="1">
         <Flex direction="row" justifyContent="space-between">
           <Heading>Legislators</Heading>
-          <IconButton colorScheme="teal" icon={<AddIcon />} onClick={onAddOpen} />
+          <Flex direction="row">
+            <SearchBar onChange={searchLegislators} />
+            <IconButton 
+              colorScheme="teal"
+              icon={<AddIcon />}
+              onClick={onAddOpen}
+              marginLeft={5}
+            />
+          </Flex>
         </Flex>
         <LegislatorAddModal
-            isOpen={isAddOpen}
-            onClose={onAddClose}
-            legislators={legislators}
-            setLegislators={setLegislators}
+          isOpen={isAddOpen}
+          onClose={onAddClose}
+          legislators={legislators}
+          setLegislators={setLegislators}
         />
         <LegislatorEditModal
           isOpen={isEditOpen}
@@ -163,6 +206,6 @@ const Legislator = () => {
       </Box>
     </Flex>
   )
-}
+};
 
-export default Legislator
+export default Legislator;

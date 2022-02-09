@@ -18,11 +18,12 @@ import adminEmails from "./api/auth/adminEmails";
 
 const Newspaper = () => {
   const { data: session } = useSession();
-  const [ isLoading,  setLoading ] = useState(true);
+  const [isLoading, setLoading] = useState(true);
   const [newspapers, setNewspapers] = useState([]);
   const [newspaperToEdit, setNewspaperToEdit] = useState();
-  const [ activeSort, setActiveSort ] = useState('');
-  const [ specialUsers, setSpecialUsers] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
+  const [activeSort, setActiveSort] = useState('');
+  const [specialUsers, setSpecialUsers] = useState([]);
 
   const debouncedActiveSort = useDebounce(activeSort, 200)
   const toggleActiveSort = (target) => {
@@ -40,7 +41,7 @@ const Newspaper = () => {
   useEffect(() => {
     const initPapers = async () => {
       setLoading(true)
-      const res = await axios.get(`/api/newspaper?order_by=${debouncedActiveSort}` );
+      const res = await axios.get(`/api/newspaper?order_by=${debouncedActiveSort}`);
       const data = await res.data;
       setNewspapers(data)
       let resSpecialUsers = await axios.get(`/api/specialUser`);
@@ -50,6 +51,33 @@ const Newspaper = () => {
     }
     initPapers()
   }, [debouncedActiveSort])
+
+  const fetchNewspapers = async () => {
+    const res = await axios.get(
+      `http://${process.env.NODE_ENV === "production"
+        ? process.env.NEXT_PUBLIC_VERCEL_URL
+        : "localhost:3000"
+      }/api/newspaper`
+    );
+    const data = await res.data;
+    return data
+  }
+
+  const searchNewspapers = async (event) => {
+    // Empty search input
+    if (!event.target.value) {
+      setSearchInput("");
+      const data = await fetchNewspapers();
+      setNewspapers(data);
+
+    } else {
+      setSearchInput(event.target.value);
+      const filteredNewspapers = newspapers.filter((newspaper) =>
+        newspaper.name.toLowerCase().includes(searchInput.toLowerCase())
+      );
+      setNewspapers(filteredNewspapers);
+    }
+  };
 
   const tableCols = useMemo(
     () => [
@@ -121,17 +149,18 @@ const Newspaper = () => {
     ],
     []
   );
-  
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
     onClose: onAddClose,
   } = useDisclosure();
+
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
     onClose: onEditClose,
   } = useDisclosure();
+
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: tableCols, data: newspapers }, useRowSelect);
 
@@ -146,21 +175,25 @@ const Newspaper = () => {
   }
 
   return (
-    <Flex direction="row"  height="100%">
+    <Flex direction="row" height="100%">
       <NavBar session={session} />
       <Box p={8} flex="1">
         <Flex direction="row" justifyContent="space-between">
           <Heading>Newspapers</Heading>
-          <IconButton
-            colorScheme="teal"
-            icon={<AddIcon />}
-            onClick={onAddOpen}
-          />
+          <Flex direction="row">
+            <SearchBar onChange={searchNewspapers} />
+            <IconButton
+              colorScheme="teal"
+              icon={<AddIcon />}
+              onClick={onAddOpen}
+              marginLeft={5}
+            />
+          </Flex>
         </Flex>
         <Table {...getTableProps()} size="md">
-          <TableHeader 
-            headerGroups={headerGroups} 
-            sort={activeSort} 
+          <TableHeader
+            headerGroups={headerGroups}
+            sort={activeSort}
             toggleSort={toggleActiveSort}
             disabledIndices={[8]}
           />
@@ -183,7 +216,7 @@ const Newspaper = () => {
             })}
           </Tbody>
         </Table>
-        {isLoading && <Loader /> }
+        {isLoading && <Loader />}
         <NewspaperAddModal
           isOpen={isAddOpen}
           onClose={onAddClose}
