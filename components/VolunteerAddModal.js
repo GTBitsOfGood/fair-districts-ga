@@ -1,5 +1,6 @@
 import {
     Box,
+    Checkbox,
     Modal,
     ModalOverlay,
     ModalContent,
@@ -141,14 +142,84 @@ import {
                                      <Field name="comments">
                                          {({ field, form}) => (
                                              <FormControl
-                                              isInvalid={form.errors.county && form.touched.county}
-                                              isRequired>
+                                              isInvalid={form.errors.comments && form.touched.comments}>
                                                   <FormLabel htmlFor="comments">Comments</FormLabel>
                                                   <Input {...field} id="comments" />
                                                   <FormErrorMessage>{form.errors.comments}</FormErrorMessage>
                                               </FormControl>
                                          )}
                                      </Field>
+                                     <Field name="submitter">
+                                         {({ field, form}) => (
+                                             <FormControl
+                                              isInvalid={form.errors.submitter && form.touched.submitter}>
+                                                  <FormLabel htmlFor="submitter">Submitter</FormLabel>
+                                                  <Checkbox />
+                                                  <FormErrorMessage>{form.errors.submitter}</FormErrorMessage>
+                                              </FormControl>
+                                         )}
+                                     </Field>
+                                     <Field name="writer">
+                                         {({ field, form}) => (
+                                             <FormControl
+                                              isInvalid={form.errors.writer && form.touched.writer}>
+                                                  <FormLabel htmlFor="writer">Writer</FormLabel>
+                                                  <Checkbox />
+                                                  <FormErrorMessage>{form.errors.writer}</FormErrorMessage>
+                                              </FormControl>
+                                         )}
+                                     </Field>
+                                     <Field name="tracker">
+                                         {({ field, form}) => (
+                                             <FormControl
+                                              isInvalid={form.errors.tracker && form.touched.tracker}>
+                                                  <FormLabel htmlFor="tracker">Tracker</FormLabel>
+                                                  <Checkbox />
+                                                  <FormErrorMessage>{form.errors.tracker}</FormErrorMessage>
+                                              </FormControl>
+                                         )}
+                                     </Field>
+                                     <FieldArray name="assignments">
+                                        {(arrayHelpers) => (
+                                            <>
+                                                <Flex direction="row">
+                                                    <FormLabel htmlFor="assignments">
+                                                    Assignments
+                                                    </FormLabel>
+                                                    <IconButton
+                                                        size="xs"
+                                                        icon={<AddIcon />}
+                                                        onClick={() => arrayHelpers.push("")}
+                                                    />
+                                                </Flex>
+                                            <Stack direction="column" spacing={2}>
+                                                {props.values.assignments.map((assignment, i) => (
+                                            <Field key={i} name={`assignments.${i}`}>
+                                            {({ field, form }) => (
+                                        <Flex
+                                                direction="row"
+                                                alignItems="center"
+                                            >
+                                            <Input
+                                                {...field}
+                                                id={`assignment-${i}`}
+                                            />
+                                            <IconButton
+                                                m={1}
+                                                size="xs"
+                                                icon={<MinusIcon />}
+                                                onClick={() =>
+                                                arrayHelpers.remove(i)
+                                                }
+                                            />
+                                        </Flex>
+                                        )}
+                                        </Field>
+                                        ))}
+                                    </Stack>
+                                    </>
+                                    )}
+                                    </FieldArray>
                                  </Stack>
                              </Form>
                          }}
@@ -158,20 +229,3 @@ import {
           </Modal>
       );
   };
-
-  /*
-    model Volunteer {
-        id String @id @default(cuid())
-        first_name String
-        last_name String
-        email String @unique
-        phone String?
-        county County @relation(fields: [countyId], references: [id])
-        countyId String
-        comments String?
-        submitter Boolean? @default(false)
-        writer Boolean? @default(false)
-        tracker Boolean? @default(false)
-        assignments Assignment[]
-      }
-    */

@@ -83,173 +83,87 @@ const Volunteer = () => {
             row: {
               values: { assignments },
             },
-          }) => <div>{assignments.map((a) => c.name).join(", ")}</div>,
+          }) => <div>{assignments.map((a) => a.name).join(", ")}</div>,
         },
       ],
       []
     );
 
-    /*
-    model Volunteer {
-        id String @id @default(cuid())
-        first_name String
-        last_name String
-        email String @unique
-        phone String?
-        county County @relation(fields: [countyId], references: [id])
-        countyId String
-        comments String?
-        submitter Boolean? @default(false)
-        writer Boolean? @default(false)
-        tracker Boolean? @default(false)
-        assignments Assignment[]
-      }
-    */
+      const [volunteers, setVolunteers] = useState(data);
+      const [volunteerToEdit, setVolunteerToEdit] = useState();
+      const {
+        isOpen: isAddOpen,
+        onOpen: onAddOpen,
+        onClose: onAddClose,
+      } = useDisclosure();
+      const {
+        isOpen: isEditOpen,
+        onOpen: onEditOpen,
+        onClose: onEditClose,
+      } = useDisclosure();
+      const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+        useTable({ columns: tableCols, data: volunteers }, useRowSelect);
+    
 
     return (
-        "Volunteer"
+        <Box p={8}>
+        <Flex direction="row" justifyContent="space-between">
+          <Heading>Volunteers</Heading>
+          <IconButton colorScheme="teal" icon={<AddIcon />} onClick={onAddOpen} />
+        </Flex>
+        <Table {...getTableProps()} variant="striped" size="md">
+          <Thead>
+            {headerGroups.map((headerGroup) => {
+              const { key, ...restHeaderGroupProps } =
+                headerGroup.getHeaderGroupProps();
+              return (
+                <Tr key={key} {...restHeaderGroupProps}>
+                  {headerGroup.headers.map((col) => {
+                    const { key, ...restColumn } = col.getHeaderProps();
+                    return (
+                      <Th key={key} {...restColumn}>
+                        {col.render("Header")}
+                      </Th>
+                    );
+                  })}
+                </Tr>
+              );
+            })}
+          </Thead>
+          <Tbody {...getTableProps()}>
+            {rows.map((row) => {
+              prepareRow(row);
+              const { key, ...restRowProps } = row.getRowProps();
+              return (
+                <Tr key={key} {...restRowProps}>
+                  {row.cells.map((cell) => {
+                    const { key, ...restCellProps } = cell.getCellProps();
+                    return (
+                      <Td key={key} {...restCellProps}>
+                        {cell.render("Cell")}
+                      </Td>
+                    );
+                  })}
+                </Tr>
+              );
+            })}
+          </Tbody>
+        </Table>
+        <VolunteerAddModal
+          isOpen={isAddOpen}
+          onClose={onAddClose}
+          volunteers={volunteers}
+          setVolunteers={setVolunteers}
+        />
+        <VolunteerEditModal
+          isOpen={isEditOpen}
+          onClose={onEditClose}
+          newspaperMeta={volunteerToEdit}
+          volunteers={volunteers}
+          setVolunteers={setVolunteers}
+        />
+      </Box>
     );
-}
-
-export default Volunteer;
-
-/*
-const Newspaper = ({ data }) => {
-  const tableCols = useMemo(
-    () => [
-      {
-        Header: "",
-        accessor: "edit",
-        Cell: ({ row }) => (
-          <IconButton
-            onClick={() => {
-              setNewspaperToEdit({
-                index: row.index,
-                newspaper: row.original,
-              });
-              onEditOpen();
-            }}
-            icon={<EditIcon />}
-            size="sm"
-            variant="outline"
-            colorScheme="black"
-          />
-        ),
-      },
-      {
-        Header: "Name",
-        accessor: "name",
-      },
-      {
-        Header: "Email",
-        accessor: "email",
-      },
-      {
-        Header: "Rating",
-        accessor: "rating",
-      },
-      {
-        Header: "Description",
-        accessor: "description",
-      },
-      {
-        Header: "Website",
-        accessor: "website",
-      },
-      {
-        Header: "Instagram",
-        accessor: "instagram",
-      },
-      {
-        Header: "Twitter",
-        accessor: "twitter",
-      },
-      {
-        Header: "Counties",
-        accessor: "counties",
-        Cell: ({
-          row: {
-            values: { counties },
-          },
-        }) => <div>{counties.map((c) => c.name).join(", ")}</div>,
-      },
-    ],
-    []
-  );
-  const [newspapers, setNewspapers] = useState(data);
-  const [newspaperToEdit, setNewspaperToEdit] = useState();
-  const {
-    isOpen: isAddOpen,
-    onOpen: onAddOpen,
-    onClose: onAddClose,
-  } = useDisclosure();
-  const {
-    isOpen: isEditOpen,
-    onOpen: onEditOpen,
-    onClose: onEditClose,
-  } = useDisclosure();
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns: tableCols, data: newspapers }, useRowSelect);
-
-  return (
-    <Box p={8}>
-      <Flex direction="row" justifyContent="space-between">
-        <Heading>Newspapers</Heading>
-        <IconButton colorScheme="teal" icon={<AddIcon />} onClick={onAddOpen} />
-      </Flex>
-      <Table {...getTableProps()} variant="striped" size="md">
-        <Thead>
-          {headerGroups.map((headerGroup) => {
-            const { key, ...restHeaderGroupProps } =
-              headerGroup.getHeaderGroupProps();
-            return (
-              <Tr key={key} {...restHeaderGroupProps}>
-                {headerGroup.headers.map((col) => {
-                  const { key, ...restColumn } = col.getHeaderProps();
-                  return (
-                    <Th key={key} {...restColumn}>
-                      {col.render("Header")}
-                    </Th>
-                  );
-                })}
-              </Tr>
-            );
-          })}
-        </Thead>
-        <Tbody {...getTableProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            const { key, ...restRowProps } = row.getRowProps();
-            return (
-              <Tr key={key} {...restRowProps}>
-                {row.cells.map((cell) => {
-                  const { key, ...restCellProps } = cell.getCellProps();
-                  return (
-                    <Td key={key} {...restCellProps}>
-                      {cell.render("Cell")}
-                    </Td>
-                  );
-                })}
-              </Tr>
-            );
-          })}
-        </Tbody>
-      </Table>
-      <NewspaperAddModal
-        isOpen={isAddOpen}
-        onClose={onAddClose}
-        newspapers={newspapers}
-        setNewspapers={setNewspapers}
-      />
-      <NewspaperEditModal
-        isOpen={isEditOpen}
-        onClose={onEditClose}
-        newspaperMeta={newspaperToEdit}
-        newspapers={newspapers}
-        setNewspapers={setNewspapers}
-      />
-    </Box>
-  );
 };
 
 export async function getServerSideProps() {
@@ -258,11 +172,10 @@ export async function getServerSideProps() {
       process.env.NODE_ENV === "production"
         ? process.env.NEXT_PUBLIC_VERCEL_URL
         : "localhost:3000"
-    }/api/newspaper`
+    }/api/volunteer`
   );
   const data = await res.data;
   return { props: { data } };
 }
 
-export default Newspaper;
-*/
+export default Volunteer;
