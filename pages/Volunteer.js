@@ -17,12 +17,12 @@ import {
   import VolunteerAddModal from "../components/VolunteerAddModal";
   import VolunteerEditModal from "../components/VolunteerEditModal";
   import { useTable, useRowSelect } from "react-table";
-
-const Volunteer = () => {
+  import { getSession, useSession } from "next-auth/react";
+  import NavBar from "../components/NavBar";
+   
+const Volunteer = ({data}) => {
     const {data: session} = useSession();
-    const {volunteers, setVolunteers} = userState([]);
-    const {volIndex, setVolIndex} = useState(0);
- 
+   
     const tableCols = useMemo(
       () => [
         {
@@ -104,78 +104,90 @@ const Volunteer = () => {
       const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
         useTable({ columns: tableCols, data: volunteers }, useRowSelect);
     
-
-    return (
-        <Box p={8}>
-        <Flex direction="row" justifyContent="space-between">
-          <Heading>Volunteers</Heading>
-          <IconButton colorScheme="teal" icon={<AddIcon />} onClick={onAddOpen} />
-        </Flex>
-        <Table {...getTableProps()} variant="striped" size="md">
-          <Thead>
-            {headerGroups.map((headerGroup) => {
-              const { key, ...restHeaderGroupProps } =
-                headerGroup.getHeaderGroupProps();
-              return (
-                <Tr key={key} {...restHeaderGroupProps}>
-                  {headerGroup.headers.map((col) => {
-                    const { key, ...restColumn } = col.getHeaderProps();
-                    return (
-                      <Th key={key} {...restColumn}>
-                        {col.render("Header")}
-                      </Th>
-                    );
-                  })}
-                </Tr>
-              );
-            })}
-          </Thead>
-          <Tbody {...getTableProps()}>
-            {rows.map((row) => {
-              prepareRow(row);
-              const { key, ...restRowProps } = row.getRowProps();
-              return (
-                <Tr key={key} {...restRowProps}>
-                  {row.cells.map((cell) => {
-                    const { key, ...restCellProps } = cell.getCellProps();
-                    return (
-                      <Td key={key} {...restCellProps}>
-                        {cell.render("Cell")}
-                      </Td>
-                    );
-                  })}
-                </Tr>
-              );
-            })}
-          </Tbody>
-        </Table>
-        <VolunteerAddModal
-          isOpen={isAddOpen}
-          onClose={onAddClose}
-          volunteers={volunteers}
-          setVolunteers={setVolunteers}
-        />
-        <VolunteerEditModal
-          isOpen={isEditOpen}
-          onClose={onEditClose}
-          newspaperMeta={volunteerToEdit}
-          volunteers={volunteers}
-          setVolunteers={setVolunteers}
-        />
-      </Box>
+      return (
+        <Flex direction="row">
+        <NavBar session={session} />
+        <Box p={8} flex="1">
+          <Flex direction="row" justifyContent="space-between">
+            <Heading>Volunteers</Heading>
+            <IconButton
+              colorScheme="teal"
+              icon={<AddIcon />}
+              onClick={onAddOpen}
+            />
+          </Flex>
+          <Table {...getTableProps()} variant="striped" size="md">
+            <Thead>
+              {headerGroups.map((headerGroup) => {
+                const { key, ...restHeaderGroupProps } =
+                  headerGroup.getHeaderGroupProps();
+                return (
+                  <Tr key={key} {...restHeaderGroupProps}>
+                    {headerGroup.headers.map((col) => {
+                      const { key, ...restColumn } = col.getHeaderProps();
+                      return (
+                        <Th key={key} {...restColumn}>
+                          {col.render("Header")}
+                        </Th>
+                      );
+                    })}
+                  </Tr>
+                );
+              })}
+            </Thead>
+            <Tbody {...getTableProps()}>
+              {rows.map((row) => {
+                prepareRow(row);
+                const { key, ...restRowProps } = row.getRowProps();
+                return (
+                  <Tr key={key} {...restRowProps}>
+                    {row.cells.map((cell) => {
+                      const { key, ...restCellProps } = cell.getCellProps();
+                      return (
+                        <Td key={key} {...restCellProps}>
+                          {cell.render("Cell")}
+                        </Td>
+                      );
+                    })}
+                  </Tr>
+                );
+              })}
+            </Tbody>
+          </Table>
+          <VolunteerAddModal
+            isOpen={isAddOpen}
+            onClose={onAddClose}
+            volunteers={volunteers}
+            setVolunteers={setVolunteers}
+          />
+          <VolunteerEditModal
+            isOpen={isEditOpen}
+            onClose={onEditClose}
+            volunteerMeta={volunteerToEdit}
+            volunteers={volunteers}
+            setVolunteers={setVolunteers}
+          />
+        </Box>
+      </Flex>
     );
-};
+  };
+  
 
-export async function getServerSideProps() {
-  const res = await axios.get(
-    `http://${
-      process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_VERCEL_URL
-        : "localhost:3000"
-    }/api/volunteer`
-  );
-  const data = await res.data;
-  return { props: { data } };
-}
+  export async function getServerSideProps(context) {
+    const res = await axios.get(
+      `http://${
+        process.env.NODE_ENV === "production"
+          ? process.env.NEXT_PUBLIC_VERCEL_URL
+          : "localhost:3000"
+      }/api/volunteer`
+    );
+    const data = await res.data;
+    return {
+      props: {
+        session: await getSession(context),
+        data,
+      },
+    };
+  }
 
 export default Volunteer;

@@ -5,11 +5,11 @@ async function handler(req, res) {
     getVolunteers(req, res);
   } else if (req.method === "POST") {
     if (req.body.type === "add") {
-      addVolunteer(req, res);
+      await addVolunteer(req, res);
     } else if (req.body.type === "edit") {
-      editVolunteer(req, res);
+      await editVolunteer(req, res);
     } else if (req.body.type === "delete") {
-      deleteVolunteer(req, res);
+      await deleteVolunteer(req, res);
     }
   }
 }
@@ -26,7 +26,7 @@ async function getVolunteers(req, res) {
 async function addVolunteer(req, res) {
   const { assignments, ...formData } = req.body.formData;
   try {
-    const vol = await prisma.newspaper.create({
+    const vol = await prisma.volunteer.create({
       data: {
         ...formData,
         assignments: {
@@ -62,7 +62,7 @@ async function editVolunteer(req, res) {
   const removedAssignments = originalAssignments.filter((x) => !assignments.includes(x));
 
   try {
-    const vol = await prisma.volunteer.update({
+    const volunteer = await prisma.volunteer.update({
       where: {
         id: id,
       },

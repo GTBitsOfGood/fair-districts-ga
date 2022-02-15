@@ -31,11 +31,23 @@ import {
       if (!value) {
           error = "Required field. Please provide a value."
       }
+      return error;
+  };
+
+  const validateEmail = (value) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let error;
+    if (!value) {
+      error = "Required field";
+    } else if (!re.test(value)) {
+      error = "Not a valid email";
+    }
+    return error;
   };
 
   const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
       return (
-          <Modal isOpen={isOpen} onClose={}>
+          <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Add a volunteer!</ModalHeader>
@@ -43,7 +55,6 @@ import {
                 <ModalBody>
                     <Formik
                       initialValues={{
-                          id: cuid(),
                           first_name: "",
                           last_name: "",
                           email: "",
@@ -56,7 +67,7 @@ import {
                           tracker: false, 
                           assignments: [""],
                       }}
-                      onsubmit = {async (values, actions) => {
+                      onSubmit = {async (values, actions) => {
                           const prunedVals = {...values};
                           prunedVals.assignments = prunedVals.assignments.filter((a) => a);
                           const res = await axios.post("/api/volunteer", {
@@ -95,7 +106,7 @@ import {
                                               </FormControl>
                                          )}
                                      </Field>
-                                     <Field name="email" validate={validateReq}>
+                                     <Field name="email" validate={validateEmail}>
                                          {({ field, form}) => (
                                              <FormControl
                                               isInvalid={form.errors.email && form.touched.email}
@@ -106,7 +117,7 @@ import {
                                               </FormControl>
                                          )}
                                      </Field>
-                                     <Field name="phone" validate={validateReq}>
+                                     <Field name="phone">
                                          {({ field, form}) => (
                                              <FormControl
                                               isInvalid={form.errors.phone && form.touched.phone}
@@ -117,7 +128,8 @@ import {
                                               </FormControl>
                                          )}
                                      </Field>
-                                     <Field name="county" validate={validateReq}>
+                                     /**
+                                      <Field name="county" validate={validateReq}>
                                          {({ field, form}) => (
                                              <FormControl
                                               isInvalid={form.errors.county && form.touched.county}
@@ -127,15 +139,16 @@ import {
                                                   <FormErrorMessage>{form.errors.county}</FormErrorMessage>
                                               </FormControl>
                                          )}
-                                     </Field>
-                                     <Field name="county" validate={validateReq}>
+                                     </Field> 
+                                     */
+                                     <Field name="countyId" validate={validateReq}>
                                          {({ field, form}) => (
                                              <FormControl
-                                              isInvalid={form.errors.county && form.touched.county}
+                                              isInvalid={form.errors.countyId && form.touched.countyId}
                                               isRequired>
-                                                  <FormLabel htmlFor="county">County</FormLabel>
-                                                  <Input {...field} id="county" />
-                                                  <FormErrorMessage>{form.errors.county}</FormErrorMessage>
+                                                  <FormLabel htmlFor="countyId">County ID</FormLabel>
+                                                  <Input {...field} id="countyId" />
+                                                  <FormErrorMessage>{form.errors.countyId}</FormErrorMessage>
                                               </FormControl>
                                          )}
                                      </Field>
@@ -179,7 +192,7 @@ import {
                                               </FormControl>
                                          )}
                                      </Field>
-                                     <FieldArray name="assignments">
+                                     <FieldArray name="assignments" validate={validateReq}>
                                         {(arrayHelpers) => (
                                             <>
                                                 <Flex direction="row">
@@ -229,3 +242,5 @@ import {
           </Modal>
       );
   };
+
+  export default VolunteerAddModal;
