@@ -12,19 +12,20 @@ import axios from "axios";
 
 const LegislatorDeleteDialog = ({
   alertOpen,
+  setAlertOpen,
   onClose,
   legislatorIndex,
   legislators,
   setLegislators,
-  
 }) => {
+  const onAlertClose = () => setAlertOpen(false);
   const cancelRef = useRef();
 
   return (
     <AlertDialog
       isOpen={alertOpen}
       leastDestructiveRef={cancelRef}
-      onClose={onClose}
+      onClose={onAlertClose}
     >
       <AlertDialogOverlay>
         <AlertDialogContent>
@@ -37,7 +38,7 @@ const LegislatorDeleteDialog = ({
           </AlertDialogBody>
 
           <AlertDialogFooter>
-            <Button ref={cancelRef} onClick={onClose}>
+            <Button ref={cancelRef} onClick={onAlertClose}>
               Cancel
             </Button>
             <Button
@@ -52,6 +53,7 @@ const LegislatorDeleteDialog = ({
                   const clonedLegislators = [...legislators];
                   clonedLegislators.splice(legislatorIndex, 1);
                   setLegislators(clonedLegislators);
+                  onAlertClose();
                   onClose();
                 }
               }}

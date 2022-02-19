@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Box,
   Modal,
@@ -20,6 +20,7 @@ import {
 import { Field, FieldArray, Form, Formik } from "formik";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import axios from "axios";
+import LegislatorDeleteDialog from "./LegislatorDeleteDialog";
 
 const validateReq = (value) => {
   let error = value ? undefined : "Required field";
@@ -33,6 +34,8 @@ const LegislatorEditModal = ({
   legislators,
   setLegislators,
 }) => {
+  const [alertOpen, setAlertOpen] = useState(false);
+
   const prunedLegislator = useMemo(() => {
     if (legislatorIndex >= legislators.length) return;
     const legislator = legislators[legislatorIndex];
@@ -46,6 +49,14 @@ const LegislatorEditModal = ({
     <>
       {prunedLegislator ? (
         <>
+          <LegislatorDeleteDialog
+            alertOpen={alertOpen}
+            setAlertOpen={setAlertOpen}
+            onClose={onClose}
+            legislatorIndex={legislatorIndex}
+            legislators={legislators}
+            setLegislators={setLegislators}
+          />
           <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
@@ -156,17 +167,22 @@ const LegislatorEditModal = ({
                       </Stack>
                       <Box mt={6} mb={4}>
                         <Divider color="gray.400" mb={4} />
-                        <Flex justifyContent="right">
+                        <Flex justifyContent="space-between">
+                          <Button
+                            colorScheme="red"
+                            onClick={() => {
+                              setAlertOpen(true);
+                            }}
+                          >
+                            Delete
+                          </Button>
                           <Box>
                             <Button
                               colorScheme="red"
                               variant="ghost"
                               mr={3}
-                              onClick={() => {
-                                onClose();
-                                props.resetForm();
-                                props.setFieldValue('counties', [...prunedLegislator.counties]);
-                              }}>
+                              onClick={onClose}
+                            >
                               Cancel
                             </Button>
                             <Button colorScheme="teal" type="submit">

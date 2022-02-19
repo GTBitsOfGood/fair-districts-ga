@@ -2,14 +2,14 @@ import prisma from "../../prisma/prisma";
 
 async function handler(req, res) {
   if (req.method === "GET") {
-    getLegislators(req, res);
+    await getLegislators(req, res);
   } else if (req.method === "POST") {
     if (req.body.type === "add") {
-      addLegislator(req, res);
+      await addLegislator(req, res);
     } else if (req.body.type === "edit") {
-      editLegislator(req, res);
+      await editLegislator(req, res);
     } else if (req.body.type === "delete") {
-      deleteLegislator(req, res);
+      await deleteLegislator(req, res);
     }
   }
 }
