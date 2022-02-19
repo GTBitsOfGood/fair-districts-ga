@@ -36,6 +36,7 @@ const CustomDateInput = forwardRef(
     />
   )
 );
+CustomDateInput.displayName = "CustomDateInput";
 
 const DatePickerField = ({ ...props }) => {
   const { setFieldValue } = useFormikContext();
@@ -136,6 +137,5 @@ const CampaignInfo = ({ setCurrentPage, campaignForm, setCampaignForm }) => {
     </>
   );
 };
-CampaignInfo.displayName = "CampaignInfo";
 
 export default CampaignInfo;
