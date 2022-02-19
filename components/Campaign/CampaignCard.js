@@ -26,7 +26,7 @@ const CampaignCard = () => {
         <Flex direction="column" justifyContent="space-between">
           <Text fontSize="xl">12/31/22 - 12/31/22</Text>
           <Center>
-            <Button variant="ghost" size="sm" color="#2D285C">
+            <Button variant="ghost" size="sm" colorScheme="brand">
               View Details
             </Button>
           </Center>
