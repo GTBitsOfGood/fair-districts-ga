@@ -136,5 +136,6 @@ const CampaignInfo = ({ setCurrentPage, campaignForm, setCampaignForm }) => {
     </>
   );
 };
+CampaignInfo.displayName = "CampaignInfo";
 
 export default CampaignInfo;
