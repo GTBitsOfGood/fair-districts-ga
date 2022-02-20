@@ -8,6 +8,7 @@ import axios from "axios";
 import LegislatorDeleteDialog from "../components/LegislatorDeleteDialog";
 import NavBar from "../components/NavBar";
 import { useSession } from "next-auth/react"
+import AccessDeniedPage from "../components/AccessDeniedPage";
 
 const Legislator = () => {
   const { data: session } = useSession();
@@ -95,7 +96,7 @@ const Legislator = () => {
   }, []);
 
   if (!session) {
-    return <p>Access Denied...</p>
+    return <AccessDeniedPage />
   }
 
   return (
