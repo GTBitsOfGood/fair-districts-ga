@@ -2,6 +2,7 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import React from 'react';
 import NavBar from '../components/NavBar';
+import Loader from '../components/Loader';
 
 const MainButton = (props) => {
   return (
@@ -14,7 +15,6 @@ const MainButton = (props) => {
 };
 
 const SignInOrOutButton = (props) => {
-  console.log(props);
   return (
     <button
       onClick={() => {
@@ -27,25 +27,56 @@ const SignInOrOutButton = (props) => {
   );
 };
 
+/*
+TODO:
+change navbar to go all the way across, remove admin menu
+design loading spinner -- something custom or with Chakra
+remove tailwindcss
+*/
+const MainPageMenu = ({ session }) => {
+  return (
+    <div className="flex flex-row">
+      <NavBar session={session} />
+      <div className="flex flex-col w-full">
+        <div className="flex flex-row items-center justify-end h-16 w-full">
+          <SignInOrOutButton signIn={signOut}>Sign Out</SignInOrOutButton>
+        </div>
+        <div className="flex flex-col items-center justify-center">
+          <MainButton href="/campaigns" message="Manage Campaigns" />
+          <MainButton href="/volunteers" message="Manage Volunteers" />
+          <MainButton href="/legislators" message="Manage Legislators" />
+          <MainButton href="/counties" message="Manage Counties" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Component() {
   const { data: session } = useSession();
 
+  const OtherComponent = React.lazy(() => MainPageMenu);
+
+  // function MyComponent() {
+  //   return (
+  //     // Displays <Spinner> until OtherComponent loads
+  //     <React.Suspense fallback={<Spinner />}>
+  //       <div>
+  //         <OtherComponent />
+  //       </div>
+  //     </React.Suspense>
+  //   );
+  // }
+  if (session === undefined) {
+    return <Loader />;
+  }
   if (session) {
     return (
-      <div className="flex flex-row">
-        <NavBar session={session} />
-        <div className="flex flex-col w-full">
-          <div className="flex flex-row items-center justify-end h-16 w-full">
-            <SignInOrOutButton signIn={signOut}>Sign Out</SignInOrOutButton>
-          </div>
-          <div className="flex flex-col items-center justify-center">
-            <MainButton href="/campaigns" message="Manage Campaigns" />
-            <MainButton href="/volunteers" message="Manage Volunteers" />
-            <MainButton href="/legislators" message="Manage Legislators" />
-            <MainButton href="/counties" message="Manage Counties" />
-          </div>
+      <React.Suspense fallback={<Loader />}>
+        <div>
+          <MainPageMenu session={session} />
         </div>
-      </div>
+      </React.Suspense>
     );
   }
   return (
