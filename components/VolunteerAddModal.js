@@ -16,7 +16,6 @@ import {
     IconButton,
     Divider,
     Checkbox, 
-    CheckboxGroup
   } from "@chakra-ui/react";
   import { Field, FieldArray, Form, Formik } from "formik";
   import { AddIcon, MinusIcon } from "@chakra-ui/icons";
@@ -53,9 +52,9 @@ import {
       if (res.status === 200) {
         console.log(newVolunteer)
         console.log(volunteers)
-        setVolunteers([volunteers]);
-        // onClose();
+        setVolunteers([...volunteers, newVolunteer]);
         actions.resetForm();
+        onClose();
       } else {
         actions.setErrors({api: 'There was an error when adding to the database.'});
       }
@@ -74,7 +73,7 @@ import {
                 last_name: "",
                 email: "",
                 phone: "",
-                county: "",
+                county: undefined,
                 comments: "",
                 submitter: false,
                 writer: false,

@@ -22,6 +22,7 @@ import {
   IconButton,
   Divider,
   Text,
+  Checkbox,
 } from "@chakra-ui/react";
 import { Field, FieldArray, Form, Formik } from "formik";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";

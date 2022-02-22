@@ -18,7 +18,6 @@ async function getVolunteers(req, res) {
   const allVolunteers = await prisma.volunteer.findMany({
     include: {
       assignments: true,
-      county: true,
     },
   });
   res.status(200).json(allVolunteers);
