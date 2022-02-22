@@ -33,7 +33,7 @@ const Volunteer = ({data}) => {
               onClick={() => {
                 setVolunteerToEdit({
                   index: row.index,
-                  newspaper: row.original,
+                  volunteer: row.original,
                 });
                 onEditOpen();
               }}
