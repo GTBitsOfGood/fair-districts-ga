@@ -261,6 +261,32 @@ const VolunteerEditModal = ({
                         )}
                         </FieldArray>
                      </Stack>
+                     <Box mt={6} mb={4}>
+                        <Divider color="gray.400" mb={4} />
+                        <Flex justifyContent="space-between">
+                          <Button
+                            colorScheme="red"
+                            onClick={() => {
+                              setAlertOpen(true);
+                            }}
+                          >
+                            Delete
+                          </Button>
+                          <Box>
+                            <Button
+                              colorScheme="red"
+                              variant="ghost"
+                              mr={3}
+                              onClick={onClose}
+                            >
+                              Cancel
+                            </Button>
+                            <Button colorScheme="teal" type="submit">
+                              Save
+                            </Button>
+                          </Box>
+                        </Flex>
+                      </Box>
                  </Form>
                   )}
                 </Formik>
