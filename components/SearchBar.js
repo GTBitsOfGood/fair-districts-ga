@@ -10,10 +10,9 @@ import { FiSearch } from "react-icons/fi";
 const SearchBar = ({ onChange }) => {
     return (
         <InputGroup width={346}>
-            <InputLeftElement
-                pointerEvents="none"
-                children={<FiSearch />}
-            />
+            <InputLeftElement pointerEvents="none">
+                <FiSearch />
+            </InputLeftElement>
             <Input
                 onChange={onChange}
                 placeholder="Search"

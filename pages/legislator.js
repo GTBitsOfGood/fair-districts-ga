@@ -6,6 +6,7 @@ import LegislatorAddModal from "../components/LegislatorAddModal";
 import LegislatorEditModal from "../components/LegislatorEditModal";
 import axios from "axios";
 import NavBar from "../components/NavBar";
+import SearchBar from "../components/SearchBar";
 import { getSession, useSession } from "next-auth/react"
 import AccessDeniedPage from "../components/AccessDeniedPage";
 import Loader from '../components/Loader';

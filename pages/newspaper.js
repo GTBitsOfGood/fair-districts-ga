@@ -10,6 +10,7 @@ import AccessDeniedPage from "../components/AccessDeniedPage";
 import useDebounce from "../components/hooks/useDebounce";
 import Loader from '../components/Loader';
 import NavBar from "../components/NavBar";
+import SearchBar from "../components/SearchBar";
 import NewspaperAddModal from "../components/NewspaperAddModal";
 import NewspaperEditModal from "../components/NewspaperEditModal";
 import TableHeader from "../components/TableHeader";
