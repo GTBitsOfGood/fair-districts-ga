@@ -18,13 +18,14 @@ async function getVolunteers(req, res) {
   const allVolunteers = await prisma.volunteer.findMany({
     include: {
       assignments: true,
+      county: true,
     },
   });
   res.status(200).json(allVolunteers);
 }
 
 async function addVolunteer(req, res) {
-  const {county, ...formData } = req.body.formData;
+  const { county, ...formData } = req.body.formData;
   try {
     const vol = await prisma.volunteer.create({
       data: {
@@ -33,17 +34,18 @@ async function addVolunteer(req, res) {
           create: [],
         },
         county: {
-          connectOrCreate: ({
+          connectOrCreate: {
             where: {
               name: county,
             },
             create: {
               name: county,
             },
-          }),
+          },
         },
       },
       include: {
+        assignments: true,
         county: true,
       },
     });
@@ -59,7 +61,9 @@ async function editVolunteer(req, res) {
   const { assignments } = formData;
 
   const originalAssignments = original.assignments.map((a) => a.name);
-  const removedAssignments = originalAssignments.filter((x) => !assignments.includes(x));
+  const removedAssignments = originalAssignments.filter(
+    (x) => !assignments.includes(x)
+  );
 
   try {
     const volunteer = await prisma.volunteer.update({
