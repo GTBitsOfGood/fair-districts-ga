@@ -118,5 +118,5 @@ model Legislator {
   firstName String
   lastName  String
   counties  County[]
-  party     Boolean?
+  party     String?
 }
