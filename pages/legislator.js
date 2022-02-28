@@ -8,11 +8,14 @@ import axios from "axios";
 import NavBar from "../components/NavBar";
 import { useSession } from "next-auth/react"
 import AccessDeniedPage from "../components/AccessDeniedPage";
+import Loader from '../components/Loader';
 
 const Legislator = () => {
   const { data: session } = useSession();
   const [ legislators, setLegislators ] = useState([]);
   const [ legislatorIndex, setLegislatorIndex ] = useState(0);
+  const [ isLoading,  setLoading ] = useState(true);
+
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
@@ -76,12 +79,29 @@ const Legislator = () => {
       const legislators = res.data;
       legislators.forEach((legislator) => legislator.counties = legislator.counties.map((county) => county.name).join(", "));
       setLegislators(legislators);
+      setTimeout(() => {
+        setLoading(false);
+      }, 100)
+
     }
     initLegislators();
   }, []);
 
   if (!session) {
     return <AccessDeniedPage />
+  }
+
+  if (isLoading) {
+    return (
+      <Flex direction="row">
+        <NavBar session={session}/>
+        <Box p={8} flex="1">
+        <Center h='80%'>
+          <Loader/>
+        </Center>
+        </Box>
+      </Flex>
+    );
   }
 
   return (

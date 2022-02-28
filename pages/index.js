@@ -20,7 +20,7 @@ const SignInOrOutButton = (props) => {
       onClick={() => {
         props.signIn();
       }}
-      className="bg-blue-900 rounded-full py-2 px-4 m-8 text-white hover:bg-white hover:text-blue-900 hover:border-2 hover:border-blue-900"
+      className="bg-blue-900 rounded-full py-2 px-4 m-8 text-white hover:bg-black hover:text-blue-900 hover:border-blue-900"
     >
       {props.children}
     </button>

@@ -4,7 +4,6 @@ const Loader = () => {
   return (
     <Center>
       <Stack mt="200px" align="center">
-        <Text fontSize="2xl">Loading...</Text>
         <Spinner
           size="xl"
           thickness="4px"
