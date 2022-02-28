@@ -19,6 +19,8 @@ import { useTable, useRowSelect } from "react-table";
 import NewspaperEditModal from "../components/NewspaperEditModal";
 import { getSession, useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
+import AccessDeniedPage from "../components/AccessDeniedPage";
+
 
 const Newspaper = ({ data }) => {
   const { data: session } = useSession();
@@ -109,7 +111,7 @@ const Newspaper = ({ data }) => {
     useTable({ columns: tableCols, data: newspapers }, useRowSelect);
 
   if (!session) {
-    return <p>Access Denied...</p>;
+    return <AccessDeniedPage />
   }
 
   return (
