@@ -42,10 +42,10 @@ const MainPageMenu = ({ session }) => {
           <SignInOrOutButton signIn={signOut}>Sign Out</SignInOrOutButton>
         </div>
         <div className="flex flex-col items-center justify-center">
-          <MainButton href="/campaigns" message="Manage Campaigns" />
-          <MainButton href="/volunteers" message="Manage Volunteers" />
-          <MainButton href="/legislators" message="Manage Legislators" />
-          <MainButton href="/counties" message="Manage Counties" />
+          <MainButton href="/campaign" message="Manage Campaigns" />
+          <MainButton href="/volunteer" message="Manage Volunteers" />
+          <MainButton href="/newspaper" message="Manage Newspapers" />
+          <MainButton href="/legislator" message="Manage Legislators" />
         </div>
       </div>
     </div>
