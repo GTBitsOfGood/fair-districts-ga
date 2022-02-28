@@ -74,7 +74,7 @@ const VolunteerEditModal = ({
           <VolunteerAlertDialog
             alertOpen={alertOpen}
             setAlertOpen={setAlertOpen}
-            newspaperId={volunteer.id}
+            volunteerId={volunteer.id}
             index={index}
             volunteers={volunteers}
             setVolunteers={setVolunteers}
@@ -93,7 +93,7 @@ const VolunteerEditModal = ({
                     prunedVals.assignments = prunedVals.assignments.filter((a) => a);
                     const res = await axios.post("/api/volunteer", {
                       type: "edit",
-                      id: volunteer.id,
+                      id: volunteerId,
                       formData: prunedVals,
                       original: volunteer,
                     });
@@ -167,18 +167,6 @@ const VolunteerEditModal = ({
                                   </FormControl>
                              )}
                          </Field> 
-                         */
-                         <Field name="countyId" validate={validateReq}>
-                             {({ field, form}) => (
-                                 <FormControl
-                                  isInvalid={form.errors.countyId && form.touched.countyId}
-                                  isRequired>
-                                      <FormLabel htmlFor="countyId">County ID</FormLabel>
-                                      <Input {...field} id="countyId" />
-                                      <FormErrorMessage>{form.errors.countyId}</FormErrorMessage>
-                                  </FormControl>
-                             )}
-                         </Field>
                          <Field name="comments">
                              {({ field, form}) => (
                                  <FormControl

@@ -93,6 +93,7 @@ async function editVolunteer(req, res) {
 
 async function deleteVolunteer(req, res) {
   const { id } = req.body;
+  console.log(id)
   try {
     const deletedVolunteer = await prisma.volunteer.delete({
       where: {

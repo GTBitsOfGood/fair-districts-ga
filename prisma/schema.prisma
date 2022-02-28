@@ -53,10 +53,10 @@ model VerificationToken {
 }
 
 model Volunteer {
-  id          String       @id @default(cuid())
+  id          String       @id @unique @default(cuid())
   first_name  String
   last_name   String
-  email       String       @unique
+  email       String       
   phone       String?
   county      County       @relation(fields: [countyId], references: [id])
   countyId    String
