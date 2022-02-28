@@ -1,15 +1,15 @@
-import React from "react";
-import { signIn, signOut } from "next-auth/react";
-import { Box, Button, Divider, Image, Stack } from "@chakra-ui/react";
+import React from 'react';
+import { signIn, signOut } from 'next-auth/react';
+import { Box, Button, Divider, Image, Stack } from '@chakra-ui/react';
 import {
   MdOutlineCampaign,
   MdOutlinePeople,
   MdOutlinePerson,
-} from "react-icons/md";
-import { FiHome, FiLogIn, FiLogOut } from "react-icons/fi";
-import { BsNewspaper } from "react-icons/bs";
-import { VscLaw } from "react-icons/vsc";
-import Link from "next/link";
+} from 'react-icons/md';
+import { FiHome, FiLogIn, FiLogOut } from 'react-icons/fi';
+import { BsNewspaper } from 'react-icons/bs';
+import { VscLaw } from 'react-icons/vsc';
+import Link from 'next/link';
 
 const NavBar = ({ session }) => {
   return (

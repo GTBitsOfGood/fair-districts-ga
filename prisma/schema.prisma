@@ -108,7 +108,7 @@ model County {
 
 model Campaign {
   id          String       @id @default(cuid())
-  name        String       
+  name        String
   description String?      @db.VarChar(300)
   assignments Assignment[]
 }
