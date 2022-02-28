@@ -43,6 +43,17 @@ const validateEmail = (value) => {
 
 const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
   const handleAddSubmit = async (values, actions) => {
+    console.log(values);
+    if(document.getElementById("submitter").checked) {
+      values["submitter"] = true
+    }
+    if(document.getElementById("writer").checked) {
+      values["writer"] = true
+    }
+    if(document.getElementById("tracker").checked) {
+      values["tracker"] = true
+    }
+    console.log(values);
     const res = await axios.post("/api/volunteer", {
       type: "add",
       formData: values,
@@ -190,7 +201,7 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
                   <Field name="writer">
                     {({ field, form }) => (
                       <FormControl>
-                        <Checkbox size="md" id="submitter" colorScheme="gray">
+                        <Checkbox size="md" id="writer" colorScheme="gray">
                           Writer
                         </Checkbox>
                         <FormErrorMessage>
@@ -202,7 +213,7 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
                   <Field name="tracker">
                     {({ field, form }) => (
                       <FormControl>
-                        <Checkbox size="md" id="submitter" colorScheme="blue">
+                        <Checkbox size="md" id="tracker" colorScheme="blue">
                           Tracker
                         </Checkbox>
                         <FormErrorMessage>

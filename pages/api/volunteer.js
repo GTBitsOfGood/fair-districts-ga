@@ -57,14 +57,10 @@ async function addVolunteer(req, res) {
 }
 
 async function editVolunteer(req, res) {
-  const { id, formData, original } = req.body;
-  const { assignments } = formData;
-
-  const originalAssignments = original.assignments.map((a) => a.name);
-  const removedAssignments = originalAssignments.filter(
-    (x) => !assignments.includes(x)
-  );
-
+  const { id, original } = req.body;
+  const {first_name, last_name, email, phone, comments, submitter, writer, tracker, county, formData} = req.body.formData;
+  const {assignments} = original.assignments;
+  console.log(submitter, writer, tracker)
   try {
     const volunteer = await prisma.volunteer.update({
       where: {
@@ -72,20 +68,29 @@ async function editVolunteer(req, res) {
       },
       data: {
         ...formData,
-        assignments: {
-          disconnect: removedAssignments.map((a) => ({ name: a })),
-          connectOrCreate: assignments.map((assignment) => ({
+        first_name: first_name,
+        last_name: last_name,
+        email: email,
+        phone: phone,
+        comments: comments,
+        submitter: submitter, 
+        writer: writer,
+        tracker: tracker,
+        assignments: assignments,
+        county: {
+          connectOrCreate: {
             where: {
-              name: assignment,
+              name: county,
             },
             create: {
-              name: assignment,
+              name: county,
             },
-          })),
+          },
         },
       },
       include: {
         assignments: true,
+        county: true,
       },
     });
     res.status(200).json(volunteer);

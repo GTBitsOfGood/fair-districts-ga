@@ -76,10 +76,29 @@ const Volunteer = ({ data }) => {
       {
         Header: "Submitter",
         accessor: "submitter",
+        Cell: ({
+          row: {
+            values: { submitter },
+          },
+        }) => <div>{submitter ? "Yes": ""}</div>,
       },
       {
         Header: "Writer",
         accessor: "writer",
+        Cell: ({
+          row: {
+            values: { writer },
+          },
+        }) => <div>{writer ? "Yes": ""}</div>,
+      },
+      {
+        Header: "Tracker",
+        accessor: "tracker",
+        Cell: ({
+          row: {
+            values: { tracker },
+          },
+        }) => <div>{tracker ? "Yes": ""}</div>,
       },
       {
         Header: "Assignments",

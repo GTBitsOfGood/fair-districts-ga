@@ -56,12 +56,11 @@ const VolunteerEditModal = ({
   setVolunteers,
 }) => {
   const [alertOpen, setAlertOpen] = useState(false);
-
   const prunedVolunteer = useMemo(() => {
     if (volunteerMeta === undefined) return;
     return {
       ...volunteerMeta.volunteer,
-      assignments: volunteerMeta.volunteer.assignments.map((a) => a.name),
+      county: volunteerMeta.volunteer.county.name,
     };
   }, [volunteerMeta]);
 
@@ -83,17 +82,31 @@ const VolunteerEditModal = ({
           <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
-              <ModalHeader>{`Edit ${prunedVolunteer.name}`}</ModalHeader>
+              <ModalHeader>{`Edit ${prunedVolunteer.first_name} ${prunedVolunteer.last_name}`}</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
                 <Formik
                   initialValues={prunedVolunteer}
                   onSubmit={async (values, actions) => {
+                    if(document.getElementById("submitter").checked) {
+                      values.submitter = true
+                    } else {
+                      values.submitter = false
+                    }
+                    if(document.getElementById("writer").checked) {
+                      values.writer = true
+                    } else {
+                      values.writer = false
+                    }
+                    if(document.getElementById("tracker").checked) {
+                      values.tracker = true
+                    } else {
+                      values.tracker = false
+                    }
                     const prunedVals = { ...values };
-                    prunedVals.assignments = prunedVals.assignments.filter((a) => a);
                     const res = await axios.post("/api/volunteer", {
                       type: "edit",
-                      id: volunteerId,
+                      id: volunteer.id,
                       formData: prunedVals,
                       original: volunteer,
                     });
@@ -182,7 +195,7 @@ const VolunteerEditModal = ({
                                  <FormControl
                                   isInvalid={form.errors.submitter && form.touched.submitter}>
                                       <FormLabel htmlFor="submitter">Submitter</FormLabel>
-                                      <Checkbox />
+                                      <Checkbox id="submitter"/>
                                       <FormErrorMessage>{form.errors.submitter}</FormErrorMessage>
                                   </FormControl>
                              )}
@@ -192,7 +205,7 @@ const VolunteerEditModal = ({
                                  <FormControl
                                   isInvalid={form.errors.writer && form.touched.writer}>
                                       <FormLabel htmlFor="writer">Writer</FormLabel>
-                                      <Checkbox />
+                                      <Checkbox id="writer"/>
                                       <FormErrorMessage>{form.errors.writer}</FormErrorMessage>
                                   </FormControl>
                              )}
@@ -202,52 +215,11 @@ const VolunteerEditModal = ({
                                  <FormControl
                                   isInvalid={form.errors.tracker && form.touched.tracker}>
                                       <FormLabel htmlFor="tracker">Tracker</FormLabel>
-                                      <Checkbox />
+                                      <Checkbox id="tracker"/>
                                       <FormErrorMessage>{form.errors.tracker}</FormErrorMessage>
                                   </FormControl>
                              )}
                          </Field>
-                         <FieldArray name="assignments" validate={validateReq}>
-                            {(arrayHelpers) => (
-                                <>
-                                    <Flex direction="row">
-                                        <FormLabel htmlFor="assignments">
-                                        Assignments
-                                        </FormLabel>
-                                        <IconButton
-                                            size="xs"
-                                            icon={<AddIcon />}
-                                            onClick={() => arrayHelpers.push("")}
-                                        />
-                                    </Flex>
-                                <Stack direction="column" spacing={2}>
-                                    {props.values.assignments.map((assignment, i) => (
-                                <Field key={i} name={`assignments.${i}`}>
-                                {({ field, form }) => (
-                            <Flex
-                                    direction="row"
-                                    alignItems="center"
-                                >
-                                <Input
-                                    {...field}
-                                    id={`assignment-${i}`}
-                                />
-                                <IconButton
-                                    m={1}
-                                    size="xs"
-                                    icon={<MinusIcon />}
-                                    onClick={() =>
-                                    arrayHelpers.remove(i)
-                                    }
-                                />
-                            </Flex>
-                            )}
-                            </Field>
-                            ))}
-                        </Stack>
-                        </>
-                        )}
-                        </FieldArray>
                      </Stack>
                      <Box mt={6} mb={4}>
                         <Divider color="gray.400" mb={4} />
