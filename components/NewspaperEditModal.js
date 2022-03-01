@@ -28,6 +28,7 @@ import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import NewspaperAlertDialog from "./NewspaperAlertDialog";
 
+
 const validateName = (value) => {
   let error;
   if (!value) {
@@ -61,6 +62,7 @@ const NewspaperEditModal = ({
     return {
       ...newspaperMeta.newspaper,
       counties: newspaperMeta.newspaper.counties.map((c) => c.name),
+      newspaperGroups: newspaperMeta.newspaper.newspaperGroups.map((g) => g.name),
     };
   }, [newspaperMeta]);
 
@@ -90,6 +92,7 @@ const NewspaperEditModal = ({
                   onSubmit={async (values, actions) => {
                     const prunedVals = { ...values };
                     prunedVals.counties = prunedVals.counties.filter((e) => e);
+                    prunedVals.newspaperGroups = prunedVals.newspaperGroups.filter((e) => e);
                     prunedVals.rating = parseInt(prunedVals.rating);
                     const res = await axios.post("/api/newspaper", {
                       type: "edit",
@@ -244,6 +247,49 @@ const NewspaperEditModal = ({
                                           <Input
                                             {...field}
                                             id={`county-${i}`}
+                                          />
+                                          <IconButton
+                                            m={1}
+                                            size="xs"
+                                            icon={<MinusIcon />}
+                                            onClick={() =>
+                                              arrayHelpers.remove(i)
+                                            }
+                                          />
+                                        </Flex>
+                                      )}
+                                    </Field>
+                                  ))}
+                                </Stack>
+                              </>
+                            )}
+                          </FieldArray>
+                        </Box>
+                        <Box>
+                        <FieldArray name="newspaperGroups">
+                            {(arrayHelpers) => (
+                              <>
+                                <Flex direction="row">
+                                  <FormLabel htmlFor="newspaperGroups">
+                                    Groups
+                                  </FormLabel>
+                                  <IconButton
+                                    size="xs"
+                                    icon={<AddIcon />}
+                                    onClick={() => arrayHelpers.push("")}
+                                  />
+                                </Flex>
+                                <Stack direction="column" spacing={2}>
+                                  {props.values.newspaperGroups.map((group, i) => (
+                                    <Field key={i} name={`newspaperGroups.${i}`}>
+                                      {({ field, form }) => (
+                                        <Flex
+                                          direction="row"
+                                          alignItems="center"
+                                        >
+                                          <Input
+                                            {...field}
+                                            id={`newspaperGroup-${i}`}
                                           />
                                           <IconButton
                                             m={1}

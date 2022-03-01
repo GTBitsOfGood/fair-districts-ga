@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
 import Router from "next/router";
-
 import {
   Box,
   Table,
@@ -12,19 +11,18 @@ import {
   Heading,
   Flex,
   IconButton,
-  useDisclosure,
-  Center
+  useDisclosure
 } from "@chakra-ui/react";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
-import NewspaperAddModal from "../components/NewspaperAddModal";
 import axios from "axios";
 import { useTable, useRowSelect } from "react-table";
-import NewspaperEditModal from "../components/NewspaperEditModal";
 import { getSession, useSession } from "next-auth/react";
-import NavBar from "../components/NavBar";
+
 import AccessDeniedPage from "../components/AccessDeniedPage";
 import Loader from '../components/Loader';
-
+import NavBar from "../components/NavBar";
+import NewspaperAddModal from "../components/NewspaperAddModal";
+import NewspaperEditModal from "../components/NewspaperEditModal";
 
 
 const Newspaper = ({ data }) => {
@@ -106,6 +104,15 @@ const Newspaper = ({ data }) => {
             values: { counties },
           },
         }) => <div>{counties.map((c) => c.name).join(", ")}</div>,
+      },
+      {
+        Header: "Groups",
+        accessor: "newspaperGroups",
+        Cell: ({
+          row: {
+            values: { newspaperGroups },
+          },
+        }) => <div>{newspaperGroups.map((g) => g.name).join(", ")}</div>
       },
     ],
     []

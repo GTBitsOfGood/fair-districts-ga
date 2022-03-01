@@ -18,13 +18,14 @@ async function getNewspapers(req, res) {
   const allNewspapers = await prisma.newspaper.findMany({
     include: {
       counties: true,
+      newspaperGroups: true
     },
   });
   res.status(200).json(allNewspapers);
 }
 
 async function addNewspaper(req, res) {
-  const { counties, ...formData } = req.body.formData;
+  const { counties, newspaperGroups, ...formData } = req.body.formData;
   try {
     const newspaper = await prisma.newspaper.create({
       data: {
@@ -42,9 +43,20 @@ async function addNewspaper(req, res) {
             },
           })),
         },
+        newspaperGroups: {
+          connectOrCreate: newspaperGroups.map((group) => ({
+            where: {
+              name: group,
+            },
+            create: {
+              name: group,
+            },
+          })),
+        }
       },
       include: {
         counties: true,
+        newspaperGroups: true
       },
     });
     res.status(200).json(newspaper);
@@ -56,10 +68,13 @@ async function addNewspaper(req, res) {
 
 async function editNewspaper(req, res) {
   const { id, formData, original } = req.body;
-  const { counties } = formData;
+  const { counties, newspaperGroups } = formData;
 
   const originalCounties = original.counties.map((c) => c.name);
   const removedCounties = originalCounties.filter((x) => !counties.includes(x));
+
+  const originalGroups = original.newspaperGroups.map((g) => g.name);
+  const removedGroups = originalGroups.filter((x) => !newspaperGroups.includes(x));
 
   try {
     const newspaper = await prisma.newspaper.update({
@@ -79,9 +94,21 @@ async function editNewspaper(req, res) {
             },
           })),
         },
+        newspaperGroups: {
+          disconnect: removedGroups.map((g) => ({ name: g })),
+          connectOrCreate: newspaperGroups.map((group) => ({
+            where: {
+              name: group,
+            },
+            create: {
+              name: group,
+            },
+          })),
+        }
       },
       include: {
         counties: true,
+        newspaperGroups: true
       },
     });
     res.status(200).json(newspaper);

@@ -86,16 +86,23 @@ model Assignment {
 }
 
 model Newspaper {
-  id          String       @id @default(cuid())
-  name        String       @unique
-  email       String?
-  rating      Int?
-  description String?
-  website     String?
-  instagram   String?
-  twitter     String?
-  assignments Assignment[]
-  counties    County[]
+  id             String           @id @default(cuid())
+  name           String           @unique
+  email          String?
+  rating         Int?
+  description    String?
+  website        String?
+  instagram      String?
+  twitter        String?
+  assignments    Assignment[]
+  counties       County[]
+  newspaperGroups NewspaperGroup[]
+}
+
+model NewspaperGroup {
+  id         String      @id @default(cuid())
+  name       String      @unique
+  newspapers Newspaper[]
 }
 
 model County {
