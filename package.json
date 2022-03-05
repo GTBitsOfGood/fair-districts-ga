@@ -41,5 +41,8 @@
     "jest": "^27.4.7",
     "prisma": "^3.9.1",
     "vercel": "^23.1.2"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }
