@@ -33,13 +33,8 @@ async function addNewspaper(req, res) {
           create: [],
         },
         counties: {
-          connectOrCreate: counties.map((county) => ({
-            where: {
-              name: county,
-            },
-            create: {
-              name: county,
-            },
+          connect: counties.map((county) => ({
+            name: county,
           })),
         },
       },
@@ -70,13 +65,8 @@ async function editNewspaper(req, res) {
         ...formData,
         counties: {
           disconnect: removedCounties.map((c) => ({ name: c })),
-          connectOrCreate: counties.map((county) => ({
-            where: {
-              name: county,
-            },
-            create: {
-              name: county,
-            },
+          connect: counties.map((county) => ({
+            name: county,
           })),
         },
       },
