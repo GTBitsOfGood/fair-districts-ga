@@ -30,13 +30,8 @@ async function addLegislator(req, res) {
       data: {
         ...formData,
         counties: {
-          connectOrCreate: counties.map((county) => ({
-            where: {
-              name: county,
-            },
-            create: {
-              name: county,
-            },
+          connect: counties.map((county) => ({
+            name: county,
           })),
         },
       },
@@ -56,7 +51,9 @@ async function addLegislator(req, res) {
 async function editLegislator(req, res) {
   const { id, formData, original } = req.body;
   const { counties } = formData;
-  const removedCounties = original.counties.filter((x) => !counties.includes(x));
+
+  const originalCounties = original.counties.map((c) => c.name);
+  const removedCounties = originalCounties.filter((x) => !counties.includes(x));
 
   try {
     const legislator = await prisma.legislator.update({
@@ -67,13 +64,8 @@ async function editLegislator(req, res) {
         ...formData,
         counties: {
           disconnect: removedCounties.map((c) => ({ name: c })),
-          connectOrCreate: counties.map((county) => ({
-            where: {
-              name: county,
-            },
-            create: {
-              name: county,
-            },
+          connect: counties.map((county) => ({
+            name: county,
           })),
         },
       },

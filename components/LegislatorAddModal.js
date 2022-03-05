@@ -16,9 +16,10 @@ import {
   IconButton,
   Divider,
 } from "@chakra-ui/react";
-import { Field, FieldArray, Form, Formik } from "formik";
-import { AddIcon, MinusIcon } from "@chakra-ui/icons";
+import { Field, Form, Formik } from "formik";
 import axios from "axios";
+import { Select } from "chakra-react-select";
+import { georgiaCounties } from "../utils/consts";
 
 const validateReq = (value) => {
   let error;
@@ -35,21 +36,15 @@ const LegislatorAddModal = ({
   setLegislators,
 }) => {
   const handleAddSubmit = async (values, actions) => {
-    const prunedVals = { ...values };
-    prunedVals.counties = prunedVals.counties.filter((e) => e);
-
     const res = await axios.post("/api/legislator", {
       type: "add",
-      formData: prunedVals,
+      formData: values,
     });
     const newLegislator = res.data;
 
     if (res.status === 200) {
-      newLegislator.counties = newLegislator.counties
-        .map((county) => county.name)
-        .join(", ");
       setLegislators([...legislators, newLegislator]);
-      // onClose();
+      onClose();
       actions.resetForm();
     } else {
       actions.setErrors({
@@ -70,7 +65,7 @@ const LegislatorAddModal = ({
               firstName: "",
               lastName: "",
               party: "",
-              counties: [""],
+              counties: [],
             }}
             onSubmit={handleAddSubmit}
           >
@@ -125,40 +120,29 @@ const LegislatorAddModal = ({
                     )}
                   </Field>
 
-                  <Box>
-                    <FieldArray name="counties">
-                      {(arrayHelpers) => (
-                        <>
-                          <Flex direction="row">
-                            <FormLabel htmlFor="counties">Counties</FormLabel>
-                            <Stack direction="row" spacing={1}>
-                              <IconButton
-                                size="xs"
-                                icon={<MinusIcon />}
-                                onClick={() => arrayHelpers.pop()}
-                              />
-                              <IconButton
-                                size="xs"
-                                icon={<AddIcon />}
-                                onClick={() => arrayHelpers.push("")}
-                              />
-                            </Stack>
-                          </Flex>
+                  <Field name="counties">
+                    {({ field, form }) => (
+                      <FormControl>
+                        <FormLabel>Counties</FormLabel>
+                        <Select
+                          isMulti
+                          closeMenuOnSelect={false}
+                          options={georgiaCounties.map((county) => ({
+                            label: county,
+                            value: county,
+                          }))}
+                          onChange={(options) => {
+                            form.setFieldValue(
+                              field.name,
+                              options.map((option) => option.value)
+                            );
+                          }}
+                        />
+                      </FormControl>
+                    )}
+                  </Field>
 
-                          <Stack direction="column" spacing={2}>
-                            {props.values.counties.map((county, ind) => (
-                              <Field key={ind} name={`counties.${ind}`}>
-                                {({ field, form }) => (
-                                  <Input {...field} id={`county-${ind}`} />
-                                )}
-                              </Field>
-                            ))}
-                          </Stack>
-                        </>
-                      )}
-                    </FieldArray>
-                    {props.errors.api && props.errors.api}
-                  </Box>
+                  <Box>{props.errors.api && props.errors.api}</Box>
                 </Stack>
                 <Box mt={6} mb={4}>
                   <Divider color="gray.400" mb={4} />
