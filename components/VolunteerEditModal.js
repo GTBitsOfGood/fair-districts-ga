@@ -88,26 +88,26 @@ const VolunteerEditModal = ({
                 <Formik
                   initialValues={prunedVolunteer}
                   onSubmit={async (values, actions) => {
-                    if(document.getElementById("submitter").checked) {
-                      values.submitter = true
+                    // const {countyId, } = values;
+                    if (document.getElementById("submitter").checked) {
+                      values.submitter = true;
                     } else {
-                      values.submitter = false
+                      values.submitter = false;
                     }
-                    if(document.getElementById("writer").checked) {
-                      values.writer = true
+                    if (document.getElementById("writer").checked) {
+                      values.writer = true;
                     } else {
-                      values.writer = false
+                      values.writer = false;
                     }
-                    if(document.getElementById("tracker").checked) {
-                      values.tracker = true
+                    if (document.getElementById("tracker").checked) {
+                      values.tracker = true;
                     } else {
-                      values.tracker = false
+                      values.tracker = false;
                     }
-                    const prunedVals = { ...values };
                     const res = await axios.post("/api/volunteer", {
                       type: "edit",
                       id: volunteer.id,
-                      formData: prunedVals,
+                      formData: values,
                       original: volunteer,
                     });
                     const status = await res.status;
@@ -122,106 +122,153 @@ const VolunteerEditModal = ({
                   }}
                 >
                   {(props) => (
-                     <Form>
-                     <Stack direction="column" spacing={4}>
-                         <Field name="first_name" validate={validateReq}>
-                             {({ field, form}) => (
-                                 <FormControl
-                                  isInvalid={form.errors.first_name && form.touched.first_name}
-                                  isRequired>
-                                      <FormLabel htmlFor="first_name">First Name</FormLabel>
-                                      <Input {...field} id="first_name" />
-                                      <FormErrorMessage>{form.errors.first_name}</FormErrorMessage>
-                                  </FormControl>
-                             )}
-                         </Field>
-                         <Field name="last_name" validate={validateReq}>
-                             {({ field, form}) => (
-                                 <FormControl
-                                  isInvalid={form.errors.last_name && form.touched.last_name}
-                                  isRequired>
-                                      <FormLabel htmlFor="last_name">Last Name</FormLabel>
-                                      <Input {...field} id="last_name" />
-                                      <FormErrorMessage>{form.errors.last_name}</FormErrorMessage>
-                                  </FormControl>
-                             )}
-                         </Field>
-                         <Field name="email" validate={validateEmail}>
-                             {({ field, form}) => (
-                                 <FormControl
-                                  isInvalid={form.errors.email && form.touched.email}
-                                  isRequired>
-                                      <FormLabel htmlFor="email">Email</FormLabel>
-                                      <Input {...field} id="email" />
-                                      <FormErrorMessage>{form.errors.email}</FormErrorMessage>
-                                  </FormControl>
-                             )}
-                         </Field>
-                         <Field name="phone">
-                             {({ field, form}) => (
-                                 <FormControl
-                                  isInvalid={form.errors.phone && form.touched.phone}
-                                  isRequired>
-                                      <FormLabel htmlFor="phone">Phone</FormLabel>
-                                      <Input {...field} id="phone" />
-                                      <FormErrorMessage>{form.errors.phone}</FormErrorMessage>
-                                  </FormControl>
-                             )}
-                         </Field>
-                         /**
-                          <Field name="county" validate={validateReq}>
-                             {({ field, form}) => (
-                                 <FormControl
-                                  isInvalid={form.errors.county && form.touched.county}
-                                  isRequired>
-                                      <FormLabel htmlFor="county">County</FormLabel>
-                                      <Input {...field} id="county" />
-                                      <FormErrorMessage>{form.errors.county}</FormErrorMessage>
-                                  </FormControl>
-                             )}
-                         </Field> 
-                         <Field name="comments">
-                             {({ field, form}) => (
-                                 <FormControl
-                                  isInvalid={form.errors.comments && form.touched.comments}>
-                                      <FormLabel htmlFor="comments">Comments</FormLabel>
-                                      <Input {...field} id="comments" />
-                                      <FormErrorMessage>{form.errors.comments}</FormErrorMessage>
-                                  </FormControl>
-                             )}
-                         </Field>
-                         <Field name="submitter">
-                             {({ field, form}) => (
-                                 <FormControl
-                                  isInvalid={form.errors.submitter && form.touched.submitter}>
-                                      <FormLabel htmlFor="submitter">Submitter</FormLabel>
-                                      <Checkbox id="submitter"/>
-                                      <FormErrorMessage>{form.errors.submitter}</FormErrorMessage>
-                                  </FormControl>
-                             )}
-                         </Field>
-                         <Field name="writer">
-                             {({ field, form}) => (
-                                 <FormControl
-                                  isInvalid={form.errors.writer && form.touched.writer}>
-                                      <FormLabel htmlFor="writer">Writer</FormLabel>
-                                      <Checkbox id="writer"/>
-                                      <FormErrorMessage>{form.errors.writer}</FormErrorMessage>
-                                  </FormControl>
-                             )}
-                         </Field>
-                         <Field name="tracker">
-                             {({ field, form}) => (
-                                 <FormControl
-                                  isInvalid={form.errors.tracker && form.touched.tracker}>
-                                      <FormLabel htmlFor="tracker">Tracker</FormLabel>
-                                      <Checkbox id="tracker"/>
-                                      <FormErrorMessage>{form.errors.tracker}</FormErrorMessage>
-                                  </FormControl>
-                             )}
-                         </Field>
-                     </Stack>
-                     <Box mt={6} mb={4}>
+                    <Form>
+                      <Stack direction="column" spacing={4}>
+                        <Field name="first_name" validate={validateReq}>
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.first_name &&
+                                form.touched.first_name
+                              }
+                              isRequired
+                            >
+                              <FormLabel htmlFor="first_name">
+                                First Name
+                              </FormLabel>
+                              <Input {...field} id="first_name" />
+                              <FormErrorMessage>
+                                {form.errors.first_name}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="last_name" validate={validateReq}>
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.last_name && form.touched.last_name
+                              }
+                              isRequired
+                            >
+                              <FormLabel htmlFor="last_name">
+                                Last Name
+                              </FormLabel>
+                              <Input {...field} id="last_name" />
+                              <FormErrorMessage>
+                                {form.errors.last_name}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="email" validate={validateEmail}>
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.email && form.touched.email
+                              }
+                              isRequired
+                            >
+                              <FormLabel htmlFor="email">Email</FormLabel>
+                              <Input {...field} id="email" />
+                              <FormErrorMessage>
+                                {form.errors.email}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="phone">
+                          {({ field, form }) => (
+                            <FormControl>
+                              <FormLabel htmlFor="phone">Phone</FormLabel>
+                              <Input {...field} id="phone" />
+                              <FormErrorMessage>
+                                {form.errors.phone}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        /**
+                        <Field name="county" validate={validateReq}>
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.county && form.touched.county
+                              }
+                              isRequired
+                            >
+                              <FormLabel htmlFor="county">County</FormLabel>
+                              <Input {...field} id="county" />
+                              <FormErrorMessage>
+                                {form.errors.county}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="comments">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.comments && form.touched.comments
+                              }
+                            >
+                              <FormLabel htmlFor="comments">Comments</FormLabel>
+                              <Input {...field} id="comments" />
+                              <FormErrorMessage>
+                                {form.errors.comments}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="submitter">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.submitter && form.touched.submitter
+                              }
+                            >
+                              <FormLabel htmlFor="submitter">
+                                Submitter
+                              </FormLabel>
+                              <Checkbox id="submitter" />
+                              <FormErrorMessage>
+                                {form.errors.submitter}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="writer">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.writer && form.touched.writer
+                              }
+                            >
+                              <FormLabel htmlFor="writer">Writer</FormLabel>
+                              <Checkbox id="writer" />
+                              <FormErrorMessage>
+                                {form.errors.writer}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="tracker">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.tracker && form.touched.tracker
+                              }
+                            >
+                              <FormLabel htmlFor="tracker">Tracker</FormLabel>
+                              <Checkbox id="tracker" />
+                              <FormErrorMessage>
+                                {form.errors.tracker}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                      </Stack>
+                      <Box mt={6} mb={4}>
                         <Divider color="gray.400" mb={4} />
                         <Flex justifyContent="space-between">
                           <Button
@@ -247,7 +294,7 @@ const VolunteerEditModal = ({
                           </Box>
                         </Flex>
                       </Box>
-                 </Form>
+                    </Form>
                   )}
                 </Formik>
               </ModalBody>

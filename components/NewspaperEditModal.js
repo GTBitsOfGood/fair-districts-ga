@@ -51,34 +51,23 @@ const validateEmail = (value) => {
 const NewspaperEditModal = ({
   isOpen,
   onClose,
-  newspaperMeta,
   newspapers,
+  newspaperIndex,
   setNewspapers,
 }) => {
   const [alertOpen, setAlertOpen] = useState(false);
 
-  const prunedNewspaper = useMemo(() => {
-    if (newspaperMeta === undefined) return;
-    return {
-      ...newspaperMeta.newspaper,
-      counties: newspaperMeta.newspaper.counties.map((c) => ({
-        value: c.name,
-        label: c.name,
-      })),
-    };
-  }, [newspaperMeta]);
-
-  const { newspaper, index } = newspaperMeta || {};
+  const newspaper = newspapers[newspaperIndex];
 
   return (
     <>
-      {newspaperMeta ? (
+      {newspaper ? (
         <>
           <NewspaperAlertDialog
             alertOpen={alertOpen}
             setAlertOpen={setAlertOpen}
             newspaperId={newspaper.id}
-            index={index}
+            index={newspaperIndex}
             newspapers={newspapers}
             setNewspapers={setNewspapers}
             onClose={onClose}
@@ -86,11 +75,14 @@ const NewspaperEditModal = ({
           <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
-              <ModalHeader>{`Edit ${prunedNewspaper.name}`}</ModalHeader>
+              <ModalHeader>{`Edit ${newspaper.name}`}</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
                 <Formik
-                  initialValues={prunedNewspaper}
+                  initialValues={{
+                    ...newspaper,
+                    counties: newspaper.counties.map((county) => county.name),
+                  }}
                   onSubmit={async (values, actions) => {
                     const prunedVals = { ...values };
                     prunedVals.rating = parseInt(prunedVals.rating);
@@ -105,7 +97,7 @@ const NewspaperEditModal = ({
 
                     if (status === 200) {
                       const clonedNewspapers = [...newspapers];
-                      clonedNewspapers[index] = data;
+                      clonedNewspapers[newspaperIndex] = data;
                       setNewspapers(clonedNewspapers);
                       onClose();
                     }
@@ -152,7 +144,7 @@ const NewspaperEditModal = ({
                                 onChange={(val) =>
                                   form.setFieldValue(field.name, val)
                                 }
-                                defaultValue={50}
+                                defaultValue={field.value}
                                 id="rating"
                                 precision={0}
                               >
@@ -233,7 +225,10 @@ const NewspaperEditModal = ({
                                   label: county,
                                   value: county,
                                 }))}
-                                defaultValue={field.value}
+                                defaultValue={field.value.map((county) => ({
+                                  label: county,
+                                  value: county,
+                                }))}
                                 onChange={(options) => {
                                   form.setFieldValue(
                                     field.name,

@@ -21,6 +21,8 @@ import { Field, FieldArray, Form, Formik } from "formik";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import React, { useState } from "react";
+import { Select } from "chakra-react-select";
+import { georgiaCounties } from "../utils/consts";
 
 const validateReq = (value) => {
   let error;
@@ -44,14 +46,14 @@ const validateEmail = (value) => {
 const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
   const handleAddSubmit = async (values, actions) => {
     console.log(values);
-    if(document.getElementById("submitter").checked) {
-      values["submitter"] = true
+    if (document.getElementById("submitter").checked) {
+      values["submitter"] = true;
     }
-    if(document.getElementById("writer").checked) {
-      values["writer"] = true
+    if (document.getElementById("writer").checked) {
+      values["writer"] = true;
     }
-    if(document.getElementById("tracker").checked) {
-      values["tracker"] = true
+    if (document.getElementById("tracker").checked) {
+      values["tracker"] = true;
     }
     console.log(values);
     const res = await axios.post("/api/volunteer", {
@@ -141,7 +143,10 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
 
                   <Field name="email" validate={validateEmail}>
                     {({ field, form }) => (
-                      <FormControl isRequired>
+                      <FormControl
+                        isRequired
+                        isInvalid={form.errors.email && form.touched.email}
+                      >
                         <FormLabel htmlFor="email">Email</FormLabel>
                         <Input
                           {...field}
@@ -165,9 +170,20 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
 
                   <Field name="county" validate={validateReq}>
                     {({ field, form }) => (
-                      <FormControl isRequired>
+                      <FormControl
+                        isRequired
+                        isInvalid={form.errors.county && form.touched.county}
+                      >
                         <FormLabel htmlFor="county">County</FormLabel>
-                        <Input {...field} id="county" placeholder="Fulton" />
+                        <Select
+                          options={georgiaCounties.map((county) => ({
+                            label: county,
+                            value: county,
+                          }))}
+                          onChange={(option) => {
+                            form.setFieldValue(field.name, option.value);
+                          }}
+                        />
                         <FormErrorMessage>
                           {form.errors.county}
                         </FormErrorMessage>

@@ -37,21 +37,11 @@ const LegislatorEditModal = ({
 }) => {
   const [alertOpen, setAlertOpen] = useState(false);
 
-  const prunedLegislator = useMemo(() => {
-    if (legislatorIndex >= legislators.length) return;
-    const legislator = legislators[legislatorIndex];
-    return {
-      ...legislator,
-      counties: legislator.counties.map((c) => ({
-        value: c.name,
-        label: c.name,
-      })),
-    };
-  }, [legislatorIndex, legislators]);
+  const legislator = legislators[legislatorIndex];
 
   return (
     <>
-      {prunedLegislator ? (
+      {legislator ? (
         <>
           <LegislatorDeleteDialog
             alertOpen={alertOpen}
@@ -64,17 +54,20 @@ const LegislatorEditModal = ({
           <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
-              <ModalHeader>{`Edit Legislator: ${prunedLegislator.firstName} ${prunedLegislator.lastName}`}</ModalHeader>
+              <ModalHeader>{`Edit Legislator: ${legislator.firstName} ${legislator.lastName}`}</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
                 <Formik
-                  initialValues={prunedLegislator}
+                  initialValues={{
+                    ...legislator,
+                    counties: legislator.counties.map((county) => county.name),
+                  }}
                   onSubmit={async (values, actions) => {
                     const res = await axios.post("/api/legislator", {
                       type: "edit",
-                      id: prunedLegislator.id,
+                      id: legislator.id,
                       formData: values,
-                      original: legislators[legislatorIndex],
+                      original: legislator,
                     });
                     const newLegislator = res.data;
 
@@ -166,7 +159,10 @@ const LegislatorEditModal = ({
                                   label: county,
                                   value: county,
                                 }))}
-                                defaultValue={field.value}
+                                defaultValue={field.value.map((county) => ({
+                                  label: county,
+                                  value: county,
+                                }))}
                                 onChange={(options) => {
                                   form.setFieldValue(
                                     field.name,

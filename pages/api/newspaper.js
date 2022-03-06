@@ -53,8 +53,9 @@ async function editNewspaper(req, res) {
   const { id, formData, original } = req.body;
   const { counties } = formData;
 
-  const originalCounties = original.counties.map((c) => c.name);
-  const removedCounties = originalCounties.filter((x) => !counties.includes(x));
+  const removedCounties = original.counties.filter(
+    (x) => !counties.includes(x.name)
+  );
 
   try {
     const newspaper = await prisma.newspaper.update({
@@ -64,7 +65,7 @@ async function editNewspaper(req, res) {
       data: {
         ...formData,
         counties: {
-          disconnect: removedCounties.map((c) => ({ name: c })),
+          disconnect: removedCounties.map((c) => ({ name: c.name })),
           connect: counties.map((county) => ({
             name: county,
           })),
