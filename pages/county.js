@@ -47,7 +47,7 @@ const County = ({ data }) => {
         }) => (
           <Stack direction="column">
             {legislators.map((l) => (
-              <div>{`${l.firstName} ${l.lastName}`}</div>
+              <div key={l.id}>{`${l.firstName} ${l.lastName}`}</div>
             ))}
           </Stack>
         ),
@@ -71,7 +71,7 @@ const County = ({ data }) => {
         }) => (
           <Stack>
             {volunteers.map((v) => (
-              <div>{`${v.first_name} ${v.last_name}`}</div>
+              <div key={v.id}>{`${v.first_name} ${v.last_name}`}</div>
             ))}
           </Stack>
         ),
@@ -95,7 +95,7 @@ const County = ({ data }) => {
         }) => (
           <Stack>
             {newspapers.map((n) => (
-              <div>{n.name}</div>
+              <div key={n.id}>{n.name}</div>
             ))}
           </Stack>
         ),
