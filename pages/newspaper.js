@@ -29,10 +29,10 @@ const Newspaper = ({ data }) => {
       {
         Header: "",
         accessor: "edit",
-        Cell: ({ row }) => (
+        Cell: ({ row: { index } }) => (
           <IconButton
             onClick={() => {
-              setNewspaperIndex(row.index);
+              setNewspaperIndex(index);
               onEditOpen();
             }}
             icon={<EditIcon />}

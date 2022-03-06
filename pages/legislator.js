@@ -44,12 +44,12 @@ const Legislator = ({ data }) => {
         Header: "",
         accessor: "edit",
         width: 60,
-        Cell: ({ row }) => (
+        Cell: ({ row: { index } }) => (
           <Center>
             <HStack spacing="24px">
               <IconButton
                 onClick={() => {
-                  setLegislatorIndex(row.index);
+                  setLegislatorIndex(index);
                   onEditOpen();
                 }}
                 icon={<EditIcon />}

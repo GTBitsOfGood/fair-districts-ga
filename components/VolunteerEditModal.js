@@ -28,6 +28,8 @@ import { Field, FieldArray, Form, Formik } from "formik";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import VolunteerAlertDialog from "./VolunteerAlertDialog";
+import { Select } from "chakra-react-select";
+import { georgiaCounties } from "../utils/consts";
 
 const validateReq = (value) => {
   let error;
@@ -51,31 +53,25 @@ const validateEmail = (value) => {
 const VolunteerEditModal = ({
   isOpen,
   onClose,
-  volunteerMeta,
   volunteers,
+  volunteerIndex,
   setVolunteers,
 }) => {
   const [alertOpen, setAlertOpen] = useState(false);
-  const prunedVolunteer = useMemo(() => {
-    if (volunteerMeta === undefined) return;
-    return {
-      ...volunteerMeta.volunteer,
-      county: volunteerMeta.volunteer.county.name,
-    };
-  }, [volunteerMeta]);
 
-  const { volunteer, index } = volunteerMeta || {};
+  const volunteer = volunteers[volunteerIndex];
+  const { countyId, assignments, ...prunedVolunteer } = volunteer;
 
   return (
     <>
-      {volunteerMeta ? (
+      {volunteer ? (
         <>
           <VolunteerAlertDialog
             alertOpen={alertOpen}
             setAlertOpen={setAlertOpen}
             volunteerId={volunteer.id}
-            index={index}
             volunteers={volunteers}
+            index={volunteerIndex}
             setVolunteers={setVolunteers}
             onClose={onClose}
           />
@@ -86,9 +82,11 @@ const VolunteerEditModal = ({
               <ModalCloseButton />
               <ModalBody>
                 <Formik
-                  initialValues={prunedVolunteer}
+                  initialValues={{
+                    ...prunedVolunteer,
+                    county: volunteer.county.name,
+                  }}
                   onSubmit={async (values, actions) => {
-                    // const {countyId, } = values;
                     if (document.getElementById("submitter").checked) {
                       values.submitter = true;
                     } else {
@@ -108,14 +106,14 @@ const VolunteerEditModal = ({
                       type: "edit",
                       id: volunteer.id,
                       formData: values,
-                      original: volunteer,
+                      original: prunedVolunteer,
                     });
                     const status = await res.status;
                     const data = await res.data;
 
                     if (status === 200) {
                       const clonedVolunteers = [...volunteers];
-                      clonedVolunteers[index] = data;
+                      clonedVolunteers[volunteerIndex] = data;
                       setVolunteers(clonedVolunteers);
                       onClose();
                     }
@@ -198,7 +196,20 @@ const VolunteerEditModal = ({
                               isRequired
                             >
                               <FormLabel htmlFor="county">County</FormLabel>
-                              <Input {...field} id="county" />
+
+                              <Select
+                                defaultValue={{
+                                  label: field.value,
+                                  value: field.value,
+                                }}
+                                options={georgiaCounties.map((county) => ({
+                                  label: county,
+                                  value: county,
+                                }))}
+                                onChange={(option) => {
+                                  form.setFieldValue(field.name, option.value);
+                                }}
+                              />
                               <FormErrorMessage>
                                 {form.errors.county}
                               </FormErrorMessage>

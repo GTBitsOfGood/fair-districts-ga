@@ -28,13 +28,10 @@ const Volunteer = ({ data }) => {
       {
         Header: "",
         accessor: "edit",
-        Cell: ({ row }) => (
+        Cell: ({ row: { index } }) => (
           <IconButton
             onClick={() => {
-              setVolunteerToEdit({
-                index: row.index,
-                volunteer: row.original,
-              });
+              setVolunteerIndex(index);
               onEditOpen();
             }}
             icon={<EditIcon />}
@@ -80,7 +77,7 @@ const Volunteer = ({ data }) => {
           row: {
             values: { submitter },
           },
-        }) => <div>{submitter ? "Yes": ""}</div>,
+        }) => <div>{submitter ? "Yes" : ""}</div>,
       },
       {
         Header: "Writer",
@@ -89,7 +86,7 @@ const Volunteer = ({ data }) => {
           row: {
             values: { writer },
           },
-        }) => <div>{writer ? "Yes": ""}</div>,
+        }) => <div>{writer ? "Yes" : ""}</div>,
       },
       {
         Header: "Tracker",
@@ -98,7 +95,7 @@ const Volunteer = ({ data }) => {
           row: {
             values: { tracker },
           },
-        }) => <div>{tracker ? "Yes": ""}</div>,
+        }) => <div>{tracker ? "Yes" : ""}</div>,
       },
       {
         Header: "Assignments",
@@ -114,7 +111,8 @@ const Volunteer = ({ data }) => {
   );
 
   const [volunteers, setVolunteers] = useState(data);
-  const [volunteerToEdit, setVolunteerToEdit] = useState();
+  const [volunteerIndex, setVolunteerIndex] = useState(0);
+
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
@@ -187,8 +185,8 @@ const Volunteer = ({ data }) => {
         <VolunteerEditModal
           isOpen={isEditOpen}
           onClose={onEditClose}
-          volunteerMeta={volunteerToEdit}
           volunteers={volunteers}
+          volunteerIndex={volunteerIndex}
           setVolunteers={setVolunteers}
         />
       </Box>

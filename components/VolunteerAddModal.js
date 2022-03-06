@@ -45,7 +45,6 @@ const validateEmail = (value) => {
 
 const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
   const handleAddSubmit = async (values, actions) => {
-    console.log(values);
     if (document.getElementById("submitter").checked) {
       values["submitter"] = true;
     }
@@ -55,15 +54,12 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
     if (document.getElementById("tracker").checked) {
       values["tracker"] = true;
     }
-    console.log(values);
     const res = await axios.post("/api/volunteer", {
       type: "add",
       formData: values,
     });
     const newVolunteer = await res.data;
     if (res.status === 200) {
-      console.log(newVolunteer);
-      console.log(volunteers);
       setVolunteers([...volunteers, newVolunteer]);
       actions.resetForm();
       onClose();
