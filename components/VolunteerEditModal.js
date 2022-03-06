@@ -186,7 +186,6 @@ const VolunteerEditModal = ({
                             </FormControl>
                           )}
                         </Field>
-                        /**
                         <Field name="county" validate={validateReq}>
                           {({ field, form }) => (
                             <FormControl
