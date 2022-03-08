@@ -9,7 +9,9 @@ import {
 import { FiHome, FiLogIn, FiLogOut } from 'react-icons/fi';
 import { BsNewspaper } from 'react-icons/bs';
 import { VscLaw } from 'react-icons/vsc';
+import { RiAdminLine } from 'react-icons/ri'
 import Link from 'next/link';
+import adminEmails from "../pages/api/auth/adminEmails";
 
 const NavBar = ({ session }) => {
   return (
@@ -68,6 +70,16 @@ const NavBar = ({ session }) => {
             Legislators
           </Button>
         </Link>
+        {adminEmails.includes(session.user.email) && 
+        <Link href="/privilege">
+          <Button
+            leftIcon={<RiAdminLine />}
+            variant="ghost"
+            justifyContent="flex-start"
+          >
+            Privileges
+          </Button>
+        </Link>}
       </Stack>
       <Box color="white" paddingTop={250} />
       <Divider />

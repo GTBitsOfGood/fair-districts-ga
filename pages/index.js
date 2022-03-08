@@ -3,6 +3,7 @@ import Link from 'next/link';
 import React from 'react';
 import NavBar from '../components/NavBar';
 import Loader from '../components/Loader';
+import adminEmails from "./api/auth/adminEmails";
 
 const MainButton = (props) => {
   return (
@@ -46,6 +47,7 @@ const MainPageMenu = ({ session }) => {
           <MainButton href="/volunteer" message="Manage Volunteers" />
           <MainButton href="/newspaper" message="Manage Newspapers" />
           <MainButton href="/legislator" message="Manage Legislators" />
+          {adminEmails.includes(session.user.email) && <MainButton href="/privilege" message="Manage Privileges" />}
         </div>
       </div>
     </div>

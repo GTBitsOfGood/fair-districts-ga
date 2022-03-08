@@ -16,10 +16,10 @@ import {
   Center
 } from "@chakra-ui/react";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
-import NewspaperAddModal from "../components/NewspaperAddModal";
+import PrivilegeAddModal from "../components/PrivilegeAddModal";
 import axios from "axios";
 import { useTable, useRowSelect } from "react-table";
-import NewspaperEditModal from "../components/NewspaperEditModal";
+import PrivilegeEditModal from "../components/PrivilegeEditModal";
 import { getSession, useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
 import AccessDeniedPage from "../components/AccessDeniedPage";
@@ -28,7 +28,7 @@ import adminEmails from "./api/auth/adminEmails";
 
 
 
-const Newspaper = ({ data, specialUsers }) => {
+const Privileges = ({ specialUsers }) => {
   
   const { data: session } = useSession();
   const [ isLoading,  setLoading ] = useState(true);
@@ -49,10 +49,11 @@ const Newspaper = ({ data, specialUsers }) => {
         Cell: ({ row }) => (
           <IconButton
             onClick={() => {
-              setNewspaperToEdit({
+              setPrivilegeToEdit({
                 index: row.index,
-                newspaper: row.original,
+                privilege: row.original,
               });
+              setTimeout(() =>console.log(privilegeToEdit), 5*1000)
               onEditOpen();
             }}
             icon={<EditIcon />}
@@ -63,56 +64,14 @@ const Newspaper = ({ data, specialUsers }) => {
         ),
       },
       {
-        Header: "Name",
-        accessor: "name",
-      },
-      {
         Header: "Email",
         accessor: "email",
-      },
-      {
-        Header: "Rating",
-        accessor: "rating",
-      },
-      {
-        Header: "Description",
-        accessor: "description",
-        Cell: ({
-          row: {
-            values: { description },
-          },
-        }) => (
-          <div style={{ whiteSpace: "break-spaces", overflowWrap: "anywhere" }}>
-            {description}
-          </div>
-        ),
-      },
-      {
-        Header: "Website",
-        accessor: "website",
-      },
-      {
-        Header: "Instagram",
-        accessor: "instagram",
-      },
-      {
-        Header: "Twitter",
-        accessor: "twitter",
-      },
-      {
-        Header: "Counties",
-        accessor: "counties",
-        Cell: ({
-          row: {
-            values: { counties },
-          },
-        }) => <div>{counties.map((c) => c.name).join(", ")}</div>,
       },
     ],
     []
   );
-  const [newspapers, setNewspapers] = useState(data);
-  const [newspaperToEdit, setNewspaperToEdit] = useState();
+  const [privileges, setPrivileges] = useState(specialUsers);
+  const [privilegeToEdit, setPrivilegeToEdit] = useState();
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
@@ -124,15 +83,13 @@ const Newspaper = ({ data, specialUsers }) => {
     onClose: onEditClose,
   } = useDisclosure();
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns: tableCols, data: newspapers }, useRowSelect);
+    useTable({ columns: tableCols, data: privileges }, useRowSelect);
 
   if (!session) {
     return <AccessDeniedPage />
   } else {
     if (!adminEmails.includes(session.user.email)) {
-      if (!specialUsers.includes(session.user.email)) {
-        return <AccessDeniedPage />
-      }
+      return <AccessDeniedPage />
     }
   }
 
@@ -155,7 +112,7 @@ const Newspaper = ({ data, specialUsers }) => {
       <NavBar session={session} />
       <Box p={8} flex="1">
         <Flex direction="row" justifyContent="space-between">
-          <Heading>Newspapers</Heading>
+          <Heading>Special Users</Heading>
           <IconButton
             colorScheme="teal"
             icon={<AddIcon />}
@@ -200,18 +157,18 @@ const Newspaper = ({ data, specialUsers }) => {
             })}
           </Tbody>
         </Table>
-        <NewspaperAddModal
+        <PrivilegeAddModal
           isOpen={isAddOpen}
           onClose={onAddClose}
-          newspapers={newspapers}
-          setNewspapers={setNewspapers}
+          privileges={privileges}
+          setPrivileges={setPrivileges}
         />
-        <NewspaperEditModal
+        <PrivilegeEditModal
           isOpen={isEditOpen}
           onClose={onEditClose}
-          newspaperMeta={newspaperToEdit}
-          newspapers={newspapers}
-          setNewspapers={setNewspapers}
+          privilegeMeta={privilegeToEdit}
+          privileges={privileges}
+          setPrivileges={setPrivileges}
         />
       </Box>
     </Flex>
@@ -219,15 +176,6 @@ const Newspaper = ({ data, specialUsers }) => {
 };
 
 export async function getServerSideProps(context) {
-  const res = await axios.get(
-    `http://${
-      process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_VERCEL_URL
-        : "localhost:3000"
-    }/api/newspaper`
-  );
-  const data = res.data;
-
   const resSpecialUsers = await axios.get(
     `http://${
       process.env.NODE_ENV === "production"
@@ -235,15 +183,14 @@ export async function getServerSideProps(context) {
         : "localhost:3000"
     }/api/specialUser`
   );
-  const specialUsers = resSpecialUsers.data.map(u => u.email);
+  const specialUsers = resSpecialUsers.data;
 
   return {
     props: {
       session: await getSession(context),
-      data,
       specialUsers,
     },
   };
 }
 
-export default Newspaper;
+export default Privileges;

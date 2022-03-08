@@ -13,13 +13,22 @@ import { AddIcon } from "@chakra-ui/icons";
 import CampaignCard from "../components/Campaign/CampaignCard";
 import CampaignModal from "../components/Campaign/CampaignModal";
 import { getSession, useSession } from "next-auth/react";
+import AccessDeniedPage from "../components/AccessDeniedPage";
 
 const Campaign = () => {
   const { data: session } = useSession();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   if (!session) {
-    return <p>Access Denied</p>;
+    return <AccessDeniedPage />
+  } else {
+    if (!adminEmails.includes(session.user.email)) {
+      if (!specialUsers.includes(session.user.email)) {
+        return <AccessDeniedPage />
+      }
+    }
   }
+
   return (
     <>
       <Flex direction="row">

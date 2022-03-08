@@ -89,6 +89,12 @@ const Legislator = () => {
 
   if (!session) {
     return <AccessDeniedPage />
+  } else {
+    if (!adminEmails.includes(session.user.email)) {
+      if (!specialUsers.includes(session.user.email)) {
+        return <AccessDeniedPage />
+      }
+    }
   }
 
   if (isLoading) {
