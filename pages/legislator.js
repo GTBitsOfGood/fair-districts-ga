@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, useDisclosure, Flex, Heading, IconButton, Box, HStack, Center } from '@chakra-ui/react'
+import { Table, Tbody, Tr, Td, useDisclosure, Flex, Heading, IconButton, Box, HStack, Center } from '@chakra-ui/react'
 import { AddIcon, EditIcon } from '@chakra-ui/icons'
 import { useTable, useRowSelect } from 'react-table'
 import LegislatorAddModal from "../components/LegislatorAddModal";
@@ -9,12 +9,27 @@ import NavBar from "../components/NavBar";
 import { useSession } from "next-auth/react"
 import AccessDeniedPage from "../components/AccessDeniedPage";
 import Loader from '../components/Loader';
+import TableHeader from "../components/TableHeader";
+import useDebounce from "../components/hooks/useDebounce";
 
 const Legislator = () => {
   const { data: session } = useSession();
   const [ legislators, setLegislators ] = useState([]);
   const [ legislatorIndex, setLegislatorIndex ] = useState(0);
   const [ isLoading,  setLoading ] = useState(true);
+  const [ activeSort, setActiveSort ] = useState('')
+  const debouncedActiveSort = useDebounce(activeSort, 200)
+  const toggleActiveSort = (target) => {
+    const [sort, order] = activeSort.split('.')
+    if (sort === undefined || order === undefined) {
+      setActiveSort(`${target}.desc`)
+      return
+    }
+    if (target === sort) {
+      if (order === 'desc') setActiveSort(`${target}.asc`)
+      else setActiveSort('')
+    } else setActiveSort(`${target}.desc`)
+  }
 
   const {
     isOpen: isAddOpen,
@@ -75,33 +90,18 @@ const Legislator = () => {
 
   useEffect(() => {
     async function initLegislators() {
-      const res = await axios.get("/api/legislator");
+      setLoading(true)
+      const res = await axios.get(`/api/legislator?order_by=${debouncedActiveSort}`);
       const legislators = res.data;
       legislators.forEach((legislator) => legislator.counties = legislator.counties.map((county) => county.name).join(", "));
       setLegislators(legislators);
-      setTimeout(() => {
-        setLoading(false);
-      }, 100)
-
+      setLoading(false)
     }
     initLegislators();
-  }, []);
+  }, [debouncedActiveSort]);
 
   if (!session) {
     return <AccessDeniedPage />
-  }
-
-  if (isLoading) {
-    return (
-      <Flex direction="row">
-        <NavBar session={session}/>
-        <Box p={8} flex="1">
-        <Center h='80%'>
-          <Loader/>
-        </Center>
-        </Box>
-      </Flex>
-    );
   }
 
   return (
@@ -125,25 +125,18 @@ const Legislator = () => {
           legislators={legislators}
           setLegislators={setLegislators}
         />
-        <Table {...getTableProps()} variant="striped" size="md">
-          <Thead>
-            {headerGroups.map((headerGroup, ind) => (
-              <Tr key={ind} {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column, ind2) => (
-                  <Th key={ind2}
-                    {...column.getHeaderProps()}
-                  >
-                    {column.render('Header')}
-                  </Th>
-                ))}
-              </Tr>
-            ))}
-          </Thead>
+        <Table {...getTableProps()} size="md">
+          <TableHeader 
+            headerGroups={headerGroups}
+            sort={activeSort}
+            toggleSort={toggleActiveSort}
+            disabledIndices={[4]}
+          />
           <Tbody {...getTableBodyProps()}>
-            {rows.map((row, ind) => {
+            {!isLoading && rows.map((row, ind) => {
               prepareRow(row)
               return (
-                <Tr key={ind} {...row.getRowProps()}>
+                <Tr key={ind} {...row.getRowProps()} _even={{ bgColor: 'gray.100' }}>
                   {row.cells.map((cell, ind2) => (
                     <Td key={ind2} {...cell.getCellProps()}>
                       {cell.render('Cell')}
@@ -154,6 +147,7 @@ const Legislator = () => {
             })}
           </Tbody>
         </Table>
+        {isLoading && <Loader />}
       </Box>
     </Flex>
   )
