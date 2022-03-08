@@ -10,13 +10,14 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 
-const LegislatorDeleteDialog = ({
+const VolunteerAlertDialog = ({
   alertOpen,
   setAlertOpen,
+  volunteerId,
+  index,
+  volunteers,
+  setVolunteers,
   onClose,
-  legislatorIndex,
-  legislators,
-  setLegislators,
 }) => {
   const onAlertClose = () => setAlertOpen(false);
   const cancelRef = useRef();
@@ -30,7 +31,7 @@ const LegislatorDeleteDialog = ({
       <AlertDialogOverlay>
         <AlertDialogContent>
           <AlertDialogHeader fontSize="lg" fontWeight="bold">
-            Delete legislator
+            Delete volunteer
           </AlertDialogHeader>
 
           <AlertDialogBody>
@@ -44,15 +45,16 @@ const LegislatorDeleteDialog = ({
             <Button
               colorScheme="red"
               onClick={async () => {
-                const res = await axios.post("/api/legislator", {
+                const res = await axios.post("/api/volunteer", {
                   type: "delete",
-                  id: legislators[legislatorIndex].id,
+                  id: volunteerId,
                 });
+                const status = await res.status;
 
-                if (res.status === 200) {
-                  const clonedLegislators = [...legislators];
-                  clonedLegislators.splice(legislatorIndex, 1);
-                  setLegislators(clonedLegislators);
+                if (status === 200) {
+                  const clonedVolunteers = [...volunteers];
+                  clonedVolunteers.splice(index, 1);
+                  setVolunteers(clonedVolunteers);
                   onAlertClose();
                   onClose();
                 }
@@ -68,4 +70,4 @@ const LegislatorDeleteDialog = ({
   );
 };
 
-export default LegislatorDeleteDialog;
+export default VolunteerAlertDialog;
