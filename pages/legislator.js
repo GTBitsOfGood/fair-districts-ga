@@ -6,11 +6,12 @@ import LegislatorAddModal from "../components/LegislatorAddModal";
 import LegislatorEditModal from "../components/LegislatorEditModal";
 import axios from "axios";
 import NavBar from "../components/NavBar";
-import { useSession } from "next-auth/react"
+import { getSession, useSession } from "next-auth/react"
 import AccessDeniedPage from "../components/AccessDeniedPage";
 import Loader from '../components/Loader';
+import adminEmails from "./api/auth/adminEmails";
 
-const Legislator = () => {
+const Legislator = ({ specialUsers }) => {
   const { data: session } = useSession();
   const [ legislators, setLegislators ] = useState([]);
   const [ legislatorIndex, setLegislatorIndex ] = useState(0);
@@ -165,5 +166,22 @@ const Legislator = () => {
   )
 }
 
+export async function getServerSideProps(context) {
+  const resSpecialUsers = await axios.get(
+    `http://${
+      process.env.NODE_ENV === "production"
+        ? process.env.NEXT_PUBLIC_VERCEL_URL
+        : "localhost:3000"
+    }/api/specialUser`
+  );
+  const specialUsers = resSpecialUsers.data.map(u => u.email);
+
+  return {
+    props: {
+      session: await getSession(context),
+      specialUsers,
+    },
+  };
+}
 
 export default Legislator
