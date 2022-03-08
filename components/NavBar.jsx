@@ -17,8 +17,6 @@ const NavBar = ({ session }) => {
       <Image
         src="/FairDistrictsGA-Logo.png"
         objectFit="cover"
-        maxWidth={80}
-        maxHeight={86}
         paddingBottom={15}
       />
       <Divider />
