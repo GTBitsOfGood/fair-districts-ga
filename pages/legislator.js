@@ -96,9 +96,7 @@ const Legislator = () => {
       <Flex direction="row">
         <NavBar session={session}/>
         <Box p={8} flex="1">
-        <Center h='80%'>
           <Loader/>
-        </Center>
         </Box>
       </Flex>
     );

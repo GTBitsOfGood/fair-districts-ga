@@ -13,7 +13,6 @@ import {
   Flex,
   IconButton,
   useDisclosure,
-  Center
 } from "@chakra-ui/react";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import NewspaperAddModal from "../components/NewspaperAddModal";
@@ -129,18 +128,16 @@ const Newspaper = ({ data }) => {
     return <AccessDeniedPage />
   }
 
-  /* if (isLoading) {
+  if (isLoading) {
     return (
       <Flex direction="row">
         <NavBar session={session}/>
         <Box p={8} flex="1">
-        <Center h='80%'>
           <Loader/>
-        </Center>
         </Box>
       </Flex>
     );
-  } */
+  } 
 
 
   return (

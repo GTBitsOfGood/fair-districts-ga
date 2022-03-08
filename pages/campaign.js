@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {
   Box,
   Button,
@@ -17,9 +17,25 @@ import { getSession, useSession } from "next-auth/react";
 const Campaign = () => {
   const { data: session } = useSession();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [ isLoading,  setLoading ] = useState(true);
+
   if (!session) {
     return <p>Access Denied</p>;
   }
+
+  if (isLoading) {
+    return (
+      <Flex direction="row">
+        <NavBar session={session}/>
+        <Box p={8} flex="1">
+        <Center h='80%'>
+          <Loader/>
+        </Center>
+        </Box>
+      </Flex>
+    );
+  } 
+
   return (
     <>
       <Flex direction="row">
