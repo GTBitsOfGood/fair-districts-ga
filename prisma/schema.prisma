@@ -1,11 +1,11 @@
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 model Account {
@@ -14,12 +14,12 @@ model Account {
   type               String
   provider           String
   providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
   expires_at         Int?
   token_type         String?
   scope              String?
-  id_token           String?  @db.Text
+  id_token           String? @db.Text
   session_state      String?
   oauth_token_secret String?
   oauth_token        String?
@@ -56,68 +56,67 @@ model VerificationToken {
 }
 
 model Volunteer {
-  id String @id @default(cuid())
-  first_name String
-  last_name String
-  email String @unique
-  phone String?
-  county County @relation(fields: [countyId], references: [id])
-  countyId String
-  comments String?
-  submitter Boolean? @default(false)
-  writer Boolean? @default(false)
-  tracker Boolean? @default(false)
+  id          String       @id @default(cuid())
+  first_name  String
+  last_name   String
+  email       String       @unique
+  phone       String?
+  county      County       @relation(fields: [countyId], references: [id])
+  countyId    String
+  comments    String?
+  submitter   Boolean?     @default(false)
+  writer      Boolean?     @default(false)
+  tracker     Boolean?     @default(false)
   assignments Assignment[]
 }
 
 model Assignment {
-  id String @id @default(cuid())
-  last_writing_request String?
-  last_sending_request String?
+  id                      String    @id @default(cuid())
+  last_writing_request    String?
+  last_sending_request    String?
   last_amplifying_request String?
-  submitted Boolean? @default(false)
-  published Boolean? @default(false)
-  volunteer Volunteer @relation(fields: [volunteerId], references: [id])
-  volunteerId String
-  newspaper Newspaper @relation(fields: [newspaperId], references: [id])
-  newspaperId String
-  campaign Campaign @relation(fields: [campaignId], references: [id])
-  campaignId String
+  submitted               Boolean?  @default(false)
+  published               Boolean?  @default(false)
+  volunteer               Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId             String
+  newspaper               Newspaper @relation(fields: [newspaperId], references: [id])
+  newspaperId             String
+  campaign                Campaign  @relation(fields: [campaignId], references: [id])
+  campaignId              String
 }
 
 model Newspaper {
-  id String @id @default(cuid())
-  name String @unique
-  email String? 
-  rating Int?
+  id          String       @id @default(cuid())
+  name        String       @unique
+  email       String?
+  rating      Int?
   description String?
-  website String?
-  instagram String?
-  twitter String?
+  website     String?
+  instagram   String?
+  twitter     String?
   assignments Assignment[]
-  counties County[]
+  counties    County[]
 }
 
 model County {
-  id String @id @default(cuid())
-  name String
-  volunteers Volunteer[]
-  newspapers Newspaper[]
+  id          String       @id @default(cuid())
+  name        String       @unique
+  volunteers  Volunteer[]
+  newspapers  Newspaper[]
   legislators Legislator[]
 }
 
 model Campaign {
-  id String @id @default(cuid())
-  name String
-  description String? @db.VarChar(300)
+  id          String       @id @default(cuid())
+  name        String
+  description String?      @db.VarChar(300)
   assignments Assignment[]
 }
 
 model Legislator {
-  id String @id @default(cuid())
+  id        String   @id @default(cuid())
   firstName String
-  lastName String 
-  counties County[]
-  party Boolean?
+  lastName  String
+  counties  County[]
+  party     String?
 }
-

@@ -1,4 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import Router from "next/router";
+
 import {
   Box,
   Table,
@@ -11,6 +13,7 @@ import {
   Flex,
   IconButton,
   useDisclosure,
+  Center
 } from "@chakra-ui/react";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import NewspaperAddModal from "../components/NewspaperAddModal";
@@ -19,9 +22,23 @@ import { useTable, useRowSelect } from "react-table";
 import NewspaperEditModal from "../components/NewspaperEditModal";
 import { getSession, useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
+import AccessDeniedPage from "../components/AccessDeniedPage";
+import Loader from '../components/Loader';
+
+
 
 const Newspaper = ({ data }) => {
+  
   const { data: session } = useSession();
+  const [ isLoading,  setLoading ] = useState(true);
+
+  useEffect(() => {
+    const end = () => {
+      setLoading(false);
+    };
+    Router.events.on("routeChangeComplete", end);
+   
+  }, [])
 
   const tableCols = useMemo(
     () => [
@@ -109,8 +126,22 @@ const Newspaper = ({ data }) => {
     useTable({ columns: tableCols, data: newspapers }, useRowSelect);
 
   if (!session) {
-    return <p>Access Denied...</p>;
+    return <AccessDeniedPage />
   }
+
+  /* if (isLoading) {
+    return (
+      <Flex direction="row">
+        <NavBar session={session}/>
+        <Box p={8} flex="1">
+        <Center h='80%'>
+          <Loader/>
+        </Center>
+        </Box>
+      </Flex>
+    );
+  } */
+
 
   return (
     <Flex direction="row">
