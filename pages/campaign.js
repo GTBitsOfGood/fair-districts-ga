@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {
   Box,
   Button,
@@ -17,9 +17,10 @@ import AccessDeniedPage from "../components/AccessDeniedPage";
 import adminEmails from "./api/auth/adminEmails";
 import axios from "axios";
 
-const Campaign = ({specialUsers}) => {
+const Campaign = () => {
   const { data: session } = useSession();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [ specialUsers, setSpecialUsers] = useState([]);
 
   if (!session) {
     return <AccessDeniedPage />
@@ -30,6 +31,16 @@ const Campaign = ({specialUsers}) => {
       }
     }
   }
+
+
+  useEffect(() => {
+    async function initLegislators() {
+      const resSpecialUsers = await axios.get(`api/specialUser`);
+      const specialUsers = resSpecialUsers.data.map(u => u.email);
+      setSpecialUsers(specialUsers);
+    }
+    initLegislators();
+  }, []);
 
   return (
     <>
@@ -66,22 +77,5 @@ const Campaign = ({specialUsers}) => {
     </>
   );
 };
-
-export async function getServerSideProps(context) {
-  const resSpecialUsers = await axios.get(
-    `http://${
-      process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_VERCEL_URL
-        : "localhost:3000"
-    }/api/specialUser`
-  );
-  const specialUsers = resSpecialUsers.data.map(u => u.email);
-  return {
-    props: {
-      session: await getSession(context),
-      specialUsers
-    },
-  };
-}
 
 export default Campaign;
