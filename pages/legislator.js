@@ -6,9 +6,10 @@ import LegislatorAddModal from "../components/LegislatorAddModal";
 import LegislatorEditModal from "../components/LegislatorEditModal";
 import axios from "axios";
 import NavBar from "../components/NavBar";
-import { useSession } from "next-auth/react"
+import { getSession, useSession } from "next-auth/react"
 import AccessDeniedPage from "../components/AccessDeniedPage";
 import Loader from '../components/Loader';
+import adminEmails from "./api/auth/adminEmails";
 import TableHeader from "../components/TableHeader";
 import useDebounce from "../components/hooks/useDebounce";
 
@@ -17,7 +18,9 @@ const Legislator = () => {
   const [ legislators, setLegislators ] = useState([]);
   const [ legislatorIndex, setLegislatorIndex ] = useState(0);
   const [ isLoading,  setLoading ] = useState(true);
-  const [ activeSort, setActiveSort ] = useState('')
+  const [ activeSort, setActiveSort ] = useState('');
+  const [ specialUsers, setSpecialUsers] = useState([]);
+
   const debouncedActiveSort = useDebounce(activeSort, 200)
   const toggleActiveSort = (target) => {
     const [sort, order] = activeSort.split('.')
@@ -95,17 +98,26 @@ const Legislator = () => {
       const legislators = res.data;
       legislators.forEach((legislator) => legislator.counties = legislator.counties.map((county) => county.name).join(", "));
       setLegislators(legislators);
-      setLoading(false)
+      let resSpecialUsers = await axios.get(`/api/specialUser`);
+      resSpecialUsers = resSpecialUsers.data.map(u => u.email);
+      setSpecialUsers(resSpecialUsers);
+      setLoading(false);
     }
     initLegislators();
   }, [debouncedActiveSort]);
 
   if (!session) {
     return <AccessDeniedPage />
+  } else {
+    if (!adminEmails.includes(session.user.email)) {
+      if (!specialUsers.includes(session.user.email)) {
+        return <AccessDeniedPage />
+      }
+    }
   }
 
   return (
-    <Flex direction="row">
+    <Flex direction="row" height="100%">
       <NavBar session={session}/>
       <Box p={8} flex="1">
         <Flex direction="row" justifyContent="space-between">
@@ -152,6 +164,5 @@ const Legislator = () => {
     </Flex>
   )
 }
-
 
 export default Legislator

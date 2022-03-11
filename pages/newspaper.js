@@ -1,31 +1,19 @@
-import React, { useMemo, useState, useEffect } from "react";
-import Router from "next/router";
-
-import {
-  Box,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Td,
-  Heading,
-  Flex,
-  IconButton,
-  useDisclosure,
-  Center
-} from "@chakra-ui/react";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
-import NewspaperAddModal from "../components/NewspaperAddModal";
+import {
+  Box, Flex, Heading, IconButton, Table, Tbody, Td, Tr, useDisclosure
+} from "@chakra-ui/react";
 import axios from "axios";
-import { useTable, useRowSelect } from "react-table";
-import NewspaperEditModal from "../components/NewspaperEditModal";
-import { getSession, useSession } from "next-auth/react";
-import NavBar from "../components/NavBar";
+import { useSession } from "next-auth/react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useRowSelect, useTable } from "react-table";
 import AccessDeniedPage from "../components/AccessDeniedPage";
-import Loader from '../components/Loader';
-import TableHeader from "../components/TableHeader";
 import useDebounce from "../components/hooks/useDebounce";
-
+import Loader from '../components/Loader';
+import NavBar from "../components/NavBar";
+import NewspaperAddModal from "../components/NewspaperAddModal";
+import NewspaperEditModal from "../components/NewspaperEditModal";
+import TableHeader from "../components/TableHeader";
+import adminEmails from "./api/auth/adminEmails";
 
 
 const Newspaper = () => {
@@ -33,7 +21,9 @@ const Newspaper = () => {
   const [ isLoading,  setLoading ] = useState(true);
   const [newspapers, setNewspapers] = useState([]);
   const [newspaperToEdit, setNewspaperToEdit] = useState();
-  const [ activeSort, setActiveSort ] = useState('')
+  const [ activeSort, setActiveSort ] = useState('');
+  const [ specialUsers, setSpecialUsers] = useState([]);
+
   const debouncedActiveSort = useDebounce(activeSort, 200)
   const toggleActiveSort = (target) => {
     const [sort, order] = activeSort.split('.')
@@ -50,15 +40,12 @@ const Newspaper = () => {
   useEffect(() => {
     const initPapers = async () => {
       setLoading(true)
-      const res = await axios.get(
-        `http://${
-          process.env.NODE_ENV === "production"
-            ? process.env.NEXT_PUBLIC_VERCEL_URL
-            : "localhost:3000"
-        }/api/newspaper?order_by=${debouncedActiveSort}`
-      );
+      const res = await axios.get(`/api/newspaper?order_by=${debouncedActiveSort}` );
       const data = await res.data;
       setNewspapers(data)
+      let resSpecialUsers = await axios.get(`/api/specialUser`);
+      resSpecialUsers = resSpecialUsers.data.map(u => u.email);
+      setSpecialUsers(resSpecialUsers);
       setLoading(false)
     }
     initPapers()
@@ -150,10 +137,16 @@ const Newspaper = () => {
 
   if (!session) {
     return <AccessDeniedPage />
+  } else {
+    if (!adminEmails.includes(session.user.email)) {
+      if (!specialUsers.includes(session.user.email)) {
+        return <AccessDeniedPage />
+      }
+    }
   }
 
   return (
-    <Flex direction="row">
+    <Flex direction="row"  height="100%">
       <NavBar session={session} />
       <Box p={8} flex="1">
         <Flex direction="row" justifyContent="space-between">
@@ -208,5 +201,6 @@ const Newspaper = () => {
     </Flex>
   );
 };
+
 
 export default Newspaper;

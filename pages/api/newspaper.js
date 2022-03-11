@@ -2,6 +2,7 @@ import prisma from "../../prisma/prisma";
 
 async function handler(req, res) {
   if (req.method === "GET") {
+    console.log('got newspaper get')
     await getNewspapers(req, res);
   } else if (req.method === "POST") {
     if (req.body.type === "add") {
