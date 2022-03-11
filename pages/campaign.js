@@ -22,6 +22,15 @@ const Campaign = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [ specialUsers, setSpecialUsers] = useState([]);
 
+  useEffect(() => {
+    async function initCampaign() {
+      const resSpecialUsers = await axios.get(`api/specialUser`);
+      const specialUsers = resSpecialUsers.data.map(u => u.email);
+      setSpecialUsers(specialUsers);
+    }
+    initCampaign();
+  }, []);
+
   if (!session) {
     return <AccessDeniedPage />
   } else {
@@ -31,16 +40,6 @@ const Campaign = () => {
       }
     }
   }
-
-
-  useEffect(() => {
-    async function initLegislators() {
-      const resSpecialUsers = await axios.get(`api/specialUser`);
-      const specialUsers = resSpecialUsers.data.map(u => u.email);
-      setSpecialUsers(specialUsers);
-    }
-    initLegislators();
-  }, []);
 
   return (
     <>
