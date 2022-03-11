@@ -1,9 +1,11 @@
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Link from 'next/link';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import NavBar from '../components/NavBar';
 import Loader from '../components/Loader';
 import adminEmails from "./api/auth/adminEmails";
+import AccessSignOutPage from "../components/AccessSignOutPage";
+import axios from "axios";
 
 const MainButton = (props) => {
   return (
@@ -56,6 +58,8 @@ const MainPageMenu = ({ session }) => {
 
 export default function Component() {
   const { data: session } = useSession();
+  const [ specialUsers, setSpecialUsers] = useState([]);
+
 
   const OtherComponent = React.lazy(() => MainPageMenu);
 
@@ -69,10 +73,26 @@ export default function Component() {
   //     </React.Suspense>
   //   );
   // }
+  useEffect(() => {
+    async function initSpecialUsers() {
+      let resSpecialUsers = await axios.get(`/api/specialUser`);
+      resSpecialUsers = resSpecialUsers.data.map(u => u.email);
+      setSpecialUsers(resSpecialUsers);
+    }
+    initSpecialUsers();
+  }, []);
+
+
   if (session === undefined) {
     return <Loader />;
   }
   if (session) {
+    if (!adminEmails.includes(session.user.email)) {
+      if (!specialUsers.includes(session.user.email)) {
+        return <AccessSignOutPage />
+      }
+    }
+
     return (
       <React.Suspense fallback={<Loader />}>
         <div>
