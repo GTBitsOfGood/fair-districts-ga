@@ -38,7 +38,7 @@ remove tailwindcss
 */
 const MainPageMenu = ({ session }) => {
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row h-full">
       <NavBar session={session} />
       <div className="flex flex-col w-full">
         <div className="flex flex-row items-center justify-end h-16 w-full">
@@ -94,15 +94,15 @@ export default function Component() {
     }
 
     return (
-      <React.Suspense fallback={<Loader />}>
-        <div>
+      <React.Suspense fallback={<Loader />} className="h-full">
+        <div className='h-full'>
           <MainPageMenu session={session} />
         </div>
       </React.Suspense>
     );
   }
   return (
-    <div className="w-full flex flex-col items-center justify-center my-24">
+    <div className="w-full flex flex-col items-center justify-center my-24 h-full">
       <div className="border-2 border-blue-900 p-4">
         <h1 className="font-bold text-xl">Fair Districts GA</h1>
         <p>You are not signed in.</p>

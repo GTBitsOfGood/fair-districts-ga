@@ -43,7 +43,7 @@ const Campaign = () => {
 
   return (
     <>
-      <Flex direction="row">
+      <Flex direction="row"  height="100%">
         <NavBar session={session}/>
         <Box p={8} flex={1}>
           <Heading>Campaigns</Heading>

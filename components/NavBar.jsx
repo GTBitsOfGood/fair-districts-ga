@@ -15,7 +15,7 @@ import adminEmails from "../pages/api/auth/adminEmails";
 
 const NavBar = ({ session }) => {
   return (
-    <Stack padding={2} width={180} direction="column">
+    <Stack padding={2} width={180} height='100%' direction="column" borderRightWidth='1px' borderColor='gray.200'>
       <Image
         src="/FairDistrictsGA-Logo.png"
         objectFit="cover"
