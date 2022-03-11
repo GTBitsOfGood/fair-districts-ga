@@ -14,8 +14,10 @@ import CampaignCard from "../components/Campaign/CampaignCard";
 import CampaignModal from "../components/Campaign/CampaignModal";
 import { getSession, useSession } from "next-auth/react";
 import AccessDeniedPage from "../components/AccessDeniedPage";
+import adminEmails from "./api/auth/adminEmails";
+import axios from "axios";
 
-const Campaign = () => {
+const Campaign = ({specialUsers}) => {
   const { data: session } = useSession();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -32,7 +34,7 @@ const Campaign = () => {
   return (
     <>
       <Flex direction="row">
-        <NavBar />
+        <NavBar session={session}/>
         <Box p={8} flex={1}>
           <Heading>Campaigns</Heading>
           <Center flexDir="column">
@@ -66,10 +68,18 @@ const Campaign = () => {
 };
 
 export async function getServerSideProps(context) {
-  // campaign fetch to go here
+  const resSpecialUsers = await axios.get(
+    `http://${
+      process.env.NODE_ENV === "production"
+        ? process.env.NEXT_PUBLIC_VERCEL_URL
+        : "localhost:3000"
+    }/api/specialUser`
+  );
+  const specialUsers = resSpecialUsers.data.map(u => u.email);
   return {
     props: {
       session: await getSession(context),
+      specialUsers
     },
   };
 }

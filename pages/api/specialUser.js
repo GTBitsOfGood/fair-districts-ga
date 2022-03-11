@@ -36,7 +36,6 @@ async function addSpecialUser(req, res) {
 
 async function editSpecialUser(req, res) {
   const { id, formData, original } = req.body;
-  console.log(id, formData, original)
 
   try {
     const specialUser = await prisma.specialUser.update({

@@ -88,7 +88,6 @@ const PrivilegeEditModal = ({
                   initialValues={prunedPrivilege}
                   onSubmit={async (values, actions) => {
                     const prunedVals = { ...values };
-                    console.log(privilege, privilege.id)
                     const res = await axios.post("/api/specialUser", {
                       type: "edit",
                       id: privilege.id,
