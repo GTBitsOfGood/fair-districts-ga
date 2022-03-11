@@ -7,7 +7,6 @@ import {
   Thead,
   Tbody,
   Tr,
-  Th,
   Td,
   Heading,
   Flex,
@@ -24,21 +23,46 @@ import { getSession, useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
 import AccessDeniedPage from "../components/AccessDeniedPage";
 import Loader from '../components/Loader';
+import TableHeader from "../components/TableHeader";
+import useDebounce from "../components/hooks/useDebounce";
 
 
 
-const Newspaper = ({ data }) => {
-  
+const Newspaper = () => {
   const { data: session } = useSession();
   const [ isLoading,  setLoading ] = useState(true);
+  const [newspapers, setNewspapers] = useState([]);
+  const [newspaperToEdit, setNewspaperToEdit] = useState();
+  const [ activeSort, setActiveSort ] = useState('')
+  const debouncedActiveSort = useDebounce(activeSort, 200)
+  const toggleActiveSort = (target) => {
+    const [sort, order] = activeSort.split('.')
+    if (sort === undefined || order === undefined) {
+      setActiveSort(`${target}.desc`)
+      return
+    }
+    if (target === sort) {
+      if (order === 'desc') setActiveSort(`${target}.asc`)
+      else setActiveSort('')
+    } else setActiveSort(`${target}.desc`)
+  }
 
   useEffect(() => {
-    const end = () => {
-      setLoading(false);
-    };
-    Router.events.on("routeChangeComplete", end);
-   
-  }, [])
+    const initPapers = async () => {
+      setLoading(true)
+      const res = await axios.get(
+        `http://${
+          process.env.NODE_ENV === "production"
+            ? process.env.NEXT_PUBLIC_VERCEL_URL
+            : "localhost:3000"
+        }/api/newspaper?order_by=${debouncedActiveSort}`
+      );
+      const data = await res.data;
+      setNewspapers(data)
+      setLoading(false)
+    }
+    initPapers()
+  }, [debouncedActiveSort])
 
   const tableCols = useMemo(
     () => [
@@ -110,8 +134,7 @@ const Newspaper = ({ data }) => {
     ],
     []
   );
-  const [newspapers, setNewspapers] = useState(data);
-  const [newspaperToEdit, setNewspaperToEdit] = useState();
+  
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
@@ -129,20 +152,6 @@ const Newspaper = ({ data }) => {
     return <AccessDeniedPage />
   }
 
-  /* if (isLoading) {
-    return (
-      <Flex direction="row">
-        <NavBar session={session}/>
-        <Box p={8} flex="1">
-        <Center h='80%'>
-          <Loader/>
-        </Center>
-        </Box>
-      </Flex>
-    );
-  } */
-
-
   return (
     <Flex direction="row">
       <NavBar session={session} />
@@ -155,31 +164,19 @@ const Newspaper = ({ data }) => {
             onClick={onAddOpen}
           />
         </Flex>
-        <Table {...getTableProps()} variant="striped" size="md">
-          <Thead>
-            {headerGroups.map((headerGroup) => {
-              const { key, ...restHeaderGroupProps } =
-                headerGroup.getHeaderGroupProps();
-              return (
-                <Tr key={key} {...restHeaderGroupProps}>
-                  {headerGroup.headers.map((col) => {
-                    const { key, ...restColumn } = col.getHeaderProps();
-                    return (
-                      <Th key={key} {...restColumn}>
-                        {col.render("Header")}
-                      </Th>
-                    );
-                  })}
-                </Tr>
-              );
-            })}
-          </Thead>
+        <Table {...getTableProps()} size="md">
+          <TableHeader 
+            headerGroups={headerGroups} 
+            sort={activeSort} 
+            toggleSort={toggleActiveSort}
+            disabledIndices={[8]}
+          />
           <Tbody {...getTableProps()}>
-            {rows.map((row) => {
+            {!isLoading && rows.map((row) => {
               prepareRow(row);
               const { key, ...restRowProps } = row.getRowProps();
               return (
-                <Tr key={key} {...restRowProps}>
+                <Tr key={key} {...restRowProps} _even={{ bgColor: 'gray.100' }}>
                   {row.cells.map((cell) => {
                     const { key, ...restCellProps } = cell.getCellProps();
                     return (
@@ -193,6 +190,7 @@ const Newspaper = ({ data }) => {
             })}
           </Tbody>
         </Table>
+        {isLoading && <Loader /> }
         <NewspaperAddModal
           isOpen={isAddOpen}
           onClose={onAddClose}
@@ -210,22 +208,5 @@ const Newspaper = ({ data }) => {
     </Flex>
   );
 };
-
-export async function getServerSideProps(context) {
-  const res = await axios.get(
-    `http://${
-      process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_VERCEL_URL
-        : "localhost:3000"
-    }/api/newspaper`
-  );
-  const data = await res.data;
-  return {
-    props: {
-      session: await getSession(context),
-      data,
-    },
-  };
-}
 
 export default Newspaper;
