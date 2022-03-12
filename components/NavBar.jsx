@@ -45,7 +45,7 @@ const NavBar = ({ session }) => {
             variant="ghost"
             justifyContent="flex-start"
           >
-            Campaign
+            Campaigns
           </Button>
         </Link>
         <Link href="/volunteer">
@@ -54,7 +54,7 @@ const NavBar = ({ session }) => {
             variant="ghost"
             justifyContent="flex-start"
           >
-            Volunteer
+            Volunteers
           </Button>
         </Link>
         <Link href="/newspaper">
