@@ -4,7 +4,17 @@ import axios from 'axios';
 import NavBar from '../components/NavBar';
 import Loader from '../components/Loader';
 import AccessSignOutPage from '../components/AccessSignOutPage';
-import { Button, Center, Heading, Text, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  Grid,
+  Heading,
+  SimpleGrid,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
 import adminEmails from './api/auth/adminEmails';
 
 const MainButton = (props) => {
@@ -23,7 +33,21 @@ const MainButton = (props) => {
 };
 
 const AdminGridBox = (props) => {
-  return null;
+  return (
+    <Box
+      borderRadius="2px"
+      borderWidth="2px"
+      borderColor="black"
+      width="100%"
+      height="500px"
+    >
+      {props.children}
+    </Box>
+  );
+};
+
+const CampaignAdminBox = (props) => {
+  return <AdminGridBox>{props.children}</AdminGridBox>;
 };
 
 const SignInOrOutButton = (props) => {
@@ -60,29 +84,33 @@ export default function Component() {
     return <Loader />;
   }
   if (session) {
-    if (!adminEmails.includes(session.user.email)) {
-      if (!specialUsers.includes(session.user.email)) {
-        return <AccessSignOutPage />;
-      }
+    if (
+      !adminEmails.includes(session.user.email) &&
+      !specialUsers.includes(session.user.email)
+    ) {
+      return <AccessSignOutPage />;
     }
     return (
       <React.Suspense fallback={<Loader />}>
-        <div className="flex flex-row">
+        <Flex direction="row" height="100%">
           <NavBar session={session} />
-          <div className="flex flex-col w-full">
-            <div className="flex flex-row items-center justify-end h-16 w-full"></div>
-            <div className="flex flex-col items-center justify-center">
-              <MainButton href="/campaigns" message="Manage Campaigns" />
-              <MainButton href="/volunteers" message="Manage Volunteers" />
-              <MainButton href="/legislators" message="Manage Legislators" />
-              <MainButton href="/counties" message="Manage Counties" />
-            </div>
-          </div>
-        </div>
+          <Flex direction="column" width="100%">
+            <Heading>Admin Dashboard</Heading>
+            <SimpleGrid spacing="40px" columns={[1, 1, 1, 2, 2]}>
+              <Box bg="tomato" width="100px" height="80px" />
+              <Box bg="tomato" width="100px" height="80px" />
+              <Box bg="tomato" width="100px" height="80px" />
+              <Box bg="tomato" width="100px" height="80px" />
+              <Box bg="tomato" width="100px" height="80px" />
+              <Box bg="tomato" width="100px" height="80px" />
+              <Box bg="tomato" width="100px" height="80px" />
+              <Box bg="tomato" width="100px" height="80px" />
+            </SimpleGrid>
+          </Flex>
+        </Flex>
       </React.Suspense>
     );
   }
-
   return (
     <Center width="100%" height="40%">
       <VStack
