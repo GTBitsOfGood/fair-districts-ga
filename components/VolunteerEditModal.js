@@ -60,11 +60,7 @@ const VolunteerEditModal = ({
   const [alertOpen, setAlertOpen] = useState(false);
 
   const volunteer = volunteers[volunteerIndex];
-  if (volunteers.length > 0) {
-    const { countyId, assignments, ...prunedVolunteer } = volunteer;
-
-  }
-
+  const { countyId, assignments, ...prunedVolunteer } = volunteer;
 
   return (
     <>
@@ -88,7 +84,7 @@ const VolunteerEditModal = ({
                 <Formik
                   initialValues={{
                     ...prunedVolunteer,
-                    county: volunteer.county.name,
+                    county: prunedVolunteer.county.name,
                   }}
                   onSubmit={async (values, actions) => {
                     if (document.getElementById("submitter").checked) {
@@ -244,7 +240,10 @@ const VolunteerEditModal = ({
                               <FormLabel htmlFor="submitter">
                                 Submitter
                               </FormLabel>
-                              <Checkbox id="submitter" />
+                              <Checkbox
+                                id="submitter"
+                                defaultChecked={field.value}
+                              />
                               <FormErrorMessage>
                                 {form.errors.submitter}
                               </FormErrorMessage>
@@ -259,7 +258,10 @@ const VolunteerEditModal = ({
                               }
                             >
                               <FormLabel htmlFor="writer">Writer</FormLabel>
-                              <Checkbox id="writer" />
+                              <Checkbox
+                                id="writer"
+                                defaultChecked={field.value}
+                              />
                               <FormErrorMessage>
                                 {form.errors.writer}
                               </FormErrorMessage>
@@ -274,7 +276,10 @@ const VolunteerEditModal = ({
                               }
                             >
                               <FormLabel htmlFor="tracker">Tracker</FormLabel>
-                              <Checkbox id="tracker" />
+                              <Checkbox
+                                id="tracker"
+                                defaultChecked={field.value}
+                              />
                               <FormErrorMessage>
                                 {form.errors.tracker}
                               </FormErrorMessage>

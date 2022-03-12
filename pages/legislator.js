@@ -117,12 +117,6 @@ const Legislator = () => {
         `/api/legislator?order_by=${debouncedActiveSort}`
       );
       const legislators = res.data;
-      legislators.forEach(
-        (legislator) =>
-          (legislator.counties = legislator.counties
-            .map((county) => county.name)
-            .join(", "))
-      );
       setLegislators(legislators);
       let resSpecialUsers = await axios.get(`/api/specialUser`);
       resSpecialUsers = resSpecialUsers.data.map((u) => u.email);
