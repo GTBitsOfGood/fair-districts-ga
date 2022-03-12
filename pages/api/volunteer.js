@@ -15,7 +15,15 @@ async function handler(req, res) {
 }
 
 async function getVolunteers(req, res) {
+  const [field, order] = req.query.order_by?.split(".");
+  const orderBy = {};
+  if (field && order) {
+    if (order === "asc" || order === "desc") {
+      if (field != "counties") orderBy[field] = order;
+    }
+  }
   const allVolunteers = await prisma.volunteer.findMany({
+    orderBy,
     include: {
       assignments: true,
       county: true,
