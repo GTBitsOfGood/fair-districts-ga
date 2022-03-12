@@ -212,23 +212,19 @@ const Volunteer = () => {
           </Tbody>
         </Table>
         {isLoading && <Loader />}
-        {volunteers.length !== 0 && (
-          <>
-            <VolunteerAddModal
-              isOpen={isAddOpen}
-              onClose={onAddClose}
-              volunteers={volunteers}
-              setVolunteers={setVolunteers}
-            />
-            <VolunteerEditModal
-              isOpen={isEditOpen}
-              onClose={onEditClose}
-              volunteers={volunteers}
-              volunteerIndex={volunteerIndex}
-              setVolunteers={setVolunteers}
-            />
-          </>
-        )}
+        <VolunteerAddModal
+          isOpen={isAddOpen}
+          onClose={onAddClose}
+          volunteers={volunteers}
+          setVolunteers={setVolunteers}
+        />
+        <VolunteerEditModal
+          isOpen={isEditOpen}
+          onClose={onEditClose}
+          volunteers={volunteers}
+          volunteerIndex={volunteerIndex}
+          setVolunteers={setVolunteers}
+        />
       </Box>
     </Flex>
   );
