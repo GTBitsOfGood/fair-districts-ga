@@ -2,6 +2,7 @@ import prisma from "../../prisma/prisma";
 
 async function handler(req, res) {
   if (req.method === "GET") {
+    console.log('got newspaper get')
     await getNewspapers(req, res);
   } else if (req.method === "POST") {
     if (req.body.type === "add") {
@@ -15,7 +16,15 @@ async function handler(req, res) {
 }
 
 async function getNewspapers(req, res) {
+  const [ field, order ] = req.query.order_by?.split('.')
+  const orderBy = {}
+  if (field && order) {
+    if (order === 'asc' || order === 'desc') {
+      if (field != 'counties') orderBy[field] = order
+    }
+  }
   const allNewspapers = await prisma.newspaper.findMany({
+    orderBy,
     include: {
       counties: true,
     },

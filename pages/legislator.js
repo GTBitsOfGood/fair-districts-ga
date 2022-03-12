@@ -22,11 +22,32 @@ import axios from "axios";
 import NavBar from "../components/NavBar";
 import { getSession, useSession } from "next-auth/react";
 import AccessDeniedPage from "../components/AccessDeniedPage";
+import Loader from "../components/Loader";
+import adminEmails from "./api/auth/adminEmails";
+import TableHeader from "../components/TableHeader";
+import useDebounce from "../components/hooks/useDebounce";
 
-const Legislator = ({ data }) => {
+const Legislator = () => {
   const { data: session } = useSession();
-  const [legislators, setLegislators] = useState(data);
+  const [legislators, setLegislators] = useState([]);
   const [legislatorIndex, setLegislatorIndex] = useState(0);
+  const [isLoading, setLoading] = useState(true);
+  const [activeSort, setActiveSort] = useState("");
+  const [specialUsers, setSpecialUsers] = useState([]);
+
+  const debouncedActiveSort = useDebounce(activeSort, 200);
+  const toggleActiveSort = (target) => {
+    const [sort, order] = activeSort.split(".");
+    if (sort === undefined || order === undefined) {
+      setActiveSort(`${target}.desc`);
+      return;
+    }
+    if (target === sort) {
+      if (order === "desc") setActiveSort(`${target}.asc`);
+      else setActiveSort("");
+    } else setActiveSort(`${target}.desc`);
+  };
+
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
@@ -89,12 +110,40 @@ const Legislator = ({ data }) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: columns, data: legislators }, useRowSelect);
 
+  useEffect(() => {
+    async function initLegislators() {
+      setLoading(true);
+      const res = await axios.get(
+        `/api/legislator?order_by=${debouncedActiveSort}`
+      );
+      const legislators = res.data;
+      legislators.forEach(
+        (legislator) =>
+          (legislator.counties = legislator.counties
+            .map((county) => county.name)
+            .join(", "))
+      );
+      setLegislators(legislators);
+      let resSpecialUsers = await axios.get(`/api/specialUser`);
+      resSpecialUsers = resSpecialUsers.data.map((u) => u.email);
+      setSpecialUsers(resSpecialUsers);
+      setLoading(false);
+    }
+    initLegislators();
+  }, [debouncedActiveSort]);
+
   if (!session) {
     return <AccessDeniedPage />;
+  } else {
+    if (!adminEmails.includes(session.user.email)) {
+      if (!specialUsers.includes(session.user.email)) {
+        return <AccessDeniedPage />;
+      }
+    }
   }
 
   return (
-    <Flex direction="row">
+    <Flex direction="row" height="100%">
       <NavBar session={session} />
       <Box p={8} flex="1">
         <Flex direction="row" justifyContent="space-between">
@@ -118,53 +167,37 @@ const Legislator = ({ data }) => {
           legislators={legislators}
           setLegislators={setLegislators}
         />
-        <Table {...getTableProps()} variant="striped" size="md">
-          <Thead>
-            {headerGroups.map((headerGroup, ind) => (
-              <Tr key={ind} {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column, ind2) => (
-                  <Th key={ind2} {...column.getHeaderProps()}>
-                    {column.render("Header")}
-                  </Th>
-                ))}
-              </Tr>
-            ))}
-          </Thead>
+        <Table {...getTableProps()} size="md">
+          <TableHeader
+            headerGroups={headerGroups}
+            sort={activeSort}
+            toggleSort={toggleActiveSort}
+            disabledIndices={[4]}
+          />
           <Tbody {...getTableBodyProps()}>
-            {rows.map((row, ind) => {
-              prepareRow(row);
-              return (
-                <Tr key={ind} {...row.getRowProps()}>
-                  {row.cells.map((cell, ind2) => (
-                    <Td key={ind2} {...cell.getCellProps()}>
-                      {cell.render("Cell")}
-                    </Td>
-                  ))}
-                </Tr>
-              );
-            })}
+            {!isLoading &&
+              rows.map((row, ind) => {
+                prepareRow(row);
+                return (
+                  <Tr
+                    key={ind}
+                    {...row.getRowProps()}
+                    _even={{ bgColor: "gray.100" }}
+                  >
+                    {row.cells.map((cell, ind2) => (
+                      <Td key={ind2} {...cell.getCellProps()}>
+                        {cell.render("Cell")}
+                      </Td>
+                    ))}
+                  </Tr>
+                );
+              })}
           </Tbody>
         </Table>
+        {isLoading && <Loader />}
       </Box>
     </Flex>
   );
 };
-
-export async function getServerSideProps(context) {
-  const res = await axios.get(
-    `http://${
-      process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_VERCEL_URL
-        : "localhost:3000"
-    }/api/legislator`
-  );
-  const data = await res.data;
-  return {
-    props: {
-      session: await getSession(context),
-      data,
-    },
-  };
-}
 
 export default Legislator;
