@@ -69,7 +69,16 @@ Run ```git clone https://github.com/bitsofgood/fair-districts-ga.git``` to clone
     CREATE DATABASE fair_districts;
     ```
 5. To ensure the database is created, type ```\l``` and see if it appears in your terminal as a database.
-
+#### Docker
+1. In the command line, run `docker run -p 5432:5432 --name NAME -e POSTGRES_PASSWORD=PASSWORD -d postgres`
+2. The username by default is `postgres` and the password is whatever you set
+3. SSH into your container
+4. psql -U postgres
+5. Create the `fair_districts` database
+   ```
+   CREATE DATABASE fair_districts;
+   ```
+5. To ensure the database is created, type ```\l``` and see if it appears in your terminal as a database.
 ### Set up Prisma and Google OAuth
 1. Navigate to the repository you clone and run the following command
     ```
@@ -88,7 +97,7 @@ Run ```git clone https://github.com/bitsofgood/fair-districts-ga.git``` to clone
     ```
 4. You can verify this by accessing the database and running the following command
     ```
-    \c fair_district
+    \c fair_districts
     \dt
     ```
 

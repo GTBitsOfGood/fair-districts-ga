@@ -7,8 +7,9 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest --watch",
+    "prebuild": "npx prisma generate",
     "ci:test": "jest --ci --passWithNoTests",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "npx prisma generate"
   },
   "dependencies": {
     "@chakra-ui/icons": "^1.1.1",

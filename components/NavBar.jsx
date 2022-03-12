@@ -9,11 +9,13 @@ import {
 import { FiHome, FiLogIn, FiLogOut } from 'react-icons/fi';
 import { BsNewspaper } from 'react-icons/bs';
 import { VscLaw } from 'react-icons/vsc';
+import { RiAdminLine } from 'react-icons/ri'
 import Link from 'next/link';
+import adminEmails from "../pages/api/auth/adminEmails";
 
 const NavBar = ({ session }) => {
   return (
-    <Stack padding={2} width={180} direction="column">
+    <Stack padding={2} width={180} height='100%' direction="column" borderRightWidth='1px' borderColor='gray.200'>
       <Image
         src="/FairDistrictsGA-Logo.png"
         objectFit="cover"
@@ -66,6 +68,16 @@ const NavBar = ({ session }) => {
             Legislators
           </Button>
         </Link>
+        {adminEmails.includes(session.user.email) && 
+        <Link href="/privilege">
+          <Button
+            leftIcon={<RiAdminLine />}
+            variant="ghost"
+            justifyContent="flex-start"
+          >
+            Privileges
+          </Button>
+        </Link>}
       </Stack>
       <Box color="white" paddingTop={250} />
       <Divider />
