@@ -28,7 +28,7 @@ jobs:
           target_url: ""
         
       - name: Update prisma
-        run: prisma:generate && prisma:migrate
+        run: npm run prisma:generate && npm run prisma:migrate
 
       - uses: amondnet/vercel-action@v19
         name: Deploy to Vercel
