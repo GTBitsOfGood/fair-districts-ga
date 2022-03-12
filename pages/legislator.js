@@ -100,7 +100,7 @@ const Legislator = ({ data }) => {
         <Flex direction="row" justifyContent="space-between">
           <Heading>Legislators</Heading>
           <IconButton
-            colorScheme="teal"
+            colorScheme="blue"
             icon={<AddIcon />}
             onClick={onAddOpen}
           />

@@ -133,7 +133,7 @@ const Volunteer = ({ data }) => {
         <Flex direction="row" justifyContent="space-between">
           <Heading>Volunteers</Heading>
           <IconButton
-            colorScheme="teal"
+            colorScheme="blue"
             icon={<AddIcon />}
             onClick={onAddOpen}
           />

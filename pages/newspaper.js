@@ -118,7 +118,7 @@ const Newspaper = ({ data }) => {
         <Flex direction="row" justifyContent="space-between">
           <Heading>Newspapers</Heading>
           <IconButton
-            colorScheme="teal"
+            colorScheme="blue"
             icon={<AddIcon />}
             onClick={onAddOpen}
           />
