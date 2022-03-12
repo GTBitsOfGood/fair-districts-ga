@@ -16,12 +16,15 @@ import { getSession, useSession } from "next-auth/react";
 import AccessDeniedPage from "../components/AccessDeniedPage";
 import adminEmails from "./api/auth/adminEmails";
 import axios from "axios";
+import Loader from '../components/Loader';
+import useDebounce from "../components/hooks/useDebounce";
 
 const Campaign = () => {
   const { data: session } = useSession();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [ isLoading,  setLoading ] = useState(true);
   const [ specialUsers, setSpecialUsers] = useState([]);
+  const [ activeSort, setActiveSort ] = useState('');
 
   useEffect(() => {
     async function initCampaign() {
@@ -47,7 +50,7 @@ const Campaign = () => {
       <Flex direction="row">
         <NavBar session={session}/>
         <Box p={8} flex="1">
-        <Center h='80%'>
+        <Center>
           <Loader/>
         </Center>
         </Box>

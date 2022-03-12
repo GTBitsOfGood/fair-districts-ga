@@ -19,10 +19,16 @@ import VolunteerEditModal from "../components/VolunteerEditModal";
 import { useTable, useRowSelect } from "react-table";
 import { getSession, useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
+import Loader from '../components/Loader';
+import adminEmails from "./api/auth/adminEmails";
+import useDebounce from "../components/hooks/useDebounce";
 
 const Volunteer = ({ data }) => {
   const { data: session } = useSession();
-
+  const [ isLoading,  setLoading ] = useState(true);
+  const [ specialUsers, setSpecialUsers] = useState([]);
+  const [ activeSort, setActiveSort ] = useState('');
+  
   const tableCols = useMemo(
     () => [
       {
@@ -127,6 +133,54 @@ const Volunteer = ({ data }) => {
   } = useDisclosure();
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: tableCols, data: volunteers }, useRowSelect);
+
+    const debouncedActiveSort = useDebounce(activeSort, 200)
+    const toggleActiveSort = (target) => {
+      const [sort, order] = activeSort.split('.')
+      if (sort === undefined || order === undefined) {
+        setActiveSort(`${target}.desc`)
+        return
+      }
+      if (target === sort) {
+        if (order === 'desc') setActiveSort(`${target}.asc`)
+        else setActiveSort('')
+      } else setActiveSort(`${target}.desc`)
+    }
+     
+    useEffect(() => {
+      async function initVolunteers() {
+        setLoading(true)
+        const res = await axios.get(`/api/volunteer?order_by=${debouncedActiveSort}`);
+        const volunteers = res.data;
+        setVolunteers(volunteers);
+        let resSpecialUsers = await axios.get(`/api/specialUser`);
+        resSpecialUsers = resSpecialUsers.data.map(u => u.email);
+        setSpecialUsers(resSpecialUsers);
+        setLoading(false);
+      }
+      initVolunteers();
+    }, [debouncedActiveSort]);
+
+  if (!session) {
+    return <AccessDeniedPage />
+  } else {
+    if (!adminEmails.includes(session.user.email)) {
+      if (!specialUsers.includes(session.user.email)) {
+        return <AccessDeniedPage />
+      }
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <Flex direction="row">
+        <NavBar session={session}/>
+        <Box p={8} flex="1">
+          <Loader/>
+        </Box>
+      </Flex>
+    );
+  } 
 
   return (
     <Flex direction="row">
