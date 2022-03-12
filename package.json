@@ -7,6 +7,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest --watch",
+    "prebuild": "npx prisma generate",
     "ci:test": "jest --ci --passWithNoTests",
     "prisma:generate": "npx prisma generate"
   },
