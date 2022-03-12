@@ -107,6 +107,7 @@ const NavBar = ({ session }) => {
       <Box color="white" paddingTop={250} />
       <Divider />
       <Stack orientation="vertical" spacing={3}>
+        <Link href="/profile">
         <Button
           leftIcon={<MdOutlinePerson />}
           variant="ghost"
@@ -114,6 +115,7 @@ const NavBar = ({ session }) => {
         >
           Profile
         </Button>
+        </Link>
         {session ? (
           <Button
             leftIcon={<FiLogOut />}
