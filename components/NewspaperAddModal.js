@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import {
   Box,
   Modal,
@@ -23,9 +24,9 @@ import {
   Divider,
   Text,
 } from "@chakra-ui/react";
-import { Field, FieldArray, Form, Formik } from "formik";
-import { AddIcon, MinusIcon } from "@chakra-ui/icons";
-import axios from "axios";
+import { Field, Form, Formik } from "formik";
+import { Select } from "chakra-react-select";
+import { georgiaCounties } from "../utils/consts";
 
 const validateName = (value) => {
   let error;
@@ -63,11 +64,10 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
               website: "",
               instagram: "",
               twitter: "",
-              counties: [""],
+              counties: [],
             }}
             onSubmit={async (values, actions) => {
               const prunedVals = { ...values };
-              prunedVals.counties = prunedVals.counties.filter((e) => e);
               prunedVals.rating = parseInt(prunedVals.rating);
               const res = await axios.post("/api/newspaper", {
                 type: "add",
@@ -179,42 +179,27 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
                       </FormControl>
                     )}
                   </Field>
-                  <Box>
-                    <FieldArray name="counties">
-                      {(arrayHelpers) => (
-                        <>
-                          <Flex direction="row">
-                            <FormLabel htmlFor="counties">Counties</FormLabel>
-                            <Stack direction="row" spacing={1}>
-                              <IconButton
-                                size="xs"
-                                icon={<AddIcon />}
-                                onClick={() => arrayHelpers.push("")}
-                              />
-                            </Stack>
-                          </Flex>
-
-                          <Stack direction="column" spacing={2}>
-                            {props.values.counties.map((county, i) => (
-                              <Field key={i} name={`counties.${i}`}>
-                                {({ field, form }) => (
-                                  <Flex direction="row" alignItems="center">
-                                    <Input {...field} id={`county-${i}`} />
-                                    <IconButton
-                                      m={1}
-                                      size="xs"
-                                      icon={<MinusIcon />}
-                                      onClick={() => arrayHelpers.remove(i)}
-                                    />
-                                  </Flex>
-                                )}
-                              </Field>
-                            ))}
-                          </Stack>
-                        </>
-                      )}
-                    </FieldArray>
-                  </Box>
+                  <Field name="counties">
+                    {({ field, form }) => (
+                      <FormControl>
+                        <FormLabel>Counties</FormLabel>
+                        <Select
+                          isMulti
+                          closeMenuOnSelect={false}
+                          options={georgiaCounties.map((county) => ({
+                            label: county,
+                            value: county,
+                          }))}
+                          onChange={(options) => {
+                            form.setFieldValue(
+                              field.name,
+                              options.map((option) => option.value)
+                            );
+                          }}
+                        />
+                      </FormControl>
+                    )}
+                  </Field>
                 </Stack>
                 <Box mt={6} mb={4}>
                   <Divider color="gray.400" mb={4} />

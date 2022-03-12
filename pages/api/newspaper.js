@@ -43,13 +43,8 @@ async function addNewspaper(req, res) {
           create: [],
         },
         counties: {
-          connectOrCreate: counties.map((county) => ({
-            where: {
-              name: county,
-            },
-            create: {
-              name: county,
-            },
+          connect: counties.map((county) => ({
+            name: county,
           })),
         },
       },
@@ -68,8 +63,9 @@ async function editNewspaper(req, res) {
   const { id, formData, original } = req.body;
   const { counties } = formData;
 
-  const originalCounties = original.counties.map((c) => c.name);
-  const removedCounties = originalCounties.filter((x) => !counties.includes(x));
+  const removedCounties = original.counties.filter(
+    (x) => !counties.includes(x.name)
+  );
 
   try {
     const newspaper = await prisma.newspaper.update({
@@ -79,14 +75,9 @@ async function editNewspaper(req, res) {
       data: {
         ...formData,
         counties: {
-          disconnect: removedCounties.map((c) => ({ name: c })),
-          connectOrCreate: counties.map((county) => ({
-            where: {
-              name: county,
-            },
-            create: {
-              name: county,
-            },
+          disconnect: removedCounties.map((c) => ({ name: c.name })),
+          connect: counties.map((county) => ({
+            name: county,
           })),
         },
       },

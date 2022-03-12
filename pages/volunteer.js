@@ -1,6 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
-import Router from "next/router";
-
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Table,
@@ -13,27 +11,27 @@ import {
   Flex,
   IconButton,
   useDisclosure,
-  Center,
 } from "@chakra-ui/react";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
-import PrivilegeAddModal from "../components/PrivilegeAddModal";
 import axios from "axios";
+import VolunteerAddModal from "../components/VolunteerAddModal";
+import VolunteerEditModal from "../components/VolunteerEditModal";
 import { useTable, useRowSelect } from "react-table";
-import PrivilegeEditModal from "../components/PrivilegeEditModal";
 import { getSession, useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
-import AccessDeniedPage from "../components/AccessDeniedPage";
-import Loader from "../components/Loader";
-import adminEmails from "./api/auth/adminEmails";
 import TableHeader from "../components/TableHeader";
 import useDebounce from "../components/hooks/useDebounce";
+import AccessDeniedPage from "../components/AccessDeniedPage";
+import adminEmails from "./api/auth/adminEmails";
+import Loader from "../components/Loader";
 
-const Privileges = () => {
+const Volunteer = () => {
   const { data: session } = useSession();
   const [isLoading, setLoading] = useState(true);
+  const [volunteers, setVolunteers] = useState([]);
+  const [volunteerIndex, setVolunteerIndex] = useState(0);
   const [activeSort, setActiveSort] = useState("");
   const [specialUsers, setSpecialUsers] = useState([]);
-  const [specialUserIndex, setSpecialUserIndex] = useState(0);
 
   const debouncedActiveSort = useDebounce(activeSort, 200);
   const toggleActiveSort = (target) => {
@@ -49,16 +47,19 @@ const Privileges = () => {
   };
 
   useEffect(() => {
-    async function initSpecialUsers() {
+    const initVolunteers = async () => {
       setLoading(true);
       const res = await axios.get(
-        `/api/specialUser?order_by=${debouncedActiveSort}`
+        `/api/volunteer?order_by=${debouncedActiveSort}`
       );
-      const data = res.data;
-      setSpecialUsers(data);
+      const data = await res.data;
+      setVolunteers(data);
+      let resSpecialUsers = await axios.get(`/api/specialUser`);
+      resSpecialUsers = resSpecialUsers.data.map((u) => u.email);
+      setSpecialUsers(resSpecialUsers);
       setLoading(false);
-    }
-    initSpecialUsers();
+    };
+    initVolunteers();
   }, [debouncedActiveSort]);
 
   const tableCols = useMemo(
@@ -69,7 +70,7 @@ const Privileges = () => {
         Cell: ({ row: { index } }) => (
           <IconButton
             onClick={() => {
-              setSpecialUserIndex(index);
+              setVolunteerIndex(index);
               onEditOpen();
             }}
             icon={<EditIcon />}
@@ -80,12 +81,74 @@ const Privileges = () => {
         ),
       },
       {
+        Header: "First Name",
+        accessor: "first_name",
+      },
+      {
+        Header: "Last Name",
+        accessor: "last_name",
+      },
+      {
         Header: "Email",
         accessor: "email",
+      },
+      {
+        Header: "Phone",
+        accessor: "phone",
+      },
+      {
+        Header: "County",
+        accessor: "county",
+        Cell: ({
+          row: {
+            values: { county },
+          },
+        }) => <div>{county.name}</div>,
+      },
+      {
+        Header: "Comments",
+        accessor: "comments",
+      },
+      {
+        Header: "Submitter",
+        accessor: "submitter",
+        Cell: ({
+          row: {
+            values: { submitter },
+          },
+        }) => <div>{submitter ? "Yes" : ""}</div>,
+      },
+      {
+        Header: "Writer",
+        accessor: "writer",
+        Cell: ({
+          row: {
+            values: { writer },
+          },
+        }) => <div>{writer ? "Yes" : ""}</div>,
+      },
+      {
+        Header: "Tracker",
+        accessor: "tracker",
+        Cell: ({
+          row: {
+            values: { tracker },
+          },
+        }) => <div>{tracker ? "Yes" : ""}</div>,
+      },
+      {
+        Header: "Assignments",
+        accessor: "assignments",
+        Cell: ({
+          row: {
+            values: { assignments },
+          },
+        }) => <div>{assignments.map((a) => a.name).join(", ")}</div>,
       },
     ],
     []
   );
+
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
@@ -97,33 +160,36 @@ const Privileges = () => {
     onClose: onEditClose,
   } = useDisclosure();
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns: tableCols, data: specialUsers }, useRowSelect);
+    useTable({ columns: tableCols, data: volunteers }, useRowSelect);
 
   if (!session) {
     return <AccessDeniedPage />;
   } else {
     if (!adminEmails.includes(session.user.email)) {
-      return <AccessDeniedPage />;
+      if (!specialUsers.includes(session.user.email)) {
+        return <AccessDeniedPage />;
+      }
     }
   }
 
   return (
-    <Flex direction="row" height="100%">
+    <Flex direction="row">
       <NavBar session={session} />
-      <Box p={8} flex="1" overflowY="auto">
+      <Box p={8} flex="1">
         <Flex direction="row" justifyContent="space-between">
-          <Heading>Special Users</Heading>
+          <Heading>Volunteers</Heading>
           <IconButton
-            colorScheme="teal"
+            colorScheme="blue"
             icon={<AddIcon />}
             onClick={onAddOpen}
           />
         </Flex>
-        <Table {...getTableProps()} variant="striped" size="md">
+        <Table {...getTableProps()} size="md" variant="striped">
           <TableHeader
             headerGroups={headerGroups}
             sort={activeSort}
             toggleSort={toggleActiveSort}
+            disabledIndices={[4, 5, 10]}
           />
           <Tbody {...getTableProps()}>
             {!isLoading &&
@@ -146,22 +212,26 @@ const Privileges = () => {
           </Tbody>
         </Table>
         {isLoading && <Loader />}
-        <PrivilegeAddModal
-          isOpen={isAddOpen}
-          onClose={onAddClose}
-          privileges={specialUsers}
-          setPrivileges={setSpecialUsers}
-        />
-        <PrivilegeEditModal
-          isOpen={isEditOpen}
-          onClose={onEditClose}
-          privileges={specialUsers}
-          privilegeIndex={specialUserIndex}
-          setPrivileges={setSpecialUsers}
-        />
+        {volunteers.length !== 0 && (
+          <>
+            <VolunteerAddModal
+              isOpen={isAddOpen}
+              onClose={onAddClose}
+              volunteers={volunteers}
+              setVolunteers={setVolunteers}
+            />
+            <VolunteerEditModal
+              isOpen={isEditOpen}
+              onClose={onEditClose}
+              volunteers={volunteers}
+              volunteerIndex={volunteerIndex}
+              setVolunteers={setVolunteers}
+            />
+          </>
+        )}
       </Box>
     </Flex>
   );
 };
 
-export default Privileges;
+export default Volunteer;

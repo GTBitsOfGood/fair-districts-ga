@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
+import axios from "axios";
 import {
   Box,
   Modal,
@@ -23,10 +24,10 @@ import {
   Divider,
   Text,
 } from "@chakra-ui/react";
-import { Field, FieldArray, Form, Formik } from "formik";
-import { AddIcon, MinusIcon } from "@chakra-ui/icons";
-import axios from "axios";
+import { Field, Form, Formik } from "formik";
+import { Select } from "chakra-react-select";
 import NewspaperAlertDialog from "./NewspaperAlertDialog";
+import { georgiaCounties } from "../utils/consts";
 
 const validateName = (value) => {
   let error;
@@ -50,31 +51,23 @@ const validateEmail = (value) => {
 const NewspaperEditModal = ({
   isOpen,
   onClose,
-  newspaperMeta,
   newspapers,
+  newspaperIndex,
   setNewspapers,
 }) => {
   const [alertOpen, setAlertOpen] = useState(false);
 
-  const prunedNewspaper = useMemo(() => {
-    if (newspaperMeta === undefined) return;
-    return {
-      ...newspaperMeta.newspaper,
-      counties: newspaperMeta.newspaper.counties.map((c) => c.name),
-    };
-  }, [newspaperMeta]);
-
-  const { newspaper, index } = newspaperMeta || {};
+  const newspaper = newspapers[newspaperIndex];
 
   return (
     <>
-      {newspaperMeta ? (
+      {newspaper ? (
         <>
           <NewspaperAlertDialog
             alertOpen={alertOpen}
             setAlertOpen={setAlertOpen}
             newspaperId={newspaper.id}
-            index={index}
+            index={newspaperIndex}
             newspapers={newspapers}
             setNewspapers={setNewspapers}
             onClose={onClose}
@@ -82,14 +75,16 @@ const NewspaperEditModal = ({
           <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
-              <ModalHeader>{`Edit ${prunedNewspaper.name}`}</ModalHeader>
+              <ModalHeader>{`Edit ${newspaper.name}`}</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
                 <Formik
-                  initialValues={prunedNewspaper}
+                  initialValues={{
+                    ...newspaper,
+                    counties: newspaper.counties.map((county) => county.name),
+                  }}
                   onSubmit={async (values, actions) => {
                     const prunedVals = { ...values };
-                    prunedVals.counties = prunedVals.counties.filter((e) => e);
                     prunedVals.rating = parseInt(prunedVals.rating);
                     const res = await axios.post("/api/newspaper", {
                       type: "edit",
@@ -102,7 +97,7 @@ const NewspaperEditModal = ({
 
                     if (status === 200) {
                       const clonedNewspapers = [...newspapers];
-                      clonedNewspapers[index] = data;
+                      clonedNewspapers[newspaperIndex] = data;
                       setNewspapers(clonedNewspapers);
                       onClose();
                     }
@@ -149,7 +144,7 @@ const NewspaperEditModal = ({
                                 onChange={(val) =>
                                   form.setFieldValue(field.name, val)
                                 }
-                                defaultValue={50}
+                                defaultValue={field.value}
                                 id="rating"
                                 precision={0}
                               >
@@ -219,49 +214,31 @@ const NewspaperEditModal = ({
                             </FormControl>
                           )}
                         </Field>
-                        <Box>
-                          <FieldArray name="counties">
-                            {(arrayHelpers) => (
-                              <>
-                                <Flex direction="row">
-                                  <FormLabel htmlFor="counties">
-                                    Counties
-                                  </FormLabel>
-                                  <IconButton
-                                    size="xs"
-                                    icon={<AddIcon />}
-                                    onClick={() => arrayHelpers.push("")}
-                                  />
-                                </Flex>
-                                <Stack direction="column" spacing={2}>
-                                  {props.values.counties.map((county, i) => (
-                                    <Field key={i} name={`counties.${i}`}>
-                                      {({ field, form }) => (
-                                        <Flex
-                                          direction="row"
-                                          alignItems="center"
-                                        >
-                                          <Input
-                                            {...field}
-                                            id={`county-${i}`}
-                                          />
-                                          <IconButton
-                                            m={1}
-                                            size="xs"
-                                            icon={<MinusIcon />}
-                                            onClick={() =>
-                                              arrayHelpers.remove(i)
-                                            }
-                                          />
-                                        </Flex>
-                                      )}
-                                    </Field>
-                                  ))}
-                                </Stack>
-                              </>
-                            )}
-                          </FieldArray>
-                        </Box>
+                        <Field name="counties">
+                          {({ field, form }) => (
+                            <FormControl>
+                              <FormLabel>Counties</FormLabel>
+                              <Select
+                                isMulti
+                                closeMenuOnSelect={false}
+                                options={georgiaCounties.map((county) => ({
+                                  label: county,
+                                  value: county,
+                                }))}
+                                defaultValue={field.value.map((county) => ({
+                                  label: county,
+                                  value: county,
+                                }))}
+                                onChange={(options) => {
+                                  form.setFieldValue(
+                                    field.name,
+                                    options.map((option) => option.value)
+                                  );
+                                }}
+                              />
+                            </FormControl>
+                          )}
+                        </Field>
                       </Stack>
                       <Box mt={6} mb={4}>
                         <Divider color="gray.400" mb={4} />
