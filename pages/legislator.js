@@ -139,7 +139,7 @@ const Legislator = () => {
   return (
     <Flex direction="row" height="100%">
       <NavBar session={session} />
-      <Box p={8} flex="1">
+      <Box p={8} flex="1" overflowY="auto">
         <Flex direction="row" justifyContent="space-between">
           <Heading>Legislators</Heading>
           <IconButton
