@@ -59,12 +59,12 @@ const VolunteerEditModal = ({
 }) => {
   const [alertOpen, setAlertOpen] = useState(false);
 
-  const volunteer = volunteers[volunteerIndex];
+  const volunteer = volunteers[volunteerIndex] || {};
   const { countyId, assignments, ...prunedVolunteer } = volunteer;
 
   return (
     <>
-      {volunteer ? (
+      {Object.keys(volunteer).length !== 0 ? (
         <>
           <VolunteerAlertDialog
             alertOpen={alertOpen}
