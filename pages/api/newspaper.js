@@ -4,6 +4,7 @@ async function handler(req, res) {
   if (req.method === "GET") {
     console.log('got newspaper get')
     await getNewspapers(req, res);
+    console.log("got");
   } else if (req.method === "POST") {
     if (req.body.type === "add") {
       await addNewspaper(req, res);

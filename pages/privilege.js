@@ -93,24 +93,10 @@ const Privileges = ({ specialUsers }) => {
     }
   }
 
-  /* if (isLoading) {
-    return (
-      <Flex direction="row">
-        <NavBar session={session}/>
-        <Box p={8} flex="1">
-        <Center h='80%'>
-          <Loader/>
-        </Center>
-        </Box>
-      </Flex>
-    );
-  } */
-
-
   return (
     <Flex direction="row"  height="100%">
       <NavBar session={session} />
-      <Box p={8} flex="1">
+      <Box p={8} flex="1" overflowY="auto">
         <Flex direction="row" justifyContent="space-between">
           <Heading>Special Users</Heading>
           <IconButton
