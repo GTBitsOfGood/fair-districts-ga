@@ -50,30 +50,23 @@ const validateEmail = (value) => {
 const PrivilegeEditModal = ({
   isOpen,
   onClose,
-  privilegeMeta,
   privileges,
+  privilegeIndex,
   setPrivileges,
 }) => {
   const [alertOpen, setAlertOpen] = useState(false);
 
-  const prunedPrivilege = useMemo(() => {
-    if (privilegeMeta === undefined) return;
-    return {
-      ...privilegeMeta.privilege,
-    };
-  }, [privilegeMeta]);
-
-  const { privilege, index } = privilegeMeta || {};
+  const privilege = privileges[privilegeIndex];
 
   return (
     <>
-      {privilegeMeta ? (
+      {privilege ? (
         <>
           <PrivilegeAlertDialog
             alertOpen={alertOpen}
             setAlertOpen={setAlertOpen}
             privilegeId={privilege.id}
-            index={index}
+            index={privilegeIndex}
             privileges={privileges}
             setPrivileges={setPrivileges}
             onClose={onClose}
@@ -81,17 +74,16 @@ const PrivilegeEditModal = ({
           <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
-              <ModalHeader>{`Edit ${prunedPrivilege.name}`}</ModalHeader>
+              <ModalHeader>{`Edit ${privilege.email}`}</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
                 <Formik
-                  initialValues={prunedPrivilege}
+                  initialValues={privilege}
                   onSubmit={async (values, actions) => {
-                    const prunedVals = { ...values };
                     const res = await axios.post("/api/specialUser", {
                       type: "edit",
                       id: privilege.id,
-                      formData: prunedVals,
+                      formData: values,
                       original: privilege,
                     });
                     const status = res.status;
@@ -99,7 +91,7 @@ const PrivilegeEditModal = ({
 
                     if (status === 200) {
                       const clonedPrivileges = [...privileges];
-                      clonedPrivileges[index] = data;
+                      clonedPrivileges[privilegeIndex] = data;
                       setPrivileges(clonedPrivileges);
                       onClose();
                     }

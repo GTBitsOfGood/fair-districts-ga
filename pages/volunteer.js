@@ -19,9 +19,48 @@ import VolunteerEditModal from "../components/VolunteerEditModal";
 import { useTable, useRowSelect } from "react-table";
 import { getSession, useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
+import TableHeader from "../components/TableHeader";
+import useDebounce from "../components/hooks/useDebounce";
+import AccessDeniedPage from "../components/AccessDeniedPage";
+import adminEmails from "./api/auth/adminEmails";
+import Loader from "../components/Loader";
 
-const Volunteer = ({ data }) => {
+const Volunteer = () => {
   const { data: session } = useSession();
+  const [isLoading, setLoading] = useState(true);
+  const [volunteers, setVolunteers] = useState([]);
+  const [volunteerIndex, setVolunteerIndex] = useState(0);
+  const [activeSort, setActiveSort] = useState("");
+  const [specialUsers, setSpecialUsers] = useState([]);
+
+  const debouncedActiveSort = useDebounce(activeSort, 200);
+  const toggleActiveSort = (target) => {
+    const [sort, order] = activeSort.split(".");
+    if (sort === undefined || order === undefined) {
+      setActiveSort(`${target}.desc`);
+      return;
+    }
+    if (target === sort) {
+      if (order === "desc") setActiveSort(`${target}.asc`);
+      else setActiveSort("");
+    } else setActiveSort(`${target}.desc`);
+  };
+
+  useEffect(() => {
+    const initVolunteers = async () => {
+      setLoading(true);
+      const res = await axios.get(
+        `/api/volunteer?order_by=${debouncedActiveSort}`
+      );
+      const data = await res.data;
+      setVolunteers(data);
+      let resSpecialUsers = await axios.get(`/api/specialUser`);
+      resSpecialUsers = resSpecialUsers.data.map((u) => u.email);
+      setSpecialUsers(resSpecialUsers);
+      setLoading(false);
+    };
+    initVolunteers();
+  }, [debouncedActiveSort]);
 
   const tableCols = useMemo(
     () => [
@@ -110,9 +149,6 @@ const Volunteer = ({ data }) => {
     []
   );
 
-  const [volunteers, setVolunteers] = useState(data);
-  const [volunteerIndex, setVolunteerIndex] = useState(0);
-
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
@@ -126,6 +162,16 @@ const Volunteer = ({ data }) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: tableCols, data: volunteers }, useRowSelect);
 
+  if (!session) {
+    return <AccessDeniedPage />;
+  } else {
+    if (!adminEmails.includes(session.user.email)) {
+      if (!specialUsers.includes(session.user.email)) {
+        return <AccessDeniedPage />;
+      }
+    }
+  }
+
   return (
     <Flex direction="row">
       <NavBar session={session} />
@@ -138,77 +184,54 @@ const Volunteer = ({ data }) => {
             onClick={onAddOpen}
           />
         </Flex>
-        <Table {...getTableProps()} variant="striped" size="md">
-          <Thead>
-            {headerGroups.map((headerGroup) => {
-              const { key, ...restHeaderGroupProps } =
-                headerGroup.getHeaderGroupProps();
-              return (
-                <Tr key={key} {...restHeaderGroupProps}>
-                  {headerGroup.headers.map((col) => {
-                    const { key, ...restColumn } = col.getHeaderProps();
-                    return (
-                      <Th key={key} {...restColumn}>
-                        {col.render("Header")}
-                      </Th>
-                    );
-                  })}
-                </Tr>
-              );
-            })}
-          </Thead>
+        <Table {...getTableProps()} size="md" variant="striped">
+          <TableHeader
+            headerGroups={headerGroups}
+            sort={activeSort}
+            toggleSort={toggleActiveSort}
+            disabledIndices={[4, 5, 10]}
+          />
           <Tbody {...getTableProps()}>
-            {rows.map((row) => {
-              prepareRow(row);
-              const { key, ...restRowProps } = row.getRowProps();
-              return (
-                <Tr key={key} {...restRowProps}>
-                  {row.cells.map((cell) => {
-                    const { key, ...restCellProps } = cell.getCellProps();
-                    return (
-                      <Td key={key} {...restCellProps}>
-                        {cell.render("Cell")}
-                      </Td>
-                    );
-                  })}
-                </Tr>
-              );
-            })}
+            {!isLoading &&
+              rows.map((row) => {
+                prepareRow(row);
+                const { key, ...restRowProps } = row.getRowProps();
+                return (
+                  <Tr key={key} {...restRowProps}>
+                    {row.cells.map((cell) => {
+                      const { key, ...restCellProps } = cell.getCellProps();
+                      return (
+                        <Td key={key} {...restCellProps}>
+                          {cell.render("Cell")}
+                        </Td>
+                      );
+                    })}
+                  </Tr>
+                );
+              })}
           </Tbody>
         </Table>
-        <VolunteerAddModal
-          isOpen={isAddOpen}
-          onClose={onAddClose}
-          volunteers={volunteers}
-          setVolunteers={setVolunteers}
-        />
-        <VolunteerEditModal
-          isOpen={isEditOpen}
-          onClose={onEditClose}
-          volunteers={volunteers}
-          volunteerIndex={volunteerIndex}
-          setVolunteers={setVolunteers}
-        />
+        {isLoading && <Loader />}
+        {volunteers.length !== 0 && (
+          <>
+            <VolunteerAddModal
+              isOpen={isAddOpen}
+              onClose={onAddClose}
+              volunteers={volunteers}
+              setVolunteers={setVolunteers}
+            />
+            <VolunteerEditModal
+              isOpen={isEditOpen}
+              onClose={onEditClose}
+              volunteers={volunteers}
+              volunteerIndex={volunteerIndex}
+              setVolunteers={setVolunteers}
+            />
+          </>
+        )}
       </Box>
     </Flex>
   );
 };
-
-export async function getServerSideProps(context) {
-  const res = await axios.get(
-    `http://${
-      process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_VERCEL_URL
-        : "localhost:3000"
-    }/api/volunteer`
-  );
-  const data = await res.data;
-  return {
-    props: {
-      session: await getSession(context),
-      data,
-    },
-  };
-}
 
 export default Volunteer;

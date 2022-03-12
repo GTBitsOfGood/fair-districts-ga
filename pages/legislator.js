@@ -148,19 +148,6 @@ const Legislator = () => {
             onClick={onAddOpen}
           />
         </Flex>
-        <LegislatorAddModal
-          isOpen={isAddOpen}
-          onClose={onAddClose}
-          legislators={legislators}
-          setLegislators={setLegislators}
-        />
-        <LegislatorEditModal
-          isOpen={isEditOpen}
-          onClose={onEditClose}
-          legislatorIndex={legislatorIndex}
-          legislators={legislators}
-          setLegislators={setLegislators}
-        />
         <Table {...getTableProps()} size="md">
           <TableHeader
             headerGroups={headerGroups}
@@ -189,6 +176,19 @@ const Legislator = () => {
           </Tbody>
         </Table>
         {isLoading && <Loader />}
+        <LegislatorAddModal
+          isOpen={isAddOpen}
+          onClose={onAddClose}
+          legislators={legislators}
+          setLegislators={setLegislators}
+        />
+        <LegislatorEditModal
+          isOpen={isEditOpen}
+          onClose={onEditClose}
+          legislatorIndex={legislatorIndex}
+          legislators={legislators}
+          setLegislators={setLegislators}
+        />
       </Box>
     </Flex>
   );

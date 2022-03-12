@@ -2,7 +2,11 @@ import prisma from "../../prisma/prisma";
 
 async function handler(req, res) {
   if (req.method === "GET") {
-    await getSpecialUsers(req, res);
+    if (req.query.order_by) {
+      await getSpecialUsersWithSort(req, res);
+    } else {
+      await getSpecialUsers(req, res);
+    }
   } else if (req.method === "POST") {
     if (req.body.type === "add") {
       await addSpecialUser(req, res);
@@ -19,13 +23,27 @@ async function getSpecialUsers(req, res) {
   res.status(200).json(allSpecialUsers);
 }
 
+async function getSpecialUsersWithSort(req, res) {
+  const [field, order] = req.query.order_by?.split(".");
+  const orderBy = {};
+  if (field && order) {
+    if (order === "asc" || order === "desc") {
+      orderBy[field] = order;
+    }
+  }
+  const allSpecialUsers = await prisma.specialUser.findMany({
+    orderBy,
+  });
+  res.status(200).json(allSpecialUsers);
+}
+
 async function addSpecialUser(req, res) {
   const { ...formData } = req.body.formData;
   try {
     const specialUser = await prisma.specialUser.create({
       data: {
         ...formData,
-      }
+      },
     });
     res.status(200).json(specialUser);
   } catch (e) {
