@@ -102,7 +102,7 @@ export default function Component() {
     );
   }
   return (
-    <div className="w-full flex flex-col items-center justify-center my-24 h-full">
+    <div className="w-full flex flex-col items-center justify-center my-24">
       <div className="border-2 border-blue-900 p-4">
         <h1 className="font-bold text-xl">Fair Districts GA</h1>
         <p>You are not signed in.</p>
