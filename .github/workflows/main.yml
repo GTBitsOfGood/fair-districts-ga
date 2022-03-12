@@ -26,6 +26,9 @@ jobs:
           token: "${{ github.token }}"
           environment: ${{ steps.pipeline.outputs.pipeline }}
           target_url: ""
+        
+      - name: Update prisma
+        run: prisma:generate && prisma:migrate
 
       - uses: amondnet/vercel-action@v19
         name: Deploy to Vercel
