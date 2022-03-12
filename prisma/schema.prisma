@@ -55,6 +55,11 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model SpecialUser {
+  id    String @id @default(cuid())
+  email String @unique
+}
+
 model Volunteer {
   id          String       @id @default(cuid())
   first_name  String
@@ -118,5 +123,5 @@ model Legislator {
   firstName String
   lastName  String
   counties  County[]
-  party     Boolean?
+  party     String?
 }

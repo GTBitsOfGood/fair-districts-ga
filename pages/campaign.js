@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {
   Box,
   Button,
@@ -13,17 +13,38 @@ import { AddIcon } from "@chakra-ui/icons";
 import CampaignCard from "../components/Campaign/CampaignCard";
 import CampaignModal from "../components/Campaign/CampaignModal";
 import { getSession, useSession } from "next-auth/react";
+import AccessDeniedPage from "../components/AccessDeniedPage";
+import adminEmails from "./api/auth/adminEmails";
+import axios from "axios";
 
 const Campaign = () => {
   const { data: session } = useSession();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [ specialUsers, setSpecialUsers] = useState([]);
+
+  useEffect(() => {
+    async function initCampaign() {
+      const resSpecialUsers = await axios.get(`api/specialUser`);
+      const specialUsers = resSpecialUsers.data.map(u => u.email);
+      setSpecialUsers(specialUsers);
+    }
+    initCampaign();
+  }, []);
+
   if (!session) {
-    return <p>Access Denied</p>;
+    return <AccessDeniedPage />
+  } else {
+    if (!adminEmails.includes(session.user.email)) {
+      if (!specialUsers.includes(session.user.email)) {
+        return <AccessDeniedPage />
+      }
+    }
   }
+
   return (
     <>
-      <Flex direction="row">
-        <NavBar />
+      <Flex direction="row"  height="100%">
+        <NavBar session={session}/>
         <Box p={8} flex={1}>
           <Heading>Campaigns</Heading>
           <Center flexDir="column">
@@ -55,14 +76,5 @@ const Campaign = () => {
     </>
   );
 };
-
-export async function getServerSideProps(context) {
-  // campaign fetch to go here
-  return {
-    props: {
-      session: await getSession(context),
-    },
-  };
-}
 
 export default Campaign;
