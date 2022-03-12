@@ -9,7 +9,7 @@
     "test": "jest --watch",
     "ci:test": "jest --ci --passWithNoTests",
     "prisma:generate": "prisma generate",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
     "@chakra-ui/icons": "^1.1.1",
