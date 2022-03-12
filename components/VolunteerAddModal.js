@@ -74,7 +74,7 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Add a Volunteer!</ModalHeader>
+        <ModalHeader>Add a volunteer</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Formik
