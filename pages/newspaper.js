@@ -21,7 +21,6 @@ import { getSession, useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
 import AccessDeniedPage from "../components/AccessDeniedPage";
 
-
 const Newspaper = ({ data }) => {
   const { data: session } = useSession();
 
@@ -30,13 +29,10 @@ const Newspaper = ({ data }) => {
       {
         Header: "",
         accessor: "edit",
-        Cell: ({ row }) => (
+        Cell: ({ row: { index } }) => (
           <IconButton
             onClick={() => {
-              setNewspaperToEdit({
-                index: row.index,
-                newspaper: row.original,
-              });
+              setNewspaperIndex(index);
               onEditOpen();
             }}
             icon={<EditIcon />}
@@ -96,7 +92,8 @@ const Newspaper = ({ data }) => {
     []
   );
   const [newspapers, setNewspapers] = useState(data);
-  const [newspaperToEdit, setNewspaperToEdit] = useState();
+  const [newspaperIndex, setNewspaperIndex] = useState(0);
+
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
@@ -111,7 +108,7 @@ const Newspaper = ({ data }) => {
     useTable({ columns: tableCols, data: newspapers }, useRowSelect);
 
   if (!session) {
-    return <AccessDeniedPage />
+    return <AccessDeniedPage />;
   }
 
   return (
@@ -121,7 +118,7 @@ const Newspaper = ({ data }) => {
         <Flex direction="row" justifyContent="space-between">
           <Heading>Newspapers</Heading>
           <IconButton
-            colorScheme="teal"
+            colorScheme="blue"
             icon={<AddIcon />}
             onClick={onAddOpen}
           />
@@ -173,7 +170,7 @@ const Newspaper = ({ data }) => {
         <NewspaperEditModal
           isOpen={isEditOpen}
           onClose={onEditClose}
-          newspaperMeta={newspaperToEdit}
+          newspaperIndex={newspaperIndex}
           newspapers={newspapers}
           setNewspapers={setNewspapers}
         />
