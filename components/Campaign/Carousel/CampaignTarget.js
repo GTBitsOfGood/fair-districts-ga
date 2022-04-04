@@ -25,12 +25,14 @@ import CampaignFooter from "../Footer";
 const validateEmpty = (value) => {
   let error;
   if (value.length === 0) {
-    error = "Required field";
+    error = "Please select 1 or more options";
   }
   return error;
 };
 
 const CampaignTarget = ({
+  focusTab,
+  setFocusTab,
   incrementPage,
   decrementPage,
   setCurrentPage,
@@ -39,11 +41,18 @@ const CampaignTarget = ({
   selectedCounties,
   setSelectedCounties,
   legislators,
-  setLegislators,
+  selectedLegislators,
+  setSelectedLegislators,
 }) => {
   return (
     <>
-      <Tabs variant="soft-rounded" colorScheme="brand" align="center">
+      <Tabs
+        variant="soft-rounded"
+        colorScheme="brand"
+        align="center"
+        defaultIndex={focusTab}
+        onChange={(index) => setFocusTab(index)}
+      >
         <TabList>
           <Tab>Counties</Tab>
           <Tab>Legislators</Tab>
@@ -109,28 +118,53 @@ const CampaignTarget = ({
               <Text fontSize="lg" fontWeight={600} mb={2}>
                 Choose legislators
               </Text>
-              <Select isMulti closeMenuOnSelect={false} options={legislators} />
-              {/* <Stack direction="column">
-                  {Object.keys(legislators).map((legislatorId) => (
-                    <Checkbox
-                      key={`checkbox-${legislatorId}`}
-                      colorScheme="brand"
-                      isChecked={legislators[legislatorId].selected}
-                      onChange={() => {
-                        const newLegislators = { ...legislators };
-                        const newLegislator = {
-                          ...legislators[legislatorId],
-                          selected: !legislators[legislatorId].selected,
-                        };
-                        newLegislators[legislatorId] = newLegislator;
-                        setLegislators(newLegislators);
-                      }}
-                    >
-                      {legislators[legislatorId].firstName}{" "}
-                      {legislators[legislatorId].lastName}
-                    </Checkbox>
-                  ))}
-                </Stack> */}
+              <Formik
+                initialValues={{
+                  legislators:
+                    selectedLegislators.length === 0 ? [] : selectedLegislators,
+                }}
+                onSubmit={({ legislators }) => {
+                  setCampaignForm({
+                    ...campaignForm,
+                    legislators: legislators.map(
+                      (legislator) => legislator.value
+                    ),
+                  });
+                  incrementPage();
+                }}
+              >
+                {(props) => (
+                  <Form>
+                    <Field name="legislators" validate={validateEmpty}>
+                      {({ field, form }) => (
+                        <FormControl
+                          isRequired
+                          isInvalid={
+                            form.errors.legislators && form.touched.legislators
+                          }
+                        >
+                          <Select
+                            name="legislators"
+                            isMulti
+                            closeMenuOnSelect={false}
+                            value={props.values.legislators}
+                            options={legislators}
+                            onChange={(options) => {
+                              form.setFieldValue(field.name, options);
+                              setSelectedLegislators(options);
+                            }}
+                            onBlur={() => props.setFieldTouched("legislators")}
+                          />
+                          <FormErrorMessage>
+                            {form.errors.legislators}
+                          </FormErrorMessage>
+                        </FormControl>
+                      )}
+                    </Field>
+                    <CampaignFooter decrementPage={decrementPage} />
+                  </Form>
+                )}
+              </Formik>
             </Box>
           </TabPanel>
         </TabPanels>

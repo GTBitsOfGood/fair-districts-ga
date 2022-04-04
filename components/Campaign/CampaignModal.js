@@ -24,6 +24,7 @@ const modalTitles = {
 
 const CampaignModal = ({ isOpen, onClose }) => {
   const [currentPage, setCurrentPage] = useState(0);
+  const [focusTab, setFocusTab] = useState(0);
   const [campaignForm, setCampaignForm] = useState({
     campaignName: "",
     campaignDescription: "",
@@ -64,6 +65,8 @@ const CampaignModal = ({ isOpen, onClose }) => {
             </Case>
             <Case condition={currentPage === 1}>
               <CampaignTarget
+                focusTab={focusTab}
+                setFocusTab={setFocusTab}
                 decrementPage={decrementPage}
                 incrementPage={incrementPage}
                 campaignForm={campaignForm}
@@ -71,7 +74,8 @@ const CampaignModal = ({ isOpen, onClose }) => {
                 selectedCounties={selectedCounties}
                 setSelectedCounties={setSelectedCounties}
                 legislators={legislators}
-                setLegislators={setLegislators}
+                selectedLegislators={selectedLegislators}
+                setSelectedLegislators={setSelectedCounties}
               />
             </Case>
             <Case condition={currentPage === 2}>
