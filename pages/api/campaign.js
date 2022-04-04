@@ -110,7 +110,7 @@ async function generateAssignments(counties) {
         first_name: true,
         last_name: true,
       },
-      take: newspaperInCounties.length - volunteersInCounties.length,
+      take: newspapersInCounties.length - volunteersInCounties.length,
     });
     volunteers = volunteers.concat(volunteersOutCounties);
   }
