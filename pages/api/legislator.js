@@ -15,11 +15,11 @@ async function handler(req, res) {
 }
 
 async function getLegislators(req, res) {
-  const [ field, order ] = req.query.order_by?.split('.')
-  const orderBy = {}
+  const [field, order] = req.query.order_by?.split(".");
+  const orderBy = {};
   if (field && order) {
-    if (order === 'asc' || order === 'desc') {
-      if (field != 'counties') orderBy[field] = order
+    if (order === "asc" || order === "desc") {
+      if (field != "counties") orderBy[field] = order;
     }
   }
   const legislators = await prisma.legislator.findMany({

@@ -36,6 +36,8 @@ const CampaignTarget = ({
   setCurrentPage,
   campaignForm,
   setCampaignForm,
+  selectedCounties,
+  setSelectedCounties,
   legislators,
   setLegislators,
 }) => {
@@ -53,44 +55,48 @@ const CampaignTarget = ({
                 Choose counties
               </Text>
               <Formik
-                initialValues={{ counties: [] }}
-                onSubmit={(values) => {
-                  console.log("here");
+                initialValues={{
+                  counties:
+                    selectedCounties.length === 0 ? [] : selectedCounties,
+                }}
+                onSubmit={({ counties }) => {
+                  setCampaignForm({
+                    ...campaignForm,
+                    counties: counties.map((county) => county.value),
+                  });
+                  incrementPage();
                 }}
               >
                 {(props) => (
                   <Form>
                     <Field name="counties" validate={validateEmpty}>
-                      {({ field, form }) => {
-                        return (
-                          <FormControl
-                            isRequired
-                            isInvalid={
-                              form.errors.counties && form.touched.counties
-                            }
-                          >
-                            <Select
-                              isMulti
-                              closeMenuOnSelect={false}
-                              options={georgiaCounties.map((county) => ({
-                                label: county,
-                                value: county,
-                                selected: false,
-                              }))}
-                              onChange={(options) => {
-                                form.setFieldValue(
-                                  field.name,
-                                  options.map((option) => option.value)
-                                );
-                              }}
-                              onBlur={() => props.setFieldTouched("counties")}
-                            />
-                            <FormErrorMessage>
-                              {form.errors.counties}
-                            </FormErrorMessage>
-                          </FormControl>
-                        );
-                      }}
+                      {({ field, form }) => (
+                        <FormControl
+                          isRequired
+                          isInvalid={
+                            form.errors.counties && form.touched.counties
+                          }
+                        >
+                          <Select
+                            name="counties"
+                            isMulti
+                            closeMenuOnSelect={false}
+                            value={props.values.counties}
+                            options={georgiaCounties.map((county) => ({
+                              label: county,
+                              value: county,
+                            }))}
+                            onChange={(options) => {
+                              form.setFieldValue(field.name, options);
+                              setSelectedCounties(options);
+                            }}
+                            onBlur={() => props.setFieldTouched("counties")}
+                          />
+                          <FormErrorMessage>
+                            {form.errors.counties}
+                          </FormErrorMessage>
+                        </FormControl>
+                      )}
                     </Field>
                     <CampaignFooter decrementPage={decrementPage} />
                   </Form>
@@ -103,14 +109,7 @@ const CampaignTarget = ({
               <Text fontSize="lg" fontWeight={600} mb={2}>
                 Choose legislators
               </Text>
-              <Select
-                isMulti
-                closeMenuOnSelect={false}
-                options={legislators.map((legislator) => ({
-                  label: `${legislator.firstName} ${legislator.lastName}`,
-                  value: legislator.id,
-                }))}
-              />
+              <Select isMulti closeMenuOnSelect={false} options={legislators} />
               {/* <Stack direction="column">
                   {Object.keys(legislators).map((legislatorId) => (
                     <Checkbox

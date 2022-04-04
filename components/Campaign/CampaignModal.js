@@ -28,9 +28,11 @@ const CampaignModal = ({ isOpen, onClose }) => {
     campaignName: "",
     campaignDescription: "",
     campaignStartDate: null,
+    campaignFocus: {},
   });
-  const [counties, setCounties] = useState([]);
+  const [selectedCounties, setSelectedCounties] = useState([]);
   const [legislators, setLegislators] = useState([]);
+  const [selectedLegislators, setSelectedLegislators] = useState([]);
 
   const decrementPage = () => {
     setCurrentPage(currentPage - 1);
@@ -42,8 +44,7 @@ const CampaignModal = ({ isOpen, onClose }) => {
 
   useEffect(async () => {
     const res = await axios.get("/api/campaign");
-    setCounties(res.data.counties);
-    setLegislators(res.data.legislators);
+    setLegislators(res.data);
   }, []);
 
   return (
@@ -67,8 +68,8 @@ const CampaignModal = ({ isOpen, onClose }) => {
                 incrementPage={incrementPage}
                 campaignForm={campaignForm}
                 setCampaignForm={setCampaignForm}
-                counties={counties}
-                setCounties={setCounties}
+                selectedCounties={selectedCounties}
+                setSelectedCounties={setSelectedCounties}
                 legislators={legislators}
                 setLegislators={setLegislators}
               />
