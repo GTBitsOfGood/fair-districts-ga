@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import DatePicker from "react-datepicker";
 import { Form, Formik, Field, useFormikContext, useField } from "formik";
+import CampaignFooter from "../Footer";
 
 const validateReq = (value) => {
   let error;
@@ -61,14 +62,14 @@ const DatePickerField = ({ ...props }) => {
   );
 };
 
-const CampaignInfo = ({ setCurrentPage, campaignForm, setCampaignForm }) => {
+const CampaignInfo = ({ incrementPage, campaignForm, setCampaignForm }) => {
   return (
     <>
       <Formik
         initialValues={campaignForm}
         onSubmit={(values) => {
           setCampaignForm(values);
-          setCurrentPage(1);
+          incrementPage();
         }}
       >
         {(props) => (
@@ -123,14 +124,7 @@ const CampaignInfo = ({ setCurrentPage, campaignForm, setCampaignForm }) => {
                 )}
               </Field>
             </Stack>
-            <Box mt={6} mb={4}>
-              <Divider color="gray.400" mb={4} />
-              <Flex justifyContent="right">
-                <Button colorScheme="brand" type="submit">
-                  Next
-                </Button>
-              </Flex>
-            </Box>
+            <CampaignFooter hasBack={false} />
           </Form>
         )}
       </Formik>

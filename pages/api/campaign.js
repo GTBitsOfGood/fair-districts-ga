@@ -11,24 +11,14 @@ async function getCountiesLegislators(req, res) {
   const counties = await prisma.county.findMany();
   const legislators = await prisma.legislator.findMany();
   res.status(200).json({
-    counties: counties.reduce(
-      (prev, cur) => ({
-        ...prev,
-        [cur["name"]]: false,
-      }),
-      {}
-    ),
-    legislators: legislators.reduce(
-      (prev, cur) => ({
-        ...prev,
-        [cur["id"]]: {
-          firstName: cur.firstName,
-          lastName: cur.lastName,
-          selected: false,
-        },
-      }),
-      {}
-    ),
+    counties: counties.map((county) => ({
+      ...county,
+      selected: false,
+    })),
+    legislators: legislators.map((legislator) => ({
+      ...legislator,
+      selected: false,
+    })),
   });
 }
 

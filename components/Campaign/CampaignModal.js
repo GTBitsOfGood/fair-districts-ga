@@ -32,6 +32,14 @@ const CampaignModal = ({ isOpen, onClose }) => {
   const [counties, setCounties] = useState([]);
   const [legislators, setLegislators] = useState([]);
 
+  const decrementPage = () => {
+    setCurrentPage(currentPage - 1);
+  };
+
+  const incrementPage = () => {
+    setCurrentPage(currentPage + 1);
+  };
+
   useEffect(async () => {
     const res = await axios.get("/api/campaign");
     setCounties(res.data.counties);
@@ -39,7 +47,7 @@ const CampaignModal = ({ isOpen, onClose }) => {
   }, []);
 
   return (
-    <Modal size="xl" isOpen={isOpen} onClose={onClose}>
+    <Modal size="lg" isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{modalTitles[currentPage]}</ModalHeader>
@@ -48,14 +56,15 @@ const CampaignModal = ({ isOpen, onClose }) => {
           <Switch>
             <Case condition={currentPage === 0}>
               <CampaignInfo
-                setCurrentPage={setCurrentPage}
+                incrementPage={incrementPage}
                 campaignForm={campaignForm}
                 setCampaignForm={setCampaignForm}
               />
             </Case>
             <Case condition={currentPage === 1}>
               <CampaignTarget
-                setCurrentPage={setCurrentPage}
+                decrementPage={decrementPage}
+                incrementPage={incrementPage}
                 campaignForm={campaignForm}
                 setCampaignForm={setCampaignForm}
                 counties={counties}
@@ -65,11 +74,12 @@ const CampaignModal = ({ isOpen, onClose }) => {
               />
             </Case>
             <Case condition={currentPage === 2}>
-              <CampaignAssignments setCurrentPage={setCurrentPage} />
+              <CampaignAssignments decrementPage={decrementPage} />
             </Case>
           </Switch>
         </ModalBody>
       </ModalContent>
+      {/* Footer can't go here because submit button must be within Formik form tag */}
     </Modal>
   );
 };
