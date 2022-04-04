@@ -75,7 +75,7 @@ const CampaignModal = ({ isOpen, onClose }) => {
                 setSelectedCounties={setSelectedCounties}
                 legislators={legislators}
                 selectedLegislators={selectedLegislators}
-                setSelectedLegislators={setSelectedCounties}
+                setSelectedLegislators={setSelectedLegislators}
               />
             </Case>
             <Case condition={currentPage === 2}>
