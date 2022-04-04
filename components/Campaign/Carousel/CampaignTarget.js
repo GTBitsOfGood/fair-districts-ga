@@ -71,7 +71,9 @@ const CampaignTarget = ({
                 onSubmit={({ counties }) => {
                   setCampaignForm({
                     ...campaignForm,
-                    counties: counties.map((county) => county.value),
+                    focus: {
+                      counties: counties.map((county) => county.value),
+                    },
                   });
                   incrementPage();
                 }}
@@ -126,9 +128,11 @@ const CampaignTarget = ({
                 onSubmit={({ legislators }) => {
                   setCampaignForm({
                     ...campaignForm,
-                    legislators: legislators.map(
-                      (legislator) => legislator.value
-                    ),
+                    focus: {
+                      legislators: legislators.map(
+                        (legislator) => legislator.value
+                      ),
+                    },
                   });
                   incrementPage();
                 }}
