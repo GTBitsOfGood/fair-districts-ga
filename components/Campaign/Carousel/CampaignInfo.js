@@ -25,10 +25,11 @@ const validateReq = (value) => {
 };
 
 const CustomDateInput = forwardRef(
-  ({ value, onClick, setFieldTouched }, ref) => (
+  ({ value, onClick, setFieldTouched, ...field }, ref) => (
     <Input
+      {...field}
       ref={ref}
-      defaultValue={value}
+      value={value}
       isReadOnly
       onClick={() => {
         onClick();
@@ -45,15 +46,13 @@ const DatePickerField = ({ ...props }) => {
 
   return (
     <DatePicker
-      {...field}
-      {...props}
-      isClearable
       selected={field.value}
       onChange={(val) => {
         setFieldValue(field.name, val);
       }}
       customInput={
         <CustomDateInput
+          {...field}
           id="campaignStartDate"
           setFieldTouched={props.setFieldTouched}
         />
