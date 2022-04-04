@@ -1,6 +1,25 @@
 import { Text, Box, Divider, Flex, Button } from "@chakra-ui/react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
-const CampaignAssignments = ({ decrementPage }) => {
+const CampaignAssignments = ({ campaignForm, decrementPage }) => {
+  const [assignments, setAssignments] = useState([]);
+
+  useEffect(async () => {
+    let focus;
+    const {
+      focus: { counties, legislators },
+    } = campaignForm;
+    if (counties) {
+      focus = "counties";
+    } else if (legislators) {
+      focus = "legislators";
+    }
+
+    const res = await axios.post(`/api/campaign?focus=${focus}`, campaignForm);
+    setAssignments(res.data);
+  }, []);
+
   return (
     <>
       <Text>Assignments</Text>

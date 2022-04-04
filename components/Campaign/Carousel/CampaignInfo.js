@@ -65,9 +65,17 @@ const CampaignInfo = ({ incrementPage, campaignForm, setCampaignForm }) => {
   return (
     <>
       <Formik
-        initialValues={campaignForm}
-        onSubmit={(values) => {
-          setCampaignForm(values);
+        initialValues={{
+          campaignName: campaignForm.name,
+          campaignDescription: campaignForm.description,
+          campaignStartDate: campaignForm.startDate,
+        }}
+        onSubmit={({
+          campaignName: name,
+          campaignDescription: description,
+          campaignStartDate: startDate,
+        }) => {
+          setCampaignForm({ name, description, startDate });
           incrementPage();
         }}
       >

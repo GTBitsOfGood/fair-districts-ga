@@ -26,10 +26,10 @@ const CampaignModal = ({ isOpen, onClose }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [focusTab, setFocusTab] = useState(0);
   const [campaignForm, setCampaignForm] = useState({
-    campaignName: "",
-    campaignDescription: "",
-    campaignStartDate: null,
-    campaignFocus: {},
+    name: "",
+    description: "",
+    startDate: null,
+    focus: {},
   });
   const [selectedCounties, setSelectedCounties] = useState([]);
   const [legislators, setLegislators] = useState([]);
@@ -79,7 +79,10 @@ const CampaignModal = ({ isOpen, onClose }) => {
               />
             </Case>
             <Case condition={currentPage === 2}>
-              <CampaignAssignments decrementPage={decrementPage} />
+              <CampaignAssignments
+                campaignForm={campaignForm}
+                decrementPage={decrementPage}
+              />
             </Case>
           </Switch>
         </ModalBody>
