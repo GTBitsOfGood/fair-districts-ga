@@ -19,7 +19,7 @@ import axios from "axios";
 const modalTitles = {
   0: "Create new campaign",
   1: "Campaign focus",
-  2: "Assignments",
+  2: "Confirm assignments",
 };
 
 const CampaignModal = ({ isOpen, onClose }) => {
@@ -49,7 +49,7 @@ const CampaignModal = ({ isOpen, onClose }) => {
   }, []);
 
   return (
-    <Modal size="lg" isOpen={isOpen} onClose={onClose}>
+    <Modal size="xl" isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{modalTitles[currentPage]}</ModalHeader>

@@ -8,6 +8,8 @@ async function handler(req, res) {
       await generateAssignmentsByCounties(req, res);
     } else if (req.query.focus === "legislators") {
       await generateAssignmentsByLegislators(req, res);
+    } else {
+      await addCampaign(req, res);
     }
   }
 }
@@ -67,6 +69,9 @@ async function generateAssignments(counties) {
     },
   });
 
+  // 2 API requests: Volunteers IN counties, volunteers OUT of counties
+  // alternatively - could query all volunteers and then sort by whether they are in counties or not
+
   // Prioritizes volunteers with least assignments IN counties
   const volunteersInCounties = await prisma.volunteer.findMany({
     where: {
@@ -85,6 +90,11 @@ async function generateAssignments(counties) {
       id: true,
       first_name: true,
       last_name: true,
+      county: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
 
@@ -109,18 +119,43 @@ async function generateAssignments(counties) {
         id: true,
         first_name: true,
         last_name: true,
+        county: {
+          select: {
+            name: true,
+          },
+        },
       },
-      take: newspapersInCounties.length - volunteersInCounties.length,
+      // take: newspapersInCounties.length - volunteersInCounties.length,
     });
     volunteers = volunteers.concat(volunteersOutCounties);
   }
 
-  const assigned = newspapersInCounties.map((newspaper, i) => ({
-    ...newspaper,
-    ...volunteers[i],
+  const assigned = newspapersInCounties.map(({ name, rating }, i) => ({
+    newspaper: {
+      label: name,
+      value: name,
+      rating,
+    },
+    volunteer: {
+      label: `${volunteers[i].first_name} ${volunteers[i].last_name}`,
+      value: volunteers[i].id,
+      county: volunteers[i].county.name,
+    },
   }));
 
-  return assigned;
+  return {
+    newspapersInCounties: newspapersInCounties.map(({ name, rating }) => ({
+      label: name,
+      value: name,
+      rating,
+    })),
+    initialAssignments: assigned,
+    volunteers: volunteers.map((volunteer) => ({
+      label: `${volunteer.first_name} ${volunteer.last_name}`,
+      value: volunteer.id,
+      county: volunteer.county.name,
+    })),
+  };
 }
 
 export default handler;
