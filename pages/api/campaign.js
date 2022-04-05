@@ -45,8 +45,13 @@ async function generateAssignmentsByLegislators(req, res) {
         },
       },
     },
+    select: {
+      name: true,
+    },
   });
-  res.status(200).json(await generateAssignments(counties));
+  res
+    .status(200)
+    .json(await generateAssignments(counties.map(({ name }) => name)));
 }
 
 async function generateAssignments(counties) {

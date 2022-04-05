@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import { AddIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Text,
@@ -13,9 +14,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { Select } from "chakra-react-select";
-import { useEffect, useMemo, useReducer, useState } from "react";
 import { Else, If, Then, When } from "react-if";
-import Loader from "../../Loader";
 
 const CampaignAssignments = ({ campaignForm, decrementPage, onClose }) => {
   const [loading, setLoading] = useState(true);
