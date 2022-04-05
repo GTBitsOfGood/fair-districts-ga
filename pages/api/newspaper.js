@@ -50,6 +50,7 @@ async function addNewspaper(req, res) {
       },
       include: {
         counties: true,
+        assignments: true,
       },
     });
     res.status(200).json(newspaper);

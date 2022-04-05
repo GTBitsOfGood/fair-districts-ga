@@ -95,10 +95,10 @@ export default function Component() {
           <div className="flex flex-col w-full">
             <div className="flex flex-row items-center justify-end h-16 w-full"></div>
             <div className="flex flex-col items-center justify-center">
-              <MainButton href="/campaigns" message="Manage Campaigns" />
-              <MainButton href="/volunteers" message="Manage Volunteers" />
-              <MainButton href="/legislators" message="Manage Legislators" />
-              <MainButton href="/counties" message="Manage Counties" />
+              <MainButton href="/campaign" message="Manage Campaigns" />
+              <MainButton href="/volunteer" message="Manage Volunteers" />
+              <MainButton href="/legislator" message="Manage Legislators" />
+              <MainButton href="/county" message="Manage Counties" />
             </div>
           </div>
         </div>

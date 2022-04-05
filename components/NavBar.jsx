@@ -22,6 +22,7 @@ const GAIcon = (props) => (
 const NavBar = ({ session }) => {
   return (
     <Stack
+      backgroundColor="#fef"
       padding={2}
       width={180}
       height="100%"
