@@ -130,18 +130,33 @@ async function generateAssignments(counties) {
     volunteers = volunteers.concat(volunteersOutCounties);
   }
 
-  const assigned = newspapersInCounties.map(({ name, rating }, i) => ({
-    newspaper: {
-      label: name,
-      value: name,
-      rating,
-    },
-    volunteer: {
-      label: `${volunteers[i].first_name} ${volunteers[i].last_name}`,
-      value: volunteers[i].id,
-      county: volunteers[i].county.name,
-    },
-  }));
+  let assigned = [];
+  for (
+    let i = 0;
+    i < Math.min(newspapersInCounties.length, volunteers.length);
+    i++
+  ) {
+    const { name: newspaperName, rating: newspaperRating } =
+      newspapersInCounties[i];
+    const {
+      first_name: volFirstName,
+      last_name: volLastName,
+      id: volId,
+      county: { name: county },
+    } = volunteers[i];
+    assigned.push({
+      newspaper: {
+        label: newspaperName,
+        value: newspaperName,
+        rating: newspaperRating,
+      },
+      volunteer: {
+        label: `${volFirstName} ${volLastName}`,
+        value: volId,
+        county,
+      },
+    });
+  }
 
   return {
     newspapersInCounties: newspapersInCounties.map(({ name, rating }) => ({
@@ -156,6 +171,10 @@ async function generateAssignments(counties) {
       county: volunteer.county.name,
     })),
   };
+}
+
+async function addCampaign(req, res) {
+  const { assignments } = req.body;
 }
 
 export default handler;

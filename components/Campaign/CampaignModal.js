@@ -82,6 +82,7 @@ const CampaignModal = ({ isOpen, onClose }) => {
               <CampaignAssignments
                 campaignForm={campaignForm}
                 decrementPage={decrementPage}
+                onClose={onClose}
               />
             </Case>
           </Switch>

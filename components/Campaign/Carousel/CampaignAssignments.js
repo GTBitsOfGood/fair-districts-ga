@@ -1,3 +1,4 @@
+import { AddIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Text,
   Box,
@@ -8,21 +9,15 @@ import {
   AlertDialogOverlay,
   Center,
   Spinner,
+  IconButton,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { Select } from "chakra-react-select";
 import { useEffect, useMemo, useReducer, useState } from "react";
-import { Else, If, Then } from "react-if";
+import { Else, If, Then, When } from "react-if";
 import Loader from "../../Loader";
 
-const CampaignAssignments = ({ campaignForm, decrementPage }) => {
-  // const [assignments, setAssignments] = useState({
-  //   newspapersInCounties: [],
-  //   initialAssignments: [],
-  //   volunteers: [],
-  // });
-
-  // const [initialAssignments]
+const CampaignAssignments = ({ campaignForm, decrementPage, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [volunteers, setVolunteers] = useState([]);
   const [assignments, setAssignments] = useState([]);
@@ -32,6 +27,15 @@ const CampaignAssignments = ({ campaignForm, decrementPage }) => {
     () => new Set(assignments.map(({ volunteer }) => volunteer.value)),
     [assignments]
   );
+
+  const error = useMemo(() => {
+    for (let a of assignments) {
+      if (a.newspaper.value === null || a.volunteer.value === null) {
+        return "Resolve empty field";
+      }
+    }
+    return "";
+  }, [assignments]);
 
   useEffect(async () => {
     let focus;
@@ -98,6 +102,7 @@ const CampaignAssignments = ({ campaignForm, decrementPage }) => {
                 >
                   <Box w="47%">
                     <Select
+                      value={volunteer}
                       options={volunteers.filter(
                         (v) => !selectedVolunteers.has(v.value)
                       )}
@@ -112,12 +117,66 @@ const CampaignAssignments = ({ campaignForm, decrementPage }) => {
                       defaultValue={volunteer}
                     />
                   </Box>
+                  <Flex alignItems="center">
+                    <IconButton
+                      size="xs"
+                      variant="ghost"
+                      icon={<CloseIcon />}
+                      colorScheme="red"
+                      onClick={() => {
+                        const clonedAssignments = [...assignments];
+                        clonedAssignments.splice(i, 1);
+                        setAssignments(clonedAssignments);
+                      }}
+                    />
+                  </Flex>
                   <Box w="47%">
-                    <Select options={newspapers} defaultValue={newspaper} />
+                    <Select
+                      value={newspaper}
+                      options={newspapers}
+                      defaultValue={newspaper}
+                      onChange={(option) => {
+                        const clonedAssignments = [...assignments];
+                        clonedAssignments[i] = {
+                          ...assignments[i],
+                          newspaper: option,
+                        };
+                        setAssignments(clonedAssignments);
+                      }}
+                    />
                   </Box>
                 </Flex>
               ))}
             </Stack>
+            <When condition={volunteers.length - assignments.length > 0}>
+              <Center>
+                <IconButton
+                  mt={4}
+                  colorScheme="gray"
+                  size="sm"
+                  icon={<AddIcon />}
+                  onClick={() => {
+                    const clonedAssignments = [...assignments];
+                    clonedAssignments.push({
+                      newspaper: {
+                        label: null,
+                        value: null,
+                      },
+                      volunteer: {
+                        label: null,
+                        value: null,
+                      },
+                    });
+                    setAssignments(clonedAssignments);
+                  }}
+                />
+              </Center>
+            </When>
+            <When condition={error}>
+              <Text color="red" fontSize="sm" mt={3}>
+                {error}
+              </Text>
+            </When>
           </Box>
         </Else>
       </If>
@@ -128,7 +187,20 @@ const CampaignAssignments = ({ campaignForm, decrementPage }) => {
           <Button colorScheme="gray" onClick={() => decrementPage()}>
             Back
           </Button>
-          <Button colorScheme="brand">Submit</Button>
+          <Button
+            colorScheme="brand"
+            onClick={async () => {
+              if (error) return;
+              const res = await axios.post("/api/campaign", assignments);
+              const status = await res.status;
+              const data = await res.data;
+              if (status === 200) {
+                onClose();
+              }
+            }}
+          >
+            Submit
+          </Button>
         </Flex>
       </Box>
     </>
