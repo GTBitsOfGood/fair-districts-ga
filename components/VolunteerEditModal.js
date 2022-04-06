@@ -208,6 +208,7 @@ const VolunteerEditModal = ({
                                 onChange={(option) => {
                                   form.setFieldValue(field.name, option.value);
                                 }}
+                                onBlur={() => props.setFieldTouched("county")}
                               />
                               <FormErrorMessage>
                                 {form.errors.county}

@@ -106,13 +106,13 @@ const NavBar = ({ session }) => {
       <Divider />
       <Stack orientation="vertical" spacing={3}>
         <Link href="/profile">
-        <Button
-          leftIcon={<MdOutlinePerson />}
-          variant="ghost"
-          justifyContent="flex-start"
-        >
-          Profile
-        </Button>
+          <Button
+            leftIcon={<MdOutlinePerson />}
+            variant="ghost"
+            justifyContent="flex-start"
+          >
+            Profile
+          </Button>
         </Link>
         {session ? (
           <Button

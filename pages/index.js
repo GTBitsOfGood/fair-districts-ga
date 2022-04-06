@@ -111,17 +111,21 @@ export default function Component() {
       <React.Suspense fallback={<Loader />}>
         <Flex direction="row" height="100%">
           <NavBar session={session} />
-          <Flex direction="column" width="100%" px="50px" py="40px">
-            <Heading>Admin Dashboard</Heading>
-            <SimpleGrid spacing="20px" py="10px" columns={[1, 1, 1, 2, 2]}>
-              <CampaignAdminBox />
-              <VolunteerAdminBox />
-              <NewspaperAdminBox />
-              <LegislatorAdminBox />
-              <PrivilegeAdminBox />
-            </SimpleGrid>
-          </Flex>
+          <div className="flex flex-col w-full">
+            <div className="flex flex-row items-center justify-end h-16 w-full">
+              <div className="flex flex-col items-center justify-center">
+                <MainButton href="/campaign" message="Manage Campaigns" />
+                <MainButton href="/volunteer" message="Manage Volunteers" />
+                <MainButton href="/legislator" message="Manage Legislators" />
+                <MainButton href="/county" message="Manage Counties" />
+              </div>
+            </div>
+          </div>
         </Flex>
+        {/* <div>
+          <MainPageMenu session={session} />
+          <MainNav session={session} />
+        </div> */}
       </React.Suspense>
     );
   }
