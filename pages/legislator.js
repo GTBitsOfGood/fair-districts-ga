@@ -1,38 +1,52 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Table, Tbody, Tr, Td, useDisclosure, Flex, Heading, IconButton, Box, HStack, Center } from '@chakra-ui/react'
-import { AddIcon, EditIcon } from '@chakra-ui/icons'
-import { useTable, useRowSelect } from 'react-table'
-import LegislatorAddModal from "../components/LegislatorAddModal";
-import LegislatorEditModal from "../components/LegislatorEditModal";
-import axios from "axios";
-import NavBar from "../components/NavBar";
-import { getSession, useSession } from "next-auth/react"
-import AccessDeniedPage from "../components/AccessDeniedPage";
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  useDisclosure,
+  Flex,
+  Heading,
+  IconButton,
+  Box,
+  HStack,
+  Center,
+} from '@chakra-ui/react';
+import { AddIcon, EditIcon } from '@chakra-ui/icons';
+import { useTable, useRowSelect } from 'react-table';
+import LegislatorAddModal from '../components/LegislatorAddModal';
+import LegislatorEditModal from '../components/LegislatorEditModal';
+import axios from 'axios';
+import NavBar from '../components/NavBar';
+import { getSession, useSession } from 'next-auth/react';
+import AccessDeniedPage from '../components/AccessDeniedPage';
 import Loader from '../components/Loader';
-import adminEmails from "./api/auth/adminEmails";
-import TableHeader from "../components/TableHeader";
-import useDebounce from "../components/hooks/useDebounce";
+import adminEmails from './api/auth/adminEmails';
+import TableHeader from '../components/TableHeader';
+import useDebounce from '../components/hooks/useDebounce';
 
 const Legislator = () => {
   const { data: session } = useSession();
-  const [ legislators, setLegislators ] = useState([]);
-  const [ legislatorIndex, setLegislatorIndex ] = useState(0);
-  const [ isLoading,  setLoading ] = useState(true);
-  const [ activeSort, setActiveSort ] = useState('');
-  const [ specialUsers, setSpecialUsers] = useState([]);
+  const [legislators, setLegislators] = useState([]);
+  const [legislatorIndex, setLegislatorIndex] = useState(0);
+  const [isLoading, setLoading] = useState(true);
+  const [activeSort, setActiveSort] = useState('');
+  const [specialUsers, setSpecialUsers] = useState([]);
 
-  const debouncedActiveSort = useDebounce(activeSort, 200)
+  const debouncedActiveSort = useDebounce(activeSort, 200);
   const toggleActiveSort = (target) => {
-    const [sort, order] = activeSort.split('.')
+    const [sort, order] = activeSort.split('.');
     if (sort === undefined || order === undefined) {
-      setActiveSort(`${target}.desc`)
-      return
+      setActiveSort(`${target}.desc`);
+      return;
     }
     if (target === sort) {
-      if (order === 'desc') setActiveSort(`${target}.asc`)
-      else setActiveSort('')
-    } else setActiveSort(`${target}.desc`)
-  }
+      if (order === 'desc') setActiveSort(`${target}.asc`);
+      else setActiveSort('');
+    } else setActiveSort(`${target}.desc`);
+  };
 
   const {
     isOpen: isAddOpen,
@@ -48,15 +62,15 @@ const Legislator = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "",
-        accessor: "edit",
+        Header: '',
+        accessor: 'edit',
         width: 60,
-        Cell: ({ row }) => (
+        Cell: ({ row: { index } }) => (
           <Center>
-            <HStack spacing='24px'>
+            <HStack spacing="24px">
               <IconButton
                 onClick={() => {
-                  setLegislatorIndex(row.index);
+                  setLegislatorIndex(index);
                   onEditOpen();
                 }}
                 icon={<EditIcon />}
@@ -82,10 +96,15 @@ const Legislator = () => {
       },
       {
         Header: 'Counties',
-        accessor: 'counties'
-      }
+        accessor: 'counties',
+        Cell: ({
+          row: {
+            values: { counties },
+          },
+        }) => <div>{counties.map((c) => c.name).join(', ')}</div>,
+      },
     ],
-    [onEditOpen],
+    [onEditOpen]
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -93,13 +112,14 @@ const Legislator = () => {
 
   useEffect(() => {
     async function initLegislators() {
-      setLoading(true)
-      const res = await axios.get(`/api/legislator?order_by=${debouncedActiveSort}`);
+      setLoading(true);
+      const res = await axios.get(
+        `/api/legislator?order_by=${debouncedActiveSort}`
+      );
       const legislators = res.data;
-      legislators.forEach((legislator) => legislator.counties = legislator.counties.map((county) => county.name).join(", "));
       setLegislators(legislators);
       let resSpecialUsers = await axios.get(`/api/specialUser`);
-      resSpecialUsers = resSpecialUsers.data.map(u => u.email);
+      resSpecialUsers = resSpecialUsers.data.map((u) => u.email);
       setSpecialUsers(resSpecialUsers);
       setLoading(false);
     }
@@ -107,39 +127,60 @@ const Legislator = () => {
   }, [debouncedActiveSort]);
 
   if (!session) {
-    return <AccessDeniedPage />
-  }
-
-  if (isLoading) {
-    return (
-      <Flex direction="row">
-        <NavBar session={session}/>
-        <Box p={8} flex="1">
-          <Loader/>
-        </Box>
-      </Flex>
-    );
+    return <AccessDeniedPage />;
   } else {
     if (!adminEmails.includes(session.user.email)) {
       if (!specialUsers.includes(session.user.email)) {
-        return <AccessDeniedPage />
+        return <AccessDeniedPage />;
       }
     }
   }
 
   return (
     <Flex direction="row" height="100%">
-      <NavBar session={session}/>
-      <Box p={8} flex="1">
+      <NavBar session={session} />
+      <Box p={8} flex="1" overflowY="auto">
         <Flex direction="row" justifyContent="space-between">
           <Heading>Legislators</Heading>
-          <IconButton colorScheme="teal" icon={<AddIcon />} onClick={onAddOpen} />
+          <IconButton
+            colorScheme="blue"
+            icon={<AddIcon />}
+            onClick={onAddOpen}
+          />
         </Flex>
+        <Table {...getTableProps()} size="md">
+          <TableHeader
+            headerGroups={headerGroups}
+            sort={activeSort}
+            toggleSort={toggleActiveSort}
+            disabledIndices={[4]}
+          />
+          <Tbody {...getTableBodyProps()}>
+            {!isLoading &&
+              rows.map((row, ind) => {
+                prepareRow(row);
+                return (
+                  <Tr
+                    key={ind}
+                    {...row.getRowProps()}
+                    _even={{ bgColor: 'gray.100' }}
+                  >
+                    {row.cells.map((cell, ind2) => (
+                      <Td key={ind2} {...cell.getCellProps()}>
+                        {cell.render('Cell')}
+                      </Td>
+                    ))}
+                  </Tr>
+                );
+              })}
+          </Tbody>
+        </Table>
+        {isLoading && <Loader />}
         <LegislatorAddModal
-            isOpen={isAddOpen}
-            onClose={onAddClose}
-            legislators={legislators}
-            setLegislators={setLegislators}
+          isOpen={isAddOpen}
+          onClose={onAddClose}
+          legislators={legislators}
+          setLegislators={setLegislators}
         />
         <LegislatorEditModal
           isOpen={isEditOpen}
@@ -148,32 +189,9 @@ const Legislator = () => {
           legislators={legislators}
           setLegislators={setLegislators}
         />
-        <Table {...getTableProps()} size="md">
-          <TableHeader 
-            headerGroups={headerGroups}
-            sort={activeSort}
-            toggleSort={toggleActiveSort}
-            disabledIndices={[4]}
-          />
-          <Tbody {...getTableBodyProps()}>
-            {!isLoading && rows.map((row, ind) => {
-              prepareRow(row)
-              return (
-                <Tr key={ind} {...row.getRowProps()} _even={{ bgColor: 'gray.100' }}>
-                  {row.cells.map((cell, ind2) => (
-                    <Td key={ind2} {...cell.getCellProps()}>
-                      {cell.render('Cell')}
-                    </Td>
-                  ))}
-                </Tr>
-              )
-            })}
-          </Tbody>
-        </Table>
-        {isLoading && <Loader />}
       </Box>
     </Flex>
-  )
-}
+  );
+};
 
-export default Legislator
+export default Legislator;

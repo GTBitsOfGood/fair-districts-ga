@@ -13,7 +13,7 @@ import {
   Flex,
   IconButton,
   useDisclosure,
-  Center
+  Center,
 } from "@chakra-ui/react";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import PrivilegeAddModal from "../components/PrivilegeAddModal";
@@ -23,37 +23,53 @@ import PrivilegeEditModal from "../components/PrivilegeEditModal";
 import { getSession, useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
 import AccessDeniedPage from "../components/AccessDeniedPage";
-import Loader from '../components/Loader';
+import Loader from "../components/Loader";
 import adminEmails from "./api/auth/adminEmails";
+import TableHeader from "../components/TableHeader";
+import useDebounce from "../components/hooks/useDebounce";
 
-
-
-const Privileges = ({ specialUsers }) => {
-  
+const Privileges = () => {
   const { data: session } = useSession();
-  const [ isLoading,  setLoading ] = useState(true);
+  const [isLoading, setLoading] = useState(true);
+  const [activeSort, setActiveSort] = useState("");
+  const [specialUsers, setSpecialUsers] = useState([]);
+  const [specialUserIndex, setSpecialUserIndex] = useState(0);
+
+  const debouncedActiveSort = useDebounce(activeSort, 200);
+  const toggleActiveSort = (target) => {
+    const [sort, order] = activeSort.split(".");
+    if (sort === undefined || order === undefined) {
+      setActiveSort(`${target}.desc`);
+      return;
+    }
+    if (target === sort) {
+      if (order === "desc") setActiveSort(`${target}.asc`);
+      else setActiveSort("");
+    } else setActiveSort(`${target}.desc`);
+  };
 
   useEffect(() => {
-    const end = () => {
+    async function initSpecialUsers() {
+      setLoading(true);
+      const res = await axios.get(
+        `/api/specialUser?order_by=${debouncedActiveSort}`
+      );
+      const data = res.data;
+      setSpecialUsers(data);
       setLoading(false);
-    };
-    Router.events.on("routeChangeComplete", end);
-   
-  }, [])
+    }
+    initSpecialUsers();
+  }, [debouncedActiveSort]);
 
   const tableCols = useMemo(
     () => [
       {
         Header: "",
         accessor: "edit",
-        Cell: ({ row }) => (
+        Cell: ({ row: { index } }) => (
           <IconButton
             onClick={() => {
-              setPrivilegeToEdit({
-                index: row.index,
-                privilege: row.original,
-              });
-              setTimeout(() =>console.log(privilegeToEdit), 5*1000)
+              setSpecialUserIndex(index);
               onEditOpen();
             }}
             icon={<EditIcon />}
@@ -70,8 +86,6 @@ const Privileges = ({ specialUsers }) => {
     ],
     []
   );
-  const [privileges, setPrivileges] = useState(specialUsers);
-  const [privilegeToEdit, setPrivilegeToEdit] = useState();
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
@@ -83,34 +97,20 @@ const Privileges = ({ specialUsers }) => {
     onClose: onEditClose,
   } = useDisclosure();
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns: tableCols, data: privileges }, useRowSelect);
+    useTable({ columns: tableCols, data: specialUsers }, useRowSelect);
 
   if (!session) {
-    return <AccessDeniedPage />
+    return <AccessDeniedPage />;
   } else {
     if (!adminEmails.includes(session.user.email)) {
-      return <AccessDeniedPage />
+      return <AccessDeniedPage />;
     }
   }
 
-  /* if (isLoading) {
-    return (
-      <Flex direction="row">
-        <NavBar session={session}/>
-        <Box p={8} flex="1">
-        <Center h='80%'>
-          <Loader/>
-        </Center>
-        </Box>
-      </Flex>
-    );
-  } */
-
-
   return (
-    <Flex direction="row"  height="100%">
+    <Flex direction="row" height="100%">
       <NavBar session={session} />
-      <Box p={8} flex="1">
+      <Box p={8} flex="1" overflowY="auto">
         <Flex direction="row" justifyContent="space-between">
           <Heading>Special Users</Heading>
           <IconButton
@@ -120,77 +120,48 @@ const Privileges = ({ specialUsers }) => {
           />
         </Flex>
         <Table {...getTableProps()} variant="striped" size="md">
-          <Thead>
-            {headerGroups.map((headerGroup) => {
-              const { key, ...restHeaderGroupProps } =
-                headerGroup.getHeaderGroupProps();
-              return (
-                <Tr key={key} {...restHeaderGroupProps}>
-                  {headerGroup.headers.map((col) => {
-                    const { key, ...restColumn } = col.getHeaderProps();
-                    return (
-                      <Th key={key} {...restColumn}>
-                        {col.render("Header")}
-                      </Th>
-                    );
-                  })}
-                </Tr>
-              );
-            })}
-          </Thead>
+          <TableHeader
+            headerGroups={headerGroups}
+            sort={activeSort}
+            toggleSort={toggleActiveSort}
+          />
           <Tbody {...getTableProps()}>
-            {rows.map((row) => {
-              prepareRow(row);
-              const { key, ...restRowProps } = row.getRowProps();
-              return (
-                <Tr key={key} {...restRowProps}>
-                  {row.cells.map((cell) => {
-                    const { key, ...restCellProps } = cell.getCellProps();
-                    return (
-                      <Td key={key} {...restCellProps}>
-                        {cell.render("Cell")}
-                      </Td>
-                    );
-                  })}
-                </Tr>
-              );
-            })}
+            {!isLoading &&
+              rows.map((row) => {
+                prepareRow(row);
+                const { key, ...restRowProps } = row.getRowProps();
+                return (
+                  <Tr key={key} {...restRowProps}>
+                    {row.cells.map((cell) => {
+                      const { key, ...restCellProps } = cell.getCellProps();
+                      return (
+                        <Td key={key} {...restCellProps}>
+                          {cell.render("Cell")}
+                        </Td>
+                      );
+                    })}
+                  </Tr>
+                );
+              })}
           </Tbody>
         </Table>
+        {isLoading && <Loader />}
         <PrivilegeAddModal
           isOpen={isAddOpen}
           onClose={onAddClose}
-          privileges={privileges}
-          setPrivileges={setPrivileges}
+          privileges={specialUsers}
+          setPrivileges={setSpecialUsers}
         />
         <PrivilegeEditModal
           isOpen={isEditOpen}
           onClose={onEditClose}
-          privilegeMeta={privilegeToEdit}
-          privileges={privileges}
-          setPrivileges={setPrivileges}
+          privileges={specialUsers}
+          privilegeIndex={specialUserIndex}
+          setPrivileges={setSpecialUsers}
         />
       </Box>
     </Flex>
   );
 };
-
-export async function getServerSideProps(context) {
-  const resSpecialUsers = await axios.get(
-    `http://${
-      process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_VERCEL_URL
-        : "localhost:3000"
-    }/api/specialUser`
-  );
-  const specialUsers = resSpecialUsers.data;
-
-  return {
-    props: {
-      session: await getSession(context),
-      specialUsers,
-    },
-  };
-}
 
 export default Privileges;

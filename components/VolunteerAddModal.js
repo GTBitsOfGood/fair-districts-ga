@@ -21,6 +21,8 @@ import { Field, FieldArray, Form, Formik } from "formik";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import React, { useState } from "react";
+import { Select } from "chakra-react-select";
+import { georgiaCounties } from "../utils/consts";
 
 const validateReq = (value) => {
   let error;
@@ -43,25 +45,21 @@ const validateEmail = (value) => {
 
 const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
   const handleAddSubmit = async (values, actions) => {
-    console.log(values);
-    if(document.getElementById("submitter").checked) {
-      values["submitter"] = true
+    if (document.getElementById("submitter").checked) {
+      values["submitter"] = true;
     }
-    if(document.getElementById("writer").checked) {
-      values["writer"] = true
+    if (document.getElementById("writer").checked) {
+      values["writer"] = true;
     }
-    if(document.getElementById("tracker").checked) {
-      values["tracker"] = true
+    if (document.getElementById("tracker").checked) {
+      values["tracker"] = true;
     }
-    console.log(values);
     const res = await axios.post("/api/volunteer", {
       type: "add",
       formData: values,
     });
     const newVolunteer = await res.data;
     if (res.status === 200) {
-      console.log(newVolunteer);
-      console.log(volunteers);
       setVolunteers([...volunteers, newVolunteer]);
       actions.resetForm();
       onClose();
@@ -76,7 +74,7 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Add a Volunteer!</ModalHeader>
+        <ModalHeader>Add a volunteer</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Formik
@@ -141,7 +139,10 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
 
                   <Field name="email" validate={validateEmail}>
                     {({ field, form }) => (
-                      <FormControl isRequired>
+                      <FormControl
+                        isRequired
+                        isInvalid={form.errors.email && form.touched.email}
+                      >
                         <FormLabel htmlFor="email">Email</FormLabel>
                         <Input
                           {...field}
@@ -165,9 +166,20 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
 
                   <Field name="county" validate={validateReq}>
                     {({ field, form }) => (
-                      <FormControl isRequired>
+                      <FormControl
+                        isRequired
+                        isInvalid={form.errors.county && form.touched.county}
+                      >
                         <FormLabel htmlFor="county">County</FormLabel>
-                        <Input {...field} id="county" placeholder="Fulton" />
+                        <Select
+                          options={georgiaCounties.map((county) => ({
+                            label: county,
+                            value: county,
+                          }))}
+                          onChange={(option) => {
+                            form.setFieldValue(field.name, option.value);
+                          }}
+                        />
                         <FormErrorMessage>
                           {form.errors.county}
                         </FormErrorMessage>

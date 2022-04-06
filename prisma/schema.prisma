@@ -23,7 +23,8 @@ model Account {
   session_state      String?
   oauth_token_secret String?
   oauth_token        String?
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([provider, providerAccountId])
 }
 
@@ -49,19 +50,21 @@ model VerificationToken {
   identifier String
   token      String   @unique
   expires    DateTime
+
   @@unique([identifier, token])
 }
 
 model SpecialUser {
   id    String @id @default(cuid())
   email String @unique
+
 }
 
 model Volunteer {
   id          String       @id @unique @default(cuid())
   first_name  String
   last_name   String
-  email       String       
+  email       String       @unique
   phone       String?
   county      County       @relation(fields: [countyId], references: [id])
   countyId    String

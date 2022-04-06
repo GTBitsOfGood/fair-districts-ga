@@ -15,7 +15,15 @@ async function handler(req, res) {
 }
 
 async function getVolunteers(req, res) {
+  const [field, order] = req.query.order_by?.split(".");
+  const orderBy = {};
+  if (field && order) {
+    if (order === "asc" || order === "desc") {
+      if (field != "counties") orderBy[field] = order;
+    }
+  }
   const allVolunteers = await prisma.volunteer.findMany({
+    orderBy,
     include: {
       assignments: true,
       county: true,
@@ -34,13 +42,8 @@ async function addVolunteer(req, res) {
           create: [],
         },
         county: {
-          connectOrCreate: {
-            where: {
-              name: county,
-            },
-            create: {
-              name: county,
-            },
+          connect: {
+            name: county,
           },
         },
       },
@@ -57,10 +60,11 @@ async function addVolunteer(req, res) {
 }
 
 async function editVolunteer(req, res) {
-  const { id, original } = req.body;
-  const {first_name, last_name, email, phone, comments, submitter, writer, tracker, county, formData} = req.body.formData;
-  const {assignments} = original.assignments;
-  console.log(submitter, writer, tracker)
+  const {
+    id,
+    formData: { county, ...formData },
+  } = req.body;
+
   try {
     const volunteer = await prisma.volunteer.update({
       where: {
@@ -68,23 +72,9 @@ async function editVolunteer(req, res) {
       },
       data: {
         ...formData,
-        first_name: first_name,
-        last_name: last_name,
-        email: email,
-        phone: phone,
-        comments: comments,
-        submitter: submitter, 
-        writer: writer,
-        tracker: tracker,
-        assignments: assignments,
         county: {
-          connectOrCreate: {
-            where: {
-              name: county,
-            },
-            create: {
-              name: county,
-            },
+          connect: {
+            name: county,
           },
         },
       },
@@ -102,7 +92,7 @@ async function editVolunteer(req, res) {
 
 async function deleteVolunteer(req, res) {
   const { id } = req.body;
-  console.log(id)
+
   try {
     const deletedVolunteer = await prisma.volunteer.delete({
       where: {

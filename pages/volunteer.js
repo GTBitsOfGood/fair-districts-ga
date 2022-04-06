@@ -1,33 +1,35 @@
-import { AddIcon, EditIcon } from '@chakra-ui/icons';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Box,
-  Flex,
-  Heading,
-  IconButton,
   Table,
+  Thead,
   Tbody,
-  Td,
   Tr,
+  Th,
+  Td,
+  Heading,
+  Flex,
+  IconButton,
   useDisclosure,
 } from '@chakra-ui/react';
+import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import axios from 'axios';
-import { useSession } from 'next-auth/react';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useRowSelect, useTable } from 'react-table';
-import AccessDeniedPage from '../components/AccessDeniedPage';
-import useDebounce from '../components/hooks/useDebounce';
-import Loader from '../components/Loader';
+import VolunteerAddModal from '../components/VolunteerAddModal';
+import VolunteerEditModal from '../components/VolunteerEditModal';
+import { useTable, useRowSelect } from 'react-table';
+import { getSession, useSession } from 'next-auth/react';
 import NavBar from '../components/NavBar';
-import NewspaperAddModal from '../components/NewspaperAddModal';
-import NewspaperEditModal from '../components/NewspaperEditModal';
 import TableHeader from '../components/TableHeader';
+import useDebounce from '../components/hooks/useDebounce';
+import AccessDeniedPage from '../components/AccessDeniedPage';
 import adminEmails from './api/auth/adminEmails';
+import Loader from '../components/Loader';
 
-const Newspaper = () => {
+const Volunteer = () => {
   const { data: session } = useSession();
   const [isLoading, setLoading] = useState(true);
-  const [newspapers, setNewspapers] = useState([]);
-  const [newspaperIndex, setNewspaperIndex] = useState(0);
+  const [volunteers, setVolunteers] = useState([]);
+  const [volunteerIndex, setVolunteerIndex] = useState(0);
   const [activeSort, setActiveSort] = useState('');
   const [specialUsers, setSpecialUsers] = useState([]);
 
@@ -45,19 +47,19 @@ const Newspaper = () => {
   };
 
   useEffect(() => {
-    const initPapers = async () => {
+    const initVolunteers = async () => {
       setLoading(true);
       const res = await axios.get(
-        `/api/newspaper?order_by=${debouncedActiveSort}`
+        `/api/volunteer?order_by=${debouncedActiveSort}`
       );
       const data = await res.data;
-      setNewspapers(data);
+      setVolunteers(data);
       let resSpecialUsers = await axios.get(`/api/specialUser`);
       resSpecialUsers = resSpecialUsers.data.map((u) => u.email);
       setSpecialUsers(resSpecialUsers);
       setLoading(false);
     };
-    initPapers();
+    initVolunteers();
   }, [debouncedActiveSort]);
 
   const tableCols = useMemo(
@@ -68,7 +70,7 @@ const Newspaper = () => {
         Cell: ({ row: { index } }) => (
           <IconButton
             onClick={() => {
-              setNewspaperIndex(index);
+              setVolunteerIndex(index);
               onEditOpen();
             }}
             icon={<EditIcon />}
@@ -79,50 +81,69 @@ const Newspaper = () => {
         ),
       },
       {
-        Header: 'Name',
-        accessor: 'name',
+        Header: 'First Name',
+        accessor: 'first_name',
+      },
+      {
+        Header: 'Last Name',
+        accessor: 'last_name',
       },
       {
         Header: 'Email',
         accessor: 'email',
       },
       {
-        Header: 'Rating',
-        accessor: 'rating',
+        Header: 'Phone',
+        accessor: 'phone',
       },
       {
-        Header: 'Description',
-        accessor: 'description',
+        Header: 'County',
+        accessor: 'county',
         Cell: ({
           row: {
-            values: { description },
+            values: { county },
           },
-        }) => (
-          <div style={{ whiteSpace: 'break-spaces', overflowWrap: 'anywhere' }}>
-            {description}
-          </div>
-        ),
+        }) => <div>{county.name}</div>,
       },
       {
-        Header: 'Website',
-        accessor: 'website',
+        Header: 'Comments',
+        accessor: 'comments',
       },
       {
-        Header: 'Instagram',
-        accessor: 'instagram',
-      },
-      {
-        Header: 'Twitter',
-        accessor: 'twitter',
-      },
-      {
-        Header: 'Counties',
-        accessor: 'counties',
+        Header: 'Submitter',
+        accessor: 'submitter',
         Cell: ({
           row: {
-            values: { counties },
+            values: { submitter },
           },
-        }) => <div>{counties.map((c) => c.name).join(', ')}</div>,
+        }) => <div>{submitter ? 'Yes' : ''}</div>,
+      },
+      {
+        Header: 'Writer',
+        accessor: 'writer',
+        Cell: ({
+          row: {
+            values: { writer },
+          },
+        }) => <div>{writer ? 'Yes' : ''}</div>,
+      },
+      {
+        Header: 'Tracker',
+        accessor: 'tracker',
+        Cell: ({
+          row: {
+            values: { tracker },
+          },
+        }) => <div>{tracker ? 'Yes' : ''}</div>,
+      },
+      {
+        Header: 'Assignments',
+        accessor: 'assignments',
+        Cell: ({
+          row: {
+            values: { assignments },
+          },
+        }) => <div>{assignments.map((a) => a.name).join(', ')}</div>,
       },
     ],
     []
@@ -139,7 +160,7 @@ const Newspaper = () => {
     onClose: onEditClose,
   } = useDisclosure();
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns: tableCols, data: newspapers }, useRowSelect);
+    useTable({ columns: tableCols, data: volunteers }, useRowSelect);
 
   if (!session) {
     return <AccessDeniedPage />;
@@ -151,35 +172,24 @@ const Newspaper = () => {
     }
   }
 
-  if (isLoading) {
-    return (
-      <Flex direction="row">
-        <NavBar session={session} />
-        <Box p={8} flex="1">
-          <Loader />
-        </Box>
-      </Flex>
-    );
-  }
-
   return (
-    <Flex direction="row" height="100%">
+    <Flex direction="row">
       <NavBar session={session} />
-      <Box p={8} flex="1" overflowY="auto">
+      <Box p={8} flex="1">
         <Flex direction="row" justifyContent="space-between">
-          <Heading>Newspapers</Heading>
+          <Heading>Volunteers</Heading>
           <IconButton
             colorScheme="blue"
             icon={<AddIcon />}
             onClick={onAddOpen}
           />
         </Flex>
-        <Table {...getTableProps()} size="md">
+        <Table {...getTableProps()} size="md" variant="striped">
           <TableHeader
             headerGroups={headerGroups}
             sort={activeSort}
             toggleSort={toggleActiveSort}
-            disabledIndices={[8]}
+            disabledIndices={[4, 5, 10]}
           />
           <Tbody {...getTableProps()}>
             {!isLoading &&
@@ -187,11 +197,7 @@ const Newspaper = () => {
                 prepareRow(row);
                 const { key, ...restRowProps } = row.getRowProps();
                 return (
-                  <Tr
-                    key={key}
-                    {...restRowProps}
-                    _even={{ bgColor: 'gray.100' }}
-                  >
+                  <Tr key={key} {...restRowProps}>
                     {row.cells.map((cell) => {
                       const { key, ...restCellProps } = cell.getCellProps();
                       return (
@@ -206,22 +212,22 @@ const Newspaper = () => {
           </Tbody>
         </Table>
         {isLoading && <Loader />}
-        <NewspaperAddModal
+        <VolunteerAddModal
           isOpen={isAddOpen}
           onClose={onAddClose}
-          newspapers={newspapers}
-          setNewspapers={setNewspapers}
+          volunteers={volunteers}
+          setVolunteers={setVolunteers}
         />
-        <NewspaperEditModal
+        <VolunteerEditModal
           isOpen={isEditOpen}
           onClose={onEditClose}
-          newspaperIndex={newspaperIndex}
-          newspapers={newspapers}
-          setNewspapers={setNewspapers}
+          volunteers={volunteers}
+          volunteerIndex={volunteerIndex}
+          setVolunteers={setVolunteers}
         />
       </Box>
     </Flex>
   );
 };
 
-export default Newspaper;
+export default Volunteer;
