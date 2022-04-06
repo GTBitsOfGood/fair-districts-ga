@@ -119,6 +119,9 @@ const CampaignAssignments = ({
                         };
                         setAssignments(clonedAssignments);
                       }}
+                      getOptionLabel={({ label, county }) =>
+                        `${label}: ${county}`
+                      }
                       defaultValue={volunteer}
                     />
                   </Box>
@@ -148,6 +151,9 @@ const CampaignAssignments = ({
                         };
                         setAssignments(clonedAssignments);
                       }}
+                      getOptionLabel={({ label, rating }) =>
+                        `${label}: ${rating}`
+                      }
                     />
                   </Box>
                 </Flex>
