@@ -32,22 +32,39 @@ const MainButton = (props) => {
   );
 };
 
+const CampaignAdminBox = () => {
+  // # active campaigns
+  return <AdminGridBox>Campaigns</AdminGridBox>;
+};
+
+const VolunteerAdminBox = () => {
+  return <AdminGridBox>Volunteers</AdminGridBox>;
+};
+
+const NewspaperAdminBox = () => {
+  return <AdminGridBox>Newspapers</AdminGridBox>;
+};
+
+const LegislatorAdminBox = () => {
+  return <AdminGridBox>Legislators</AdminGridBox>;
+};
+
+const PrivilegeAdminBox = () => {
+  return <AdminGridBox>Privileges</AdminGridBox>;
+};
+
 const AdminGridBox = (props) => {
   return (
     <Box
-      borderRadius="2px"
+      borderRadius="4px"
       borderWidth="2px"
       borderColor="black"
       width="100%"
-      height="500px"
+      height="400px"
     >
       {props.children}
     </Box>
   );
-};
-
-const CampaignAdminBox = (props) => {
-  return <AdminGridBox>{props.children}</AdminGridBox>;
 };
 
 const SignInOrOutButton = (props) => {
@@ -94,17 +111,14 @@ export default function Component() {
       <React.Suspense fallback={<Loader />}>
         <Flex direction="row" height="100%">
           <NavBar session={session} />
-          <Flex direction="column" width="100%">
+          <Flex direction="column" width="100%" px="50px" py="40px">
             <Heading>Admin Dashboard</Heading>
-            <SimpleGrid spacing="40px" columns={[1, 1, 1, 2, 2]}>
-              <Box bg="tomato" width="100px" height="80px" />
-              <Box bg="tomato" width="100px" height="80px" />
-              <Box bg="tomato" width="100px" height="80px" />
-              <Box bg="tomato" width="100px" height="80px" />
-              <Box bg="tomato" width="100px" height="80px" />
-              <Box bg="tomato" width="100px" height="80px" />
-              <Box bg="tomato" width="100px" height="80px" />
-              <Box bg="tomato" width="100px" height="80px" />
+            <SimpleGrid spacing="20px" py="10px" columns={[1, 1, 1, 2, 2]}>
+              <CampaignAdminBox />
+              <VolunteerAdminBox />
+              <NewspaperAdminBox />
+              <LegislatorAdminBox />
+              <PrivilegeAdminBox />
             </SimpleGrid>
           </Flex>
         </Flex>
