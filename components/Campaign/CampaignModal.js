@@ -22,7 +22,7 @@ const modalTitles = {
   2: "Confirm assignments",
 };
 
-const CampaignModal = ({ isOpen, onClose }) => {
+const CampaignModal = ({ appendNewCampaign, isOpen, onClose }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [focusTab, setFocusTab] = useState(0);
   const [campaignForm, setCampaignForm] = useState({
@@ -35,6 +35,18 @@ const CampaignModal = ({ isOpen, onClose }) => {
   const [legislators, setLegislators] = useState([]);
   const [selectedLegislators, setSelectedLegislators] = useState([]);
 
+  const resetModal = () => {
+    setCampaignForm({
+      name: "",
+      description: "",
+      startDate: null,
+      focus: {},
+    });
+    setSelectedCounties([]);
+    setSelectedLegislators([]);
+    setCurrentPage(0);
+  };
+
   const decrementPage = () => {
     setCurrentPage(currentPage - 1);
   };
@@ -44,7 +56,7 @@ const CampaignModal = ({ isOpen, onClose }) => {
   };
 
   useEffect(async () => {
-    const res = await axios.get("/api/campaign");
+    const res = await axios.get("/api/legislator?campaign=true");
     setLegislators(res.data);
   }, []);
 
@@ -80,9 +92,11 @@ const CampaignModal = ({ isOpen, onClose }) => {
             </Case>
             <Case condition={currentPage === 2}>
               <CampaignAssignments
+                appendNewCampaign={appendNewCampaign}
                 campaignForm={campaignForm}
                 decrementPage={decrementPage}
                 onClose={onClose}
+                resetModal={resetModal}
               />
             </Case>
           </Switch>

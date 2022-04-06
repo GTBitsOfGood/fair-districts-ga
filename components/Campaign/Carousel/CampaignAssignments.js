@@ -16,7 +16,13 @@ import axios from "axios";
 import { Select } from "chakra-react-select";
 import { Else, If, Then, When } from "react-if";
 
-const CampaignAssignments = ({ campaignForm, decrementPage, onClose }) => {
+const CampaignAssignments = ({
+  campaignForm,
+  decrementPage,
+  appendNewCampaign,
+  onClose,
+  resetModal,
+}) => {
   const [loading, setLoading] = useState(true);
   const [volunteers, setVolunteers] = useState([]);
   const [assignments, setAssignments] = useState([]);
@@ -190,10 +196,15 @@ const CampaignAssignments = ({ campaignForm, decrementPage, onClose }) => {
             colorScheme="brand"
             onClick={async () => {
               if (error) return;
-              const res = await axios.post("/api/campaign", assignments);
+              const res = await axios.post("/api/campaign", {
+                campaignForm,
+                assignments,
+              });
               const status = await res.status;
               const data = await res.data;
               if (status === 200) {
+                appendNewCampaign(data);
+                resetModal();
                 onClose();
               }
             }}

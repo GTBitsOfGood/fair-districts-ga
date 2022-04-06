@@ -1,6 +1,8 @@
 import { Box, Flex, Text, Button, Center } from "@chakra-ui/react";
+import Link from "next/link";
+import * as dayjs from "dayjs";
 
-const CampaignCard = () => {
+const CampaignCard = ({ id, description, name, startDate }) => {
   return (
     <Box
       padding={4}
@@ -12,23 +14,17 @@ const CampaignCard = () => {
     >
       <Flex direction="row" justifyContent="space-between">
         <Flex direction="column" flex="4">
-          <Text fontSize="xl">Campaign Title</Text>
-          <Text>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
-          </Text>
+          <Text fontSize="xl">{name}</Text>
+          <Text>{description}</Text>
         </Flex>
         <Flex direction="column" justifyContent="space-between">
-          <Text fontSize="xl">12/31/22 - 12/31/22</Text>
+          <Text fontSize="xl">{dayjs(startDate).format("MM/DD/YYYY")}</Text>
           <Center>
-            <Button variant="ghost" size="sm" colorScheme="brand">
-              View Details
-            </Button>
+            <Link href={`/campaign/${id}`}>
+              <Button variant="ghost" size="sm" colorScheme="brand">
+                View Details
+              </Button>
+            </Link>
           </Center>
         </Flex>
       </Flex>

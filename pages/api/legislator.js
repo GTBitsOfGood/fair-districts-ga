@@ -2,7 +2,11 @@ import prisma from "../../prisma/prisma";
 
 async function handler(req, res) {
   if (req.method === "GET") {
-    await getLegislators(req, res);
+    if (req.query.campaign) {
+      await getLegislatorsCampaigns(req, res);
+    } else {
+      await getLegislators(req, res);
+    }
   } else if (req.method === "POST") {
     if (req.body.type === "add") {
       await addLegislator(req, res);
@@ -29,6 +33,17 @@ async function getLegislators(req, res) {
     },
   });
   res.status(200).json(legislators);
+}
+
+// Fetches all legislators for campaign legislator select
+async function getLegislatorsCampaigns(req, res) {
+  const legislators = await prisma.legislator.findMany();
+  res.status(200).json(
+    legislators.map(({ id, firstName, lastName }) => ({
+      label: `${firstName} ${lastName}`,
+      value: id,
+    }))
+  );
 }
 
 async function addLegislator(req, res) {

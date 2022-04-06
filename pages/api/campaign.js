@@ -2,7 +2,11 @@ import prisma from "../../prisma/prisma";
 
 async function handler(req, res) {
   if (req.method === "GET") {
-    await getLegislators(req, res);
+    if (req.query.id) {
+      await getCampaignById(req, res);
+    } else {
+      await getCampaigns(req, res);
+    }
   } else if (req.method === "POST") {
     if (req.query.focus === "counties") {
       await generateAssignmentsByCounties(req, res);
@@ -14,14 +18,38 @@ async function handler(req, res) {
   }
 }
 
-async function getLegislators(req, res) {
-  const legislators = await prisma.legislator.findMany();
-  res.status(200).json(
-    legislators.map(({ id, firstName, lastName }) => ({
-      label: `${firstName} ${lastName}`,
-      value: id,
-    }))
-  );
+async function getCampaigns(req, res) {
+  const campaigns = await prisma.campaign.findMany({});
+  res.status(200).json(campaigns);
+}
+
+async function getCampaignById(req, res) {
+  const { id } = req.query;
+  const campaign = await prisma.campaign.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      assignments: {
+        select: {
+          volunteer: {
+            select: {
+              first_name: true,
+              last_name: true,
+              email: true,
+            },
+          },
+          newspaper: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  res.status(200).json(campaign);
 }
 
 async function generateAssignmentsByCounties(req, res) {
@@ -69,6 +97,7 @@ async function generateAssignments(counties) {
       rating: "desc",
     },
     select: {
+      id: true,
       name: true,
       rating: true,
     },
@@ -141,8 +170,11 @@ async function generateAssignments(counties) {
     i < Math.min(newspapersInCounties.length, volunteers.length);
     i++
   ) {
-    const { name: newspaperName, rating: newspaperRating } =
-      newspapersInCounties[i];
+    const {
+      id: newspaperId,
+      name: newspaperName,
+      rating: newspaperRating,
+    } = newspapersInCounties[i];
     const {
       first_name: volFirstName,
       last_name: volLastName,
@@ -152,7 +184,7 @@ async function generateAssignments(counties) {
     assigned.push({
       newspaper: {
         label: newspaperName,
-        value: newspaperName,
+        value: newspaperId,
         rating: newspaperRating,
       },
       volunteer: {
@@ -164,9 +196,9 @@ async function generateAssignments(counties) {
   }
 
   return {
-    newspapersInCounties: newspapersInCounties.map(({ name, rating }) => ({
+    newspapersInCounties: newspapersInCounties.map(({ id, name, rating }) => ({
       label: name,
-      value: name,
+      value: id,
       rating,
     })),
     initialAssignments: assigned,
@@ -179,7 +211,33 @@ async function generateAssignments(counties) {
 }
 
 async function addCampaign(req, res) {
-  const { assignments } = req.body;
+  const { campaignForm, assignments } = req.body;
+  const { name, description, startDate } = campaignForm;
+
+  const campaign = await prisma.campaign.create({
+    data: {
+      name,
+      description,
+      startDate,
+      assignments: {
+        createMany: {
+          data: assignments.map(
+            ({
+              newspaper: { value: newspaperId },
+              volunteer: { value: volId },
+            }) => ({
+              volunteerId: volId,
+              newspaperId,
+            })
+          ),
+        },
+      },
+    },
+    include: {
+      assignments: true,
+    },
+  });
+  res.status(200).json(campaign);
 }
 
 export default handler;

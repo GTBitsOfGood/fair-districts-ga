@@ -115,6 +115,7 @@ model Campaign {
   id          String       @id @default(cuid())
   name        String
   description String?      @db.VarChar(300)
+  startDate   DateTime     @default(now())
   assignments Assignment[]
 }
 
