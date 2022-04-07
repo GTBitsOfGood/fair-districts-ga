@@ -1,7 +1,8 @@
 import axios from "axios";
 import { getSession, useSession } from "next-auth/react";
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import AccessDeniedPage from "../components/AccessDeniedPage";
+import adminEmails from "./api/auth/adminEmails";
 import NavBar from "../components/NavBar";
 import {
   Box,
@@ -21,6 +22,7 @@ import { useTable, useRowSelect } from "react-table";
 
 const County = ({ data }) => {
   const { data: session } = useSession();
+  const [specialUsers, setSpecialUsers] = useState([]);
 
   const tableCols = useMemo(
     () => [
@@ -107,8 +109,25 @@ const County = ({ data }) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: tableCols, data: data });
 
+
+  useEffect(() => {
+    async function initSpecialUsers() {
+      let resSpecialUsers = await axios.get(`/api/specialUser`);
+      resSpecialUsers = resSpecialUsers.data.map((u) => u.email);
+      setSpecialUsers(resSpecialUsers);
+    }
+    initSpecialUsers();
+  }, []);
+
+
   if (!session) {
     return <AccessDeniedPage />;
+  } else {
+    if (!adminEmails.includes(session.user.email)) {
+      if (!specialUsers.includes(session.user.email)) {
+        return <AccessDeniedPage />;
+      }
+    }
   }
 
   return (
