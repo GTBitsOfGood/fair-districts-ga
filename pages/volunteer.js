@@ -97,6 +97,10 @@ const Volunteer = () => {
         accessor: "phone",
       },
       {
+        Header: "Zip Code",
+        accessor: "zip_code",
+      },
+      {
         Header: "County",
         accessor: "county",
         Cell: ({

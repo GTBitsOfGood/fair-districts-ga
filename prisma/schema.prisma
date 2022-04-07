@@ -66,6 +66,7 @@ model Volunteer {
   last_name   String
   email       String       @unique
   phone       String?
+  zip_code    String?
   county      County       @relation(fields: [countyId], references: [id])
   countyId    String
   comments    String?
@@ -122,6 +123,7 @@ model Legislator {
   id        String   @id @default(cuid())
   firstName String
   lastName  String
+  zip_code  String?
   counties  County[]
   party     String?
 }
