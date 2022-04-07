@@ -73,6 +73,7 @@ model Volunteer {
   writer      Boolean?     @default(false)
   tracker     Boolean?     @default(false)
   assignments Assignment[]
+  quality     Int?
 }
 
 model Assignment {
@@ -97,10 +98,9 @@ model Newspaper {
   rating      Int?
   description String?
   website     String?
-  instagram   String?
-  twitter     String?
   assignments Assignment[]
   counties    County[]
+  published   Boolean?
 }
 
 model County {

@@ -23,6 +23,7 @@ import {
   IconButton,
   Divider,
   Text,
+  Checkbox,
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
 import { Select } from "chakra-react-select";
@@ -62,12 +63,12 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
               rating: 50,
               description: "",
               website: "",
-              instagram: "",
-              twitter: "",
               counties: [],
+              published: false,
             }}
             onSubmit={async (values, actions) => {
               const prunedVals = { ...values };
+              prunedVals.published = document.getElementById("published").checked;
               prunedVals.rating = parseInt(prunedVals.rating);
               const res = await axios.post("/api/newspaper", {
                 type: "add",
@@ -153,32 +154,6 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
                       </FormControl>
                     )}
                   </Field>
-                  <Field name="instagram">
-                    {({ field, form }) => (
-                      <FormControl>
-                        <FormLabel htmlFor="instagram">Instagram</FormLabel>
-                        <InputGroup>
-                          <InputLeftElement color="gray.400">
-                            @
-                          </InputLeftElement>
-                          <Input {...field} id="instagram" />
-                        </InputGroup>
-                      </FormControl>
-                    )}
-                  </Field>
-                  <Field name="twitter">
-                    {({ field, form }) => (
-                      <FormControl>
-                        <FormLabel htmlFor="twitter">Twitter</FormLabel>
-                        <InputGroup>
-                          <InputLeftElement color="gray.400">
-                            @
-                          </InputLeftElement>
-                          <Input {...field} id="twitter" />
-                        </InputGroup>
-                      </FormControl>
-                    )}
-                  </Field>
                   <Field name="counties">
                     {({ field, form }) => (
                       <FormControl>
@@ -197,6 +172,18 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
                             );
                           }}
                         />
+                      </FormControl>
+                    )}
+                  </Field>
+                  <Field name="published">
+                    {({ field, form }) => (
+                      <FormControl>
+                        <Checkbox size="md" id="published" colorScheme="red">
+                          Published
+                        </Checkbox>
+                        <FormErrorMessage>
+                          {form.errors.published}
+                        </FormErrorMessage>
                       </FormControl>
                     )}
                   </Field>

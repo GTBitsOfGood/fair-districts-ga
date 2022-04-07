@@ -23,6 +23,7 @@ import {
   IconButton,
   Divider,
   Text,
+  Checkbox,
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
 import { Select } from "chakra-react-select";
@@ -85,6 +86,7 @@ const NewspaperEditModal = ({
                   }}
                   onSubmit={async (values, actions) => {
                     const prunedVals = { ...values };
+                    prunedVals.published = document.getElementById("published").checked;
                     prunedVals.rating = parseInt(prunedVals.rating);
                     const res = await axios.post("/api/newspaper", {
                       type: "edit",
@@ -186,34 +188,6 @@ const NewspaperEditModal = ({
                             </FormControl>
                           )}
                         </Field>
-                        <Field name="instagram">
-                          {({ field, form }) => (
-                            <FormControl>
-                              <FormLabel htmlFor="instagram">
-                                Instagram
-                              </FormLabel>
-                              <InputGroup>
-                                <InputLeftElement color="gray.400">
-                                  @
-                                </InputLeftElement>
-                                <Input {...field} id="instagram" />
-                              </InputGroup>
-                            </FormControl>
-                          )}
-                        </Field>
-                        <Field name="twitter">
-                          {({ field, form }) => (
-                            <FormControl>
-                              <FormLabel htmlFor="twitter">Twitter</FormLabel>
-                              <InputGroup>
-                                <InputLeftElement color="gray.400">
-                                  @
-                                </InputLeftElement>
-                                <Input {...field} id="twitter" />
-                              </InputGroup>
-                            </FormControl>
-                          )}
-                        </Field>
                         <Field name="counties">
                           {({ field, form }) => (
                             <FormControl>
@@ -236,6 +210,26 @@ const NewspaperEditModal = ({
                                   );
                                 }}
                               />
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="published">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.published && form.touched.published
+                              }
+                            >
+                              <FormLabel htmlFor="published">
+                                Published
+                              </FormLabel>
+                              <Checkbox
+                                id="published"
+                                defaultChecked={field.value}
+                              />
+                              <FormErrorMessage>
+                                {form.errors.published}
+                              </FormErrorMessage>
                             </FormControl>
                           )}
                         </Field>
