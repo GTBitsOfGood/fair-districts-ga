@@ -71,21 +71,10 @@ const VolunteerEditModal = ({
                     county: prunedVolunteer.county.name,
                   }}
                   onSubmit={async (values, actions) => {
-                    if (document.getElementById("submitter").checked) {
-                      values.submitter = true;
-                    } else {
-                      values.submitter = false;
-                    }
-                    if (document.getElementById("writer").checked) {
-                      values.writer = true;
-                    } else {
-                      values.writer = false;
-                    }
-                    if (document.getElementById("tracker").checked) {
-                      values.tracker = true;
-                    } else {
-                      values.tracker = false;
-                    }
+                    values.submitter = document.getElementById("submitter").checked;
+                    values.writer = document.getElementById("writer").checked;
+                    values.tracker = document.getElementById("tracker").checked;
+                    values["quality"] = parseInt(values["quality"]);
                     const res = await axios.post("/api/volunteer", {
                       type: "edit",
                       id: volunteer.id,
@@ -280,6 +269,23 @@ const VolunteerEditModal = ({
                               <FormErrorMessage>
                                 {form.errors.tracker}
                               </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="quality">
+                          {({ field, form }) => (
+                            <FormControl>
+                              <FormLabel htmlFor="quality">Quality</FormLabel>
+                              <NumberInput
+                                onChange={(val) =>
+                                  form.setFieldValue(field.name, val)
+                                }
+                                defaultValue={field.value}
+                                id="quality"
+                                precision={0}
+                              >
+                                <NumberInputField />
+                              </NumberInput>
                             </FormControl>
                           )}
                         </Field>

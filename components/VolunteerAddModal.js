@@ -16,6 +16,8 @@ import {
   IconButton,
   Divider,
   Checkbox,
+  NumberInput,
+  NumberInputField,
 } from "@chakra-ui/react";
 import { Field, FieldArray, Form, Formik } from "formik";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
@@ -28,15 +30,10 @@ import { validateReq, validateEmail, validateZipCode } from "../utils/validation
 
 const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
   const handleAddSubmit = async (values, actions) => {
-    if (document.getElementById("submitter").checked) {
-      values["submitter"] = true;
-    }
-    if (document.getElementById("writer").checked) {
-      values["writer"] = true;
-    }
-    if (document.getElementById("tracker").checked) {
-      values["tracker"] = true;
-    }
+    values["submitter"] = document.getElementById("submitter").checked;
+    values["writer"] = document.getElementById("writer").checked;
+    values["tracker"] = document.getElementById("tracker").checked;
+    values["quality"] = parseInt(values["quality"]);
     const res = await axios.post("/api/volunteer", {
       type: "add",
       formData: values,
@@ -73,6 +70,7 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
               writer: false,
               tracker: false,
               assignments: [],
+              quality: null,
             }}
             onSubmit={handleAddSubmit}
           >
@@ -227,6 +225,25 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
                         <FormErrorMessage>
                           {form.errors.tracker}
                         </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+                  <Field name="quality">
+                    {({ field, form }) => (
+                      <FormControl>
+                        <FormLabel htmlFor="quality">Quality</FormLabel>
+                        <NumberInput
+                          onChange={(val) =>
+                            form.setFieldValue(field.name, val)
+                          }
+                          defaultValue={1}
+                          min={1}
+                          max={3}
+                          id="quality"
+                          precision={0}
+                        >
+                          <NumberInputField />
+                        </NumberInput>
                       </FormControl>
                     )}
                   </Field>

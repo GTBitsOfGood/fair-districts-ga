@@ -108,14 +108,6 @@ const Newspaper = () => {
         accessor: "website",
       },
       {
-        Header: "Instagram",
-        accessor: "instagram",
-      },
-      {
-        Header: "Twitter",
-        accessor: "twitter",
-      },
-      {
         Header: "Counties",
         accessor: "counties",
         Cell: ({
@@ -123,6 +115,15 @@ const Newspaper = () => {
             values: { counties },
           },
         }) => <div>{counties.map((c) => c.name).join(", ")}</div>,
+      },
+      {
+        Header: "Published",
+        accessor: "published",
+        Cell: ({
+          row: {
+            values: { published },
+          },
+        }) => <div>{published ? "Yes" : "No"}</div>,
       },
     ],
     []

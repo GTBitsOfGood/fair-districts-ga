@@ -149,6 +149,15 @@ const Volunteer = () => {
           },
         }) => <div>{assignments.map((a) => a.name).join(", ")}</div>,
       },
+      {
+        Header: "Quality",
+        accessor: "quality",
+        Cell: ({
+          row: {
+            values: { quality },
+          },
+        }) => <div>{quality ? quality : "NA"}</div>,
+      },
     ],
     []
   );
