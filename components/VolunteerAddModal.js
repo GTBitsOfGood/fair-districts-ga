@@ -25,25 +25,8 @@ import axios from "axios";
 import React, { useState } from "react";
 import { Select } from "chakra-react-select";
 import { georgiaCounties } from "../utils/consts";
+import { validateReq, validateEmail, validateZipCode } from "../utils/validation";
 
-const validateReq = (value) => {
-  let error;
-  if (!value) {
-    error = "Required field";
-  }
-  return error;
-};
-
-const validateEmail = (value) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  let error;
-  if (!value) {
-    error = "Required field";
-  } else if (!re.test(value)) {
-    error = "Not a valid email";
-  }
-  return error;
-};
 
 const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
   const handleAddSubmit = async (values, actions) => {
@@ -80,6 +63,7 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
               last_name: "",
               email: "",
               phone: "",
+              zip_code: "",
               county: undefined,
               comments: "",
               submitter: false,
@@ -158,6 +142,18 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
                         <FormLabel htmlFor="phone">Phone</FormLabel>
                         <Input {...field} id="phone" placeholder="4044044040" />
                         <FormErrorMessage>{form.errors.phone}</FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+
+                  <Field name="zip_code" validate={validateZipCode}>
+                    {({ field, form }) => (
+                      <FormControl 
+                        isInvalid={form.errors.zip_code && form.touched.zip_code}
+                      >
+                        <FormLabel htmlFor="zip_code">Zip Code</FormLabel>
+                        <Input {...field} id="zip_code" placeholder="30332" />
+                        <FormErrorMessage>{form.errors.zip_code}</FormErrorMessage>
                       </FormControl>
                     )}
                   </Field>

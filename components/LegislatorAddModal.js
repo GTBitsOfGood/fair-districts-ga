@@ -20,14 +20,8 @@ import { Field, Form, Formik } from "formik";
 import axios from "axios";
 import { Select } from "chakra-react-select";
 import { georgiaCounties } from "../utils/consts";
+import { validateReq, validateZipCode } from "../utils/validation";
 
-const validateReq = (value) => {
-  let error;
-  if (!value) {
-    error = "Required field";
-  }
-  return error;
-};
 
 const LegislatorAddModal = ({
   isOpen,
@@ -64,6 +58,7 @@ const LegislatorAddModal = ({
             initialValues={{
               firstName: "",
               lastName: "",
+              zip_code: "",
               party: "",
               counties: [],
             }}
@@ -101,6 +96,24 @@ const LegislatorAddModal = ({
                         <Input {...field} id="lastName" placeholder="Burdell" />
                         <FormErrorMessage>
                           {form.errors.lastName}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+
+                  <Field name="zip_code" validate={validateZipCode}>
+                    {({ field, form }) => (
+                      <FormControl
+                        isInvalid={form.errors.zip_code && form.touched.zip_code}
+                      >
+                        <FormLabel htmlFor="zip_code">Zip Code</FormLabel>
+                        <Input
+                          {...field}
+                          id="zip_code"
+                          placeholder="30332"
+                        />
+                        <FormErrorMessage>
+                          {form.errors.zip_code}
                         </FormErrorMessage>
                       </FormControl>
                     )}

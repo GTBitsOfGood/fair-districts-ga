@@ -22,11 +22,8 @@ import axios from "axios";
 import LegislatorDeleteDialog from "./LegislatorDeleteDialog";
 import { Select } from "chakra-react-select";
 import { georgiaCounties } from "../utils/consts";
+import { validateReq, validateZipCode } from "../utils/validation";
 
-const validateReq = (value) => {
-  let error = value ? undefined : "Required field";
-  return error;
-};
 
 const LegislatorEditModal = ({
   isOpen,
@@ -127,6 +124,24 @@ const LegislatorEditModal = ({
                               />
                               <FormErrorMessage>
                                 {form.errors.lastName}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+
+                        <Field name="zip_code" validate={validateZipCode}>
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={form.errors.zip_code && form.touched.zip_code}
+                            >
+                              <FormLabel htmlFor="zip_code">Zip Code</FormLabel>
+                              <Input
+                                {...field}
+                                id="zip_code"
+                                placeholder="30332"
+                              />
+                              <FormErrorMessage>
+                                {form.errors.zip_code}
                               </FormErrorMessage>
                             </FormControl>
                           )}

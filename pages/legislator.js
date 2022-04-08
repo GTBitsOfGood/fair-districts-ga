@@ -91,6 +91,10 @@ const Legislator = () => {
         accessor: "lastName",
       },
       {
+        Header: "Zip Code",
+        accessor: "zip_code"
+      },
+      {
         Header: "Party",
         accessor: "party",
       },
@@ -102,7 +106,7 @@ const Legislator = () => {
             values: { counties },
           },
         }) => <div>{counties.map((c) => c.name).join(", ")}</div>,
-      },
+      }
     ],
     [onEditOpen]
   );
