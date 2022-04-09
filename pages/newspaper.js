@@ -206,17 +206,12 @@ const Newspaper = () => {
           <Flex direction="row">
             <SearchBar onChange={searchNewspapers} />
             <IconButton
-              colorScheme="teal"
+              marginLeft={10}
+              colorScheme="blue"
               icon={<AddIcon />}
               onClick={onAddOpen}
-              marginLeft={5}
             />
           </Flex>
-          <IconButton
-            colorScheme="blue"
-            icon={<AddIcon />}
-            onClick={onAddOpen}
-          />
         </Flex>
         <Table {...getTableProps()} size="md">
           <TableHeader
