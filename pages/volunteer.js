@@ -186,9 +186,9 @@ const Volunteer = () => {
   }
 
   return (
-    <Flex direction="row">
+    <Flex direction="row"  height="100%">
       <NavBar session={session} />
-      <Box p={8} flex="1" width={100}>
+      <Box p={8} flex="1" width={100} overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Volunteers</Heading>
           <IconButton
