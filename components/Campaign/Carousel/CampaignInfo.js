@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import DatePicker from "react-datepicker";
 import { Form, Formik, Field, useFormikContext, useField } from "formik";
+import CampaignFooter from "../Footer";
 
 const validateReq = (value) => {
   let error;
@@ -24,10 +25,11 @@ const validateReq = (value) => {
 };
 
 const CustomDateInput = forwardRef(
-  ({ value, onClick, setFieldTouched }, ref) => (
+  ({ value, onClick, setFieldTouched, ...field }, ref) => (
     <Input
+      {...field}
       ref={ref}
-      defaultValue={value}
+      value={value}
       isReadOnly
       onClick={() => {
         onClick();
@@ -44,15 +46,13 @@ const DatePickerField = ({ ...props }) => {
 
   return (
     <DatePicker
-      {...field}
-      {...props}
-      isClearable
       selected={field.value}
       onChange={(val) => {
         setFieldValue(field.name, val);
       }}
       customInput={
         <CustomDateInput
+          {...field}
           id="campaignStartDate"
           setFieldTouched={props.setFieldTouched}
         />
@@ -61,14 +61,22 @@ const DatePickerField = ({ ...props }) => {
   );
 };
 
-const CampaignInfo = ({ setCurrentPage, campaignForm, setCampaignForm }) => {
+const CampaignInfo = ({ incrementPage, campaignForm, setCampaignForm }) => {
   return (
     <>
       <Formik
-        initialValues={campaignForm}
-        onSubmit={(values) => {
-          setCampaignForm(values);
-          setCurrentPage(1);
+        initialValues={{
+          campaignName: campaignForm.name,
+          campaignDescription: campaignForm.description,
+          campaignStartDate: campaignForm.startDate,
+        }}
+        onSubmit={({
+          campaignName: name,
+          campaignDescription: description,
+          campaignStartDate: startDate,
+        }) => {
+          setCampaignForm({ name, description, startDate });
+          incrementPage();
         }}
       >
         {(props) => (
@@ -123,14 +131,7 @@ const CampaignInfo = ({ setCurrentPage, campaignForm, setCampaignForm }) => {
                 )}
               </Field>
             </Stack>
-            <Box mt={6} mb={4}>
-              <Divider color="gray.400" mb={4} />
-              <Flex justifyContent="right">
-                <Button colorScheme="brand" type="submit">
-                  Next
-                </Button>
-              </Flex>
-            </Box>
+            <CampaignFooter hasBack={false} />
           </Form>
         )}
       </Formik>

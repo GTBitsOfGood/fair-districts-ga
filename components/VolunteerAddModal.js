@@ -173,6 +173,7 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
                           onChange={(option) => {
                             form.setFieldValue(field.name, option.value);
                           }}
+                          onBlur={() => props.setFieldTouched("county")}
                         />
                         <FormErrorMessage>
                           {form.errors.county}
