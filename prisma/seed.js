@@ -1,6 +1,6 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const { georgiaCounties } = require("../utils/consts");
+const { georgiaCounties } = require('../utils/consts');
 
 async function main() {
   await prisma.county.deleteMany();
@@ -20,3 +20,5 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
+import { useSession, signIn } from 'next-auth/react';
