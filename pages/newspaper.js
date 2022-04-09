@@ -108,6 +108,10 @@ const Newspaper = () => {
         accessor: "website",
       },
       {
+        Header: "Submission URL",
+        accessor: "submissionURL",
+      },
+      {
         Header: "Counties",
         accessor: "counties",
         Cell: ({
@@ -179,7 +183,7 @@ const Newspaper = () => {
             sort={activeSort}
             toggleSort={toggleActiveSort}
             disabledIndices={[8]}
-          />
+          /> 
           <Tbody {...getTableProps()}>
             {!isLoading &&
               rows.map((row) => {
@@ -194,7 +198,7 @@ const Newspaper = () => {
                     {row.cells.map((cell) => {
                       const { key, ...restCellProps } = cell.getCellProps();
                       return (
-                        <Td key={key} {...restCellProps}>
+                        <Td key={key} {...restCellProps}  maxWidth={11}>
                           {cell.render("Cell")}
                         </Td>
                       );

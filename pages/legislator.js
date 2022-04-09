@@ -157,6 +157,8 @@ const Legislator = () => {
       }
     }
   }
+  
+  console.log(headerGroups);
 
   return (
     <Flex direction="row" height="100%">
@@ -188,7 +190,7 @@ const Legislator = () => {
                     _even={{ bgColor: "gray.100" }}
                   >
                     {row.cells.map((cell, ind2) => (
-                      <Td key={ind2} {...cell.getCellProps()}>
+                      <Td key={ind2} {...cell.getCellProps()} maxWidth={14}>
                         {cell.render("Cell")}
                       </Td>
                     ))}

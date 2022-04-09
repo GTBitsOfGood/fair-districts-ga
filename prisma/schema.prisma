@@ -103,6 +103,7 @@ model Newspaper {
   counties    County[]
   published   Boolean?
   campus      Boolean?     @default(false)
+  submissionURL String?
 }
 
 model County {

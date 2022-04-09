@@ -190,6 +190,23 @@ const NewspaperEditModal = ({
                             </FormControl>
                           )}
                         </Field>
+                        <Field name="submissionURL">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={form.errors.submissionURL && form.touched.submissionURL}
+                            >
+                              <FormLabel htmlFor="submissionURL">Submission URL</FormLabel>
+                              <Input
+                                {...field}
+                                id="submissionURL"
+                                placeholder="https://www.submit.com"
+                              />
+                              <FormErrorMessage>
+                                {form.errors.submissionURL}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
                         <Field name="counties">
                           {({ field, form }) => (
                             <FormControl>
