@@ -15,31 +15,21 @@ async function handler(req, res) {
 }
 
 async function getVolunteers(req, res) {
-  if (req.query.length > 0) {
-    const [field, order] = req.query.order_by?.split(".");
-    const orderBy = {};
-    if (field && order) {
-      if (order === "asc" || order === "desc") {
-        if (field != "counties") orderBy[field] = order;
-      }
+  const [field, order] = req.query.order_by?.split(".");
+  const orderBy = {};
+  if (field && order) {
+    if (order === "asc" || order === "desc") {
+      if (field != "counties") orderBy[field] = order;
     }
-    const allVolunteers = await prisma.volunteer.findMany({
-      orderBy,
-      include: {
-        assignments: true,
-        county: true,
-      },
-    });
-    res.status(200).json(allVolunteers);
-  } else {
-    const allVolunteers = await prisma.volunteer.findMany({
-      include: {
-        assignments: true,
-        county: true,
-      },
-    });
-    res.status(200).json(allVolunteers);
   }
+  const allVolunteers = await prisma.volunteer.findMany({
+    orderBy,
+    include: {
+      assignments: true,
+      county: true,
+    },
+  });
+  res.status(200).json(allVolunteers);
 }
 
 async function addVolunteer(req, res) {
