@@ -88,6 +88,8 @@ const NewspaperEditModal = ({
                     const prunedVals = { ...values };
                     prunedVals.published = document.getElementById("published").checked;
                     prunedVals.rating = parseInt(prunedVals.rating);
+                    prunedVals.campus = document.getElementById("campus").checked;
+
                     const res = await axios.post("/api/newspaper", {
                       type: "edit",
                       id: newspaper.id,
@@ -229,6 +231,26 @@ const NewspaperEditModal = ({
                               />
                               <FormErrorMessage>
                                 {form.errors.published}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="campus">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.campus && form.touched.campus
+                              }
+                            >
+                              <FormLabel htmlFor="campus">
+                                Campus Paper 
+                              </FormLabel>
+                              <Checkbox
+                                id="campus"
+                                defaultChecked={field.value}
+                              />
+                              <FormErrorMessage>
+                                {form.errors.campus}
                               </FormErrorMessage>
                             </FormControl>
                           )}

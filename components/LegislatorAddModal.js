@@ -1,5 +1,6 @@
 import {
   Box,
+  Checkbox, 
   Modal,
   ModalOverlay,
   ModalContent,
@@ -30,6 +31,9 @@ const LegislatorAddModal = ({
   setLegislators,
 }) => {
   const handleAddSubmit = async (values, actions) => {
+    values["isSenator"] = document.getElementById("senator").checked;
+    values["isRepresentative"] = document.getElementById("representative").checked;
+
     const res = await axios.post("/api/legislator", {
       type: "add",
       formData: values,
@@ -60,6 +64,8 @@ const LegislatorAddModal = ({
               lastName: "",
               zip_code: "",
               party: "",
+              isSenator: false,
+              isRepresentative: false, 
               counties: [],
             }}
             onSubmit={handleAddSubmit}
@@ -154,6 +160,32 @@ const LegislatorAddModal = ({
                       </FormControl>
                     )}
                   </Field>
+
+                  <Field name="isSenator">
+                    {({ field, form }) => (
+                      <FormControl>
+                        <Checkbox size="md" id="senator" colorScheme="gray">
+                          Senator
+                        </Checkbox>
+                        <FormErrorMessage>
+                          {form.errors.isSenator}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                    </Field>
+
+                    <Field name="isRepresentative">
+                    {({ field, form }) => (
+                      <FormControl>
+                        <Checkbox size="md" id="representative" colorScheme="gray">
+                          Representative
+                        </Checkbox>
+                        <FormErrorMessage>
+                          {form.errors.isRepresentative}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                    </Field>
 
                   <Box>{props.errors.api && props.errors.api}</Box>
                 </Stack>

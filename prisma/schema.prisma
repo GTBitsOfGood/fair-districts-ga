@@ -102,6 +102,7 @@ model Newspaper {
   assignments Assignment[]
   counties    County[]
   published   Boolean?
+  campus      Boolean?     @default(false)
 }
 
 model County {
@@ -127,4 +128,7 @@ model Legislator {
   zip_code  String?
   counties  County[]
   party     String?
+  isSenator Boolean?     @default(false)
+  isRepresentative Boolean?     @default(false)
+
 }

@@ -95,6 +95,24 @@ const Legislator = () => {
         accessor: "zip_code"
       },
       {
+        Header: "Senator",
+        accessor: "isSenator",
+        Cell: ({
+          row: {
+            values: { isSenator },
+          },
+        }) => <div>{isSenator ? "Yes" : ""}</div>,
+      },
+      {
+        Header: "Representative",
+        accessor: "isRepresentative",
+        Cell: ({
+          row: {
+            values: { isRepresentative },
+          },
+        }) => <div>{isRepresentative ? "Yes" : ""}</div>,
+      },
+      {
         Header: "Party",
         accessor: "party",
       },

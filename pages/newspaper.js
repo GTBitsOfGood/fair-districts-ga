@@ -125,6 +125,15 @@ const Newspaper = () => {
           },
         }) => <div>{published ? "Yes" : "No"}</div>,
       },
+      {
+        Header: "Campus Paper",
+        accessor: "campus",
+        Cell: ({
+          row: {
+            values: { campus },
+          },
+        }) => <div>{campus ? "Yes" : "No"}</div>,
+      },
     ],
     []
   );

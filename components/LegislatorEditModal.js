@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import {
   Box,
+  Checkbox,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -60,6 +61,9 @@ const LegislatorEditModal = ({
                     counties: legislator.counties.map((county) => county.name),
                   }}
                   onSubmit={async (values, actions) => {
+                    values["isSenator"] = document.getElementById("senator").checked;
+                    values["isRepresentative"] = document.getElementById("representative").checked;
+
                     const res = await axios.post("/api/legislator", {
                       type: "edit",
                       id: legislator.id,
@@ -67,6 +71,7 @@ const LegislatorEditModal = ({
                       original: legislator,
                     });
                     const newLegislator = res.data;
+                    
 
                     if (res.status === 200) {
                       const clonedLegislators = [...legislators];
@@ -189,6 +194,43 @@ const LegislatorEditModal = ({
                           )}
                         </Field>
 
+                        <Field name="isSenator">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.isSenator && form.touched.isSenator
+                              }
+                            >
+                              <FormLabel htmlFor="isSenator">Senator</FormLabel>
+                              <Checkbox
+                                id="senator"
+                                defaultChecked={field.value}
+                              />
+                              <FormErrorMessage>
+                                {form.errors.isSenator}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+
+                        <Field name="isRepresentative">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.isRepresentative&& form.touched.isRepresentative
+                              }
+                            >
+                              <FormLabel htmlFor="isRepresentative">Representative</FormLabel>
+                              <Checkbox
+                                id="representative"
+                                defaultChecked={field.value}
+                              />
+                              <FormErrorMessage>
+                                {form.errors.isRepresentative}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
                         <Box>{props.errors.api && props.errors.api}</Box>
                       </Stack>
                       <Box mt={6} mb={4}>

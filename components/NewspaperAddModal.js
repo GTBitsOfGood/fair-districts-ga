@@ -65,11 +65,14 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
               website: "",
               counties: [],
               published: false,
+              campus: false, 
             }}
             onSubmit={async (values, actions) => {
               const prunedVals = { ...values };
               prunedVals.published = document.getElementById("published").checked;
               prunedVals.rating = parseInt(prunedVals.rating);
+              prunedVals.campus= document.getElementById("campus").checked;
+
               const res = await axios.post("/api/newspaper", {
                 type: "add",
                 formData: prunedVals,
@@ -183,6 +186,18 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
                         </Checkbox>
                         <FormErrorMessage>
                           {form.errors.published}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+                  <Field name="campus">
+                    {({ field, form }) => (
+                      <FormControl>
+                        <Checkbox size="md" id="campus" colorScheme="gray">
+                          Campus Paper
+                        </Checkbox>
+                        <FormErrorMessage>
+                          {form.errors.campus}
                         </FormErrorMessage>
                       </FormControl>
                     )}
