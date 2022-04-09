@@ -29,7 +29,7 @@ import TableHeader from "../components/TableHeader";
 import useDebounce from "../components/hooks/useDebounce";
 
 
-const Legislator = ({ data }) => {
+const Legislator = () => {
   const { data: session } = useSession();
   const [ legislators, setLegislators ] = useState([]);
   const [ legislatorIndex, setLegislatorIndex ] = useState(0);
