@@ -30,25 +30,9 @@ import axios from "axios";
 import VolunteerAlertDialog from "./VolunteerAlertDialog";
 import { Select } from "chakra-react-select";
 import { georgiaCounties } from "../utils/consts";
+import { validateReq, validateEmail, validateZipCode } from "../utils/validation";
+import { FormSelect } from "react-bootstrap";
 
-const validateReq = (value) => {
-  let error;
-  if (!value) {
-    error = "Required field";
-  }
-  return error;
-};
-
-const validateEmail = (value) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  let error;
-  if (!value) {
-    error = "Required field";
-  } else if (!re.test(value)) {
-    error = "Not a valid email";
-  }
-  return error;
-};
 
 const VolunteerEditModal = ({
   isOpen,
@@ -87,21 +71,10 @@ const VolunteerEditModal = ({
                     county: prunedVolunteer.county.name,
                   }}
                   onSubmit={async (values, actions) => {
-                    if (document.getElementById("submitter").checked) {
-                      values.submitter = true;
-                    } else {
-                      values.submitter = false;
-                    }
-                    if (document.getElementById("writer").checked) {
-                      values.writer = true;
-                    } else {
-                      values.writer = false;
-                    }
-                    if (document.getElementById("tracker").checked) {
-                      values.tracker = true;
-                    } else {
-                      values.tracker = false;
-                    }
+                    values.submitter = document.getElementById("submitter").checked;
+                    values.writer = document.getElementById("writer").checked;
+                    values.tracker = document.getElementById("tracker").checked;
+                    values["quality"] = parseInt(values["quality"]);
                     const res = await axios.post("/api/volunteer", {
                       type: "edit",
                       id: volunteer.id,
@@ -182,6 +155,19 @@ const VolunteerEditModal = ({
                               <Input {...field} id="phone" />
                               <FormErrorMessage>
                                 {form.errors.phone}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="zip_code" validate={validateZipCode}>
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={form.errors.zip_code && form.touched.zip_code}
+                            >
+                              <FormLabel htmlFor="zip_code">Zip Code</FormLabel>
+                              <Input {...field} id="zip_code" />
+                              <FormErrorMessage>
+                                {form.errors.zip_code}
                               </FormErrorMessage>
                             </FormControl>
                           )}
@@ -284,6 +270,23 @@ const VolunteerEditModal = ({
                               <FormErrorMessage>
                                 {form.errors.tracker}
                               </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Field name="quality">
+                          {({ field, form }) => (
+                            <FormControl>
+                              <FormLabel htmlFor="quality">Quality</FormLabel>
+                              <NumberInput
+                                onChange={(val) =>
+                                  form.setFieldValue(field.name, val)
+                                }
+                                defaultValue={field.value}
+                                id="quality"
+                                precision={0}
+                              >
+                                <NumberInputField />
+                              </NumberInput>
                             </FormControl>
                           )}
                         </Field>

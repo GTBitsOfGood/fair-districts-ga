@@ -4,7 +4,8 @@ const adminEmails = [
   "justin.h.hinckley@gmail.com",
   "katsukic7@gmail.com",
   "teddy.m.feldmann@gmail.com",
-  "sumedhgarimella@gmail.com"
+  "sumedhgarimella@gmail.com",
+  "matthew.brown@gtbeta.org"
 ];
 
 export default adminEmails;
