@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import {
   Box,
+  Checkbox,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -17,15 +18,13 @@ import {
   IconButton,
   Divider,
 } from "@chakra-ui/react";
-import { Field, FieldArray, Form, Formik } from "formik";
-import { AddIcon, MinusIcon } from "@chakra-ui/icons";
+import { Field, Form, Formik } from "formik";
 import axios from "axios";
 import LegislatorDeleteDialog from "./LegislatorDeleteDialog";
+import { Select } from "chakra-react-select";
+import { georgiaCounties } from "../utils/consts";
+import { validateReq, validateZipCode } from "../utils/validation";
 
-const validateReq = (value) => {
-  let error = value ? undefined : "Required field";
-  return error;
-};
 
 const LegislatorEditModal = ({
   isOpen,
@@ -36,18 +35,11 @@ const LegislatorEditModal = ({
 }) => {
   const [alertOpen, setAlertOpen] = useState(false);
 
-  const prunedLegislator = useMemo(() => {
-    if (legislatorIndex >= legislators.length) return;
-    const legislator = legislators[legislatorIndex];
-    return {
-      ...legislator,
-      counties: legislator.counties.split(', '),
-    };
-  }, [legislatorIndex, legislators]);
+  const legislator = legislators[legislatorIndex];
 
   return (
     <>
-      {prunedLegislator ? (
+      {legislator ? (
         <>
           <LegislatorDeleteDialog
             alertOpen={alertOpen}
@@ -60,32 +52,36 @@ const LegislatorEditModal = ({
           <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
-              <ModalHeader>{`Edit Legislator: ${prunedLegislator.firstName} ${prunedLegislator.lastName}`}</ModalHeader>
+              <ModalHeader>{`Edit Legislator: ${legislator.firstName} ${legislator.lastName}`}</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
                 <Formik
-                  initialValues={{...prunedLegislator, counties: [...prunedLegislator.counties]}}
+                  initialValues={{
+                    ...legislator,
+                    counties: legislator.counties.map((county) => county.name),
+                  }}
                   onSubmit={async (values, actions) => {
-                    const prunedVals = { ...values };
-                    prunedVals.counties = prunedVals.counties.filter((e) => e);
+                    values["isSenator"] = document.getElementById("senator").checked;
+                    values["isRepresentative"] = document.getElementById("representative").checked;
+
                     const res = await axios.post("/api/legislator", {
                       type: "edit",
-                      id: prunedLegislator.id,
-                      formData: prunedVals,
-                      original: prunedLegislator,
+                      id: legislator.id,
+                      formData: values,
+                      original: legislator,
                     });
                     const newLegislator = res.data;
+                    
 
                     if (res.status === 200) {
                       const clonedLegislators = [...legislators];
-                      newLegislator.counties = newLegislator.counties
-                        .map((county) => county.name)
-                        .join(", ");
                       clonedLegislators[legislatorIndex] = newLegislator;
                       setLegislators(clonedLegislators);
                       onClose();
                     } else {
-                      actions.setErrors({api: 'There was an error when adding to the database.'});
+                      actions.setErrors({
+                        api: "There was an error when adding to the database.",
+                      });
                     }
                   }}
                 >
@@ -95,12 +91,22 @@ const LegislatorEditModal = ({
                         <Field name="firstName" validate={validateReq}>
                           {({ field, form }) => (
                             <FormControl
-                              isInvalid={form.errors.firstName && form.touched.firstName}
+                              isInvalid={
+                                form.errors.firstName && form.touched.firstName
+                              }
                               isRequired
                             >
-                              <FormLabel htmlFor="firstName">First Name</FormLabel>
-                              <Input {...field} id="firstName" placeholder="George" />
-                              <FormErrorMessage>{form.errors.firstName}</FormErrorMessage>
+                              <FormLabel htmlFor="firstName">
+                                First Name
+                              </FormLabel>
+                              <Input
+                                {...field}
+                                id="firstName"
+                                placeholder="George"
+                              />
+                              <FormErrorMessage>
+                                {form.errors.firstName}
+                              </FormErrorMessage>
                             </FormControl>
                           )}
                         </Field>
@@ -108,12 +114,40 @@ const LegislatorEditModal = ({
                         <Field name="lastName" validate={validateReq}>
                           {({ field, form }) => (
                             <FormControl
-                              isInvalid={form.errors.lastName && form.touched.lastName}
+                              isInvalid={
+                                form.errors.lastName && form.touched.lastName
+                              }
                               isRequired
                             >
-                              <FormLabel htmlFor="lastName">Last Name</FormLabel>
-                              <Input {...field} id="lastName" placeholder="Burdell" />
-                              <FormErrorMessage>{form.errors.lastName}</FormErrorMessage>
+                              <FormLabel htmlFor="lastName">
+                                Last Name
+                              </FormLabel>
+                              <Input
+                                {...field}
+                                id="lastName"
+                                placeholder="Burdell"
+                              />
+                              <FormErrorMessage>
+                                {form.errors.lastName}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+
+                        <Field name="zip_code" validate={validateZipCode}>
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={form.errors.zip_code && form.touched.zip_code}
+                            >
+                              <FormLabel htmlFor="zip_code">Zip Code</FormLabel>
+                              <Input
+                                {...field}
+                                id="zip_code"
+                                placeholder="30332"
+                              />
+                              <FormErrorMessage>
+                                {form.errors.zip_code}
+                              </FormErrorMessage>
                             </FormControl>
                           )}
                         </Field>
@@ -122,48 +156,82 @@ const LegislatorEditModal = ({
                           {({ field, form }) => (
                             <FormControl>
                               <FormLabel htmlFor="party">Party</FormLabel>
-                              <Input {...field} id="party" placeholder="Independent" />
-                              <FormErrorMessage>{form.errors.party}</FormErrorMessage>
+                              <Input
+                                {...field}
+                                id="party"
+                                placeholder="Independent"
+                              />
+                              <FormErrorMessage>
+                                {form.errors.party}
+                              </FormErrorMessage>
                             </FormControl>
                           )}
                         </Field>
-                    
-                        <Box>
-                          <FieldArray name="counties">
-                            {(arrayHelpers) => (
-                              <>
-                                <Flex direction="row">
-                                  <FormLabel htmlFor="counties">Counties</FormLabel>
-                                  <Stack direction="row" spacing={1}>
-                                    <IconButton
-                                      size="xs"
-                                      icon={<MinusIcon />}
-                                      onClick={() =>
-                                        arrayHelpers.pop()
-                                      }
-                                    />
-                                    <IconButton
-                                      size="xs"
-                                      icon={<AddIcon />}
-                                      onClick={() => arrayHelpers.push("")}
-                                    />
-                                  </Stack>
-                                </Flex>
-      
-                                <Stack direction="column" spacing={2}>
-                                  {props.values.counties.map((county, ind) => (
-                                    <Field key={ind} name={`counties.${ind}`}>
-                                      {({ field, form }) => (
-                                        <Input {...field} id={`county-${ind}`} />
-                                      )}
-                                    </Field>
-                                  ))}
-                                </Stack>
-                              </>
-                            )}
-                          </FieldArray>
-                          {props.errors.api && props.errors.api}
-                        </Box>
+
+                        <Field name="counties">
+                          {({ field, form }) => (
+                            <FormControl>
+                              <FormLabel>Counties</FormLabel>
+                              <Select
+                                isMulti
+                                closeMenuOnSelect={false}
+                                options={georgiaCounties.map((county) => ({
+                                  label: county,
+                                  value: county,
+                                }))}
+                                defaultValue={field.value.map((county) => ({
+                                  label: county,
+                                  value: county,
+                                }))}
+                                onChange={(options) => {
+                                  form.setFieldValue(
+                                    field.name,
+                                    options.map((option) => option.value)
+                                  );
+                                }}
+                              />
+                            </FormControl>
+                          )}
+                        </Field>
+
+                        <Field name="isSenator">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.isSenator && form.touched.isSenator
+                              }
+                            >
+                              <FormLabel htmlFor="isSenator">Senator</FormLabel>
+                              <Checkbox
+                                id="senator"
+                                defaultChecked={field.value}
+                              />
+                              <FormErrorMessage>
+                                {form.errors.isSenator}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+
+                        <Field name="isRepresentative">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.isRepresentative&& form.touched.isRepresentative
+                              }
+                            >
+                              <FormLabel htmlFor="isRepresentative">Representative</FormLabel>
+                              <Checkbox
+                                id="representative"
+                                defaultChecked={field.value}
+                              />
+                              <FormErrorMessage>
+                                {form.errors.isRepresentative}
+                              </FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                        <Box>{props.errors.api && props.errors.api}</Box>
                       </Stack>
                       <Box mt={6} mb={4}>
                         <Divider color="gray.400" mb={4} />

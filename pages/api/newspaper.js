@@ -2,8 +2,9 @@ import prisma from "../../prisma/prisma";
 
 async function handler(req, res) {
   if (req.method === "GET") {
-    console.log('got newspaper get')
+    console.log("got newspaper get");
     await getNewspapers(req, res);
+    console.log("got");
   } else if (req.method === "POST") {
     if (req.body.type === "add") {
       await addNewspaper(req, res);
@@ -16,11 +17,11 @@ async function handler(req, res) {
 }
 
 async function getNewspapers(req, res) {
-  const [ field, order ] = req.query.order_by?.split('.')
-  const orderBy = {}
+  const [field, order] = req.query.order_by?.split(".");
+  const orderBy = {};
   if (field && order) {
-    if (order === 'asc' || order === 'desc') {
-      if (field != 'counties') orderBy[field] = order
+    if (order === "asc" || order === "desc") {
+      if (field != "counties") orderBy[field] = order;
     }
   }
   const allNewspapers = await prisma.newspaper.findMany({
@@ -42,13 +43,8 @@ async function addNewspaper(req, res) {
           create: [],
         },
         counties: {
-          connectOrCreate: counties.map((county) => ({
-            where: {
-              name: county,
-            },
-            create: {
-              name: county,
-            },
+          connect: counties.map((county) => ({
+            name: county,
           })),
         },
       },
@@ -67,8 +63,9 @@ async function editNewspaper(req, res) {
   const { id, formData, original } = req.body;
   const { counties } = formData;
 
-  const originalCounties = original.counties.map((c) => c.name);
-  const removedCounties = originalCounties.filter((x) => !counties.includes(x));
+  const removedCounties = original.counties.filter(
+    (x) => !counties.includes(x.name)
+  );
 
   try {
     const newspaper = await prisma.newspaper.update({
@@ -78,14 +75,9 @@ async function editNewspaper(req, res) {
       data: {
         ...formData,
         counties: {
-          disconnect: removedCounties.map((c) => ({ name: c })),
-          connectOrCreate: counties.map((county) => ({
-            where: {
-              name: county,
-            },
-            create: {
-              name: county,
-            },
+          disconnect: removedCounties.map((c) => ({ name: c.name })),
+          connect: counties.map((county) => ({
+            name: county,
           })),
         },
       },

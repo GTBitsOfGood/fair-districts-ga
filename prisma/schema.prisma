@@ -23,8 +23,7 @@ model Account {
   session_state      String?
   oauth_token_secret String?
   oauth_token        String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -58,6 +57,7 @@ model VerificationToken {
 model SpecialUser {
   id    String @id @default(cuid())
   email String @unique
+
 }
 
 model Volunteer {
@@ -66,6 +66,7 @@ model Volunteer {
   last_name   String
   email       String       @unique
   phone       String?
+  zip_code    String?
   county      County       @relation(fields: [countyId], references: [id])
   countyId    String
   comments    String?
@@ -73,6 +74,7 @@ model Volunteer {
   writer      Boolean?     @default(false)
   tracker     Boolean?     @default(false)
   assignments Assignment[]
+  quality     Int?
 }
 
 model Assignment {
@@ -97,10 +99,11 @@ model Newspaper {
   rating      Int?
   description String?
   website     String?
-  instagram   String?
-  twitter     String?
   assignments Assignment[]
   counties    County[]
+  published   Boolean?
+  campus      Boolean?     @default(false)
+  submissionURL String?
 }
 
 model County {
@@ -115,6 +118,7 @@ model Campaign {
   id          String       @id @default(cuid())
   name        String
   description String?      @db.VarChar(300)
+  startDate   DateTime     @default(now())
   assignments Assignment[]
 }
 
@@ -122,6 +126,10 @@ model Legislator {
   id        String   @id @default(cuid())
   firstName String
   lastName  String
+  zip_code  String?
   counties  County[]
   party     String?
+  isSenator Boolean?     @default(false)
+  isRepresentative Boolean?     @default(false)
+
 }

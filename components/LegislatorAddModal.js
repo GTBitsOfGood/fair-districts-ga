@@ -1,5 +1,6 @@
 import {
   Box,
+  Checkbox, 
   Modal,
   ModalOverlay,
   ModalContent,
@@ -16,17 +17,12 @@ import {
   IconButton,
   Divider,
 } from "@chakra-ui/react";
-import { Field, FieldArray, Form, Formik } from "formik";
-import { AddIcon, MinusIcon } from "@chakra-ui/icons";
+import { Field, Form, Formik } from "formik";
 import axios from "axios";
+import { Select } from "chakra-react-select";
+import { georgiaCounties } from "../utils/consts";
+import { validateReq, validateZipCode } from "../utils/validation";
 
-const validateReq = (value) => {
-  let error;
-  if (!value) {
-    error = "Required field";
-  }
-  return error;
-};
 
 const LegislatorAddModal = ({
   isOpen,
@@ -35,21 +31,18 @@ const LegislatorAddModal = ({
   setLegislators,
 }) => {
   const handleAddSubmit = async (values, actions) => {
-    const prunedVals = { ...values };
-    prunedVals.counties = prunedVals.counties.filter((e) => e);
+    values["isSenator"] = document.getElementById("senator").checked;
+    values["isRepresentative"] = document.getElementById("representative").checked;
 
     const res = await axios.post("/api/legislator", {
       type: "add",
-      formData: prunedVals,
+      formData: values,
     });
     const newLegislator = res.data;
 
     if (res.status === 200) {
-      newLegislator.counties = newLegislator.counties
-        .map((county) => county.name)
-        .join(", ");
       setLegislators([...legislators, newLegislator]);
-      // onClose();
+      onClose();
       actions.resetForm();
     } else {
       actions.setErrors({
@@ -69,8 +62,11 @@ const LegislatorAddModal = ({
             initialValues={{
               firstName: "",
               lastName: "",
+              zip_code: "",
               party: "",
-              counties: [""],
+              isSenator: false,
+              isRepresentative: false, 
+              counties: [],
             }}
             onSubmit={handleAddSubmit}
           >
@@ -111,6 +107,24 @@ const LegislatorAddModal = ({
                     )}
                   </Field>
 
+                  <Field name="zip_code" validate={validateZipCode}>
+                    {({ field, form }) => (
+                      <FormControl
+                        isInvalid={form.errors.zip_code && form.touched.zip_code}
+                      >
+                        <FormLabel htmlFor="zip_code">Zip Code</FormLabel>
+                        <Input
+                          {...field}
+                          id="zip_code"
+                          placeholder="30332"
+                        />
+                        <FormErrorMessage>
+                          {form.errors.zip_code}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+
                   <Field name="party">
                     {({ field, form }) => (
                       <FormControl>
@@ -125,40 +139,55 @@ const LegislatorAddModal = ({
                     )}
                   </Field>
 
-                  <Box>
-                    <FieldArray name="counties">
-                      {(arrayHelpers) => (
-                        <>
-                          <Flex direction="row">
-                            <FormLabel htmlFor="counties">Counties</FormLabel>
-                            <Stack direction="row" spacing={1}>
-                              <IconButton
-                                size="xs"
-                                icon={<MinusIcon />}
-                                onClick={() => arrayHelpers.pop()}
-                              />
-                              <IconButton
-                                size="xs"
-                                icon={<AddIcon />}
-                                onClick={() => arrayHelpers.push("")}
-                              />
-                            </Stack>
-                          </Flex>
+                  <Field name="counties">
+                    {({ field, form }) => (
+                      <FormControl>
+                        <FormLabel>Counties</FormLabel>
+                        <Select
+                          isMulti
+                          closeMenuOnSelect={false}
+                          options={georgiaCounties.map((county) => ({
+                            label: county,
+                            value: county,
+                          }))}
+                          onChange={(options) => {
+                            form.setFieldValue(
+                              field.name,
+                              options.map((option) => option.value)
+                            );
+                          }}
+                        />
+                      </FormControl>
+                    )}
+                  </Field>
 
-                          <Stack direction="column" spacing={2}>
-                            {props.values.counties.map((county, ind) => (
-                              <Field key={ind} name={`counties.${ind}`}>
-                                {({ field, form }) => (
-                                  <Input {...field} id={`county-${ind}`} />
-                                )}
-                              </Field>
-                            ))}
-                          </Stack>
-                        </>
-                      )}
-                    </FieldArray>
-                    {props.errors.api && props.errors.api}
-                  </Box>
+                  <Field name="isSenator">
+                    {({ field, form }) => (
+                      <FormControl>
+                        <Checkbox size="md" id="senator" colorScheme="gray">
+                          Senator
+                        </Checkbox>
+                        <FormErrorMessage>
+                          {form.errors.isSenator}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                    </Field>
+
+                    <Field name="isRepresentative">
+                    {({ field, form }) => (
+                      <FormControl>
+                        <Checkbox size="md" id="representative" colorScheme="gray">
+                          Representative
+                        </Checkbox>
+                        <FormErrorMessage>
+                          {form.errors.isRepresentative}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                    </Field>
+
+                  <Box>{props.errors.api && props.errors.api}</Box>
                 </Stack>
                 <Box mt={6} mb={4}>
                   <Divider color="gray.400" mb={4} />

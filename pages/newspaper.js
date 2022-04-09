@@ -1,6 +1,14 @@
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import {
-  Box, Flex, Heading, IconButton, Table, Tbody, Td, Tr, useDisclosure
+  Box,
+  Flex,
+  Heading,
+  IconButton,
+  Table,
+  Tbody,
+  Td,
+  Tr,
+  useDisclosure,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
@@ -8,7 +16,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRowSelect, useTable } from "react-table";
 import AccessDeniedPage from "../components/AccessDeniedPage";
 import useDebounce from "../components/hooks/useDebounce";
-import Loader from '../components/Loader';
+import Loader from "../components/Loader";
 import NavBar from "../components/NavBar";
 import SearchBar from "../components/SearchBar";
 import NewspaperAddModal from "../components/NewspaperAddModal";
@@ -16,42 +24,44 @@ import NewspaperEditModal from "../components/NewspaperEditModal";
 import TableHeader from "../components/TableHeader";
 import adminEmails from "./api/auth/adminEmails";
 
-
 const Newspaper = () => {
   const { data: session } = useSession();
   const [isLoading, setLoading] = useState(true);
   const [newspapers, setNewspapers] = useState([]);
+
   const [newspaperToEdit, setNewspaperToEdit] = useState();
   const [searchInput, setSearchInput] = useState("");
-  const [activeSort, setActiveSort] = useState('');
+  const [newspaperIndex, setNewspaperIndex] = useState(0);
+  const [activeSort, setActiveSort] = useState("");
+
   const [specialUsers, setSpecialUsers] = useState([]);
 
-  const debouncedActiveSort = useDebounce(activeSort, 200)
+  const debouncedActiveSort = useDebounce(activeSort, 200);
   const toggleActiveSort = (target) => {
-    const [sort, order] = activeSort.split('.')
+    const [sort, order] = activeSort.split(".");
     if (sort === undefined || order === undefined) {
-      setActiveSort(`${target}.desc`)
-      return
+      setActiveSort(`${target}.desc`);
+      return;
     }
     if (target === sort) {
-      if (order === 'desc') setActiveSort(`${target}.asc`)
-      else setActiveSort('')
-    } else setActiveSort(`${target}.desc`)
-  }
+      if (order === "desc") setActiveSort(`${target}.asc`);
+      else setActiveSort("");
+    } else setActiveSort(`${target}.desc`);
+  };
 
   useEffect(() => {
     const initPapers = async () => {
       setLoading(true)
       const res = await axios.get(`/api/newspaper?order_by=${debouncedActiveSort}`);
       const data = await res.data;
-      setNewspapers(data)
+      setNewspapers(data);
       let resSpecialUsers = await axios.get(`/api/specialUser`);
-      resSpecialUsers = resSpecialUsers.data.map(u => u.email);
+      resSpecialUsers = resSpecialUsers.data.map((u) => u.email);
       setSpecialUsers(resSpecialUsers);
-      setLoading(false)
-    }
-    initPapers()
-  }, [debouncedActiveSort])
+      setLoading(false);
+    };
+    initPapers();
+  }, [debouncedActiveSort]);
 
   const fetchNewspapers = async () => {
     const res = await axios.get(
@@ -85,13 +95,10 @@ const Newspaper = () => {
       {
         Header: "",
         accessor: "edit",
-        Cell: ({ row }) => (
+        Cell: ({ row: { index } }) => (
           <IconButton
             onClick={() => {
-              setNewspaperToEdit({
-                index: row.index,
-                newspaper: row.original,
-              });
+              setNewspaperIndex(index);
               onEditOpen();
             }}
             icon={<EditIcon />}
@@ -131,12 +138,8 @@ const Newspaper = () => {
         accessor: "website",
       },
       {
-        Header: "Instagram",
-        accessor: "instagram",
-      },
-      {
-        Header: "Twitter",
-        accessor: "twitter",
+        Header: "Submission URL",
+        accessor: "submissionURL",
       },
       {
         Header: "Counties",
@@ -147,9 +150,28 @@ const Newspaper = () => {
           },
         }) => <div>{counties.map((c) => c.name).join(", ")}</div>,
       },
+      {
+        Header: "Published",
+        accessor: "published",
+        Cell: ({
+          row: {
+            values: { published },
+          },
+        }) => <div>{published ? "Yes" : "No"}</div>,
+      },
+      {
+        Header: "Campus Paper",
+        accessor: "campus",
+        Cell: ({
+          row: {
+            values: { campus },
+          },
+        }) => <div>{campus ? "Yes" : "No"}</div>,
+      },
     ],
     []
   );
+
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
@@ -166,11 +188,11 @@ const Newspaper = () => {
     useTable({ columns: tableCols, data: newspapers }, useRowSelect);
 
   if (!session) {
-    return <AccessDeniedPage />
+    return <AccessDeniedPage />;
   } else {
     if (!adminEmails.includes(session.user.email)) {
       if (!specialUsers.includes(session.user.email)) {
-        return <AccessDeniedPage />
+        return <AccessDeniedPage />;
       }
     }
   }
@@ -178,7 +200,7 @@ const Newspaper = () => {
   return (
     <Flex direction="row" height="100%">
       <NavBar session={session} />
-      <Box p={8} flex="1">
+      <Box p={8} flex="1" overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Newspapers</Heading>
           <Flex direction="row">
@@ -190,6 +212,11 @@ const Newspaper = () => {
               marginLeft={5}
             />
           </Flex>
+          <IconButton
+            colorScheme="blue"
+            icon={<AddIcon />}
+            onClick={onAddOpen}
+          />
         </Flex>
         <Table {...getTableProps()} size="md">
           <TableHeader
@@ -197,24 +224,29 @@ const Newspaper = () => {
             sort={activeSort}
             toggleSort={toggleActiveSort}
             disabledIndices={[8]}
-          />
+          /> 
           <Tbody {...getTableProps()}>
-            {!isLoading && rows.map((row) => {
-              prepareRow(row);
-              const { key, ...restRowProps } = row.getRowProps();
-              return (
-                <Tr key={key} {...restRowProps} _even={{ bgColor: 'gray.100' }}>
-                  {row.cells.map((cell) => {
-                    const { key, ...restCellProps } = cell.getCellProps();
-                    return (
-                      <Td key={key} {...restCellProps}>
-                        {cell.render("Cell")}
-                      </Td>
-                    );
-                  })}
-                </Tr>
-              );
-            })}
+            {!isLoading &&
+              rows.map((row) => {
+                prepareRow(row);
+                const { key, ...restRowProps } = row.getRowProps();
+                return (
+                  <Tr
+                    key={key}
+                    {...restRowProps}
+                    _even={{ bgColor: "gray.100" }}
+                  >
+                    {row.cells.map((cell) => {
+                      const { key, ...restCellProps } = cell.getCellProps();
+                      return (
+                        <Td key={key} {...restCellProps}  maxWidth={11}>
+                          {cell.render("Cell")}
+                        </Td>
+                      );
+                    })}
+                  </Tr>
+                );
+              })}
           </Tbody>
         </Table>
         {isLoading && <Loader />}
@@ -227,7 +259,7 @@ const Newspaper = () => {
         <NewspaperEditModal
           isOpen={isEditOpen}
           onClose={onEditClose}
-          newspaperMeta={newspaperToEdit}
+          newspaperIndex={newspaperIndex}
           newspapers={newspapers}
           setNewspapers={setNewspapers}
         />
@@ -235,6 +267,5 @@ const Newspaper = () => {
     </Flex>
   );
 };
-
 
 export default Newspaper;

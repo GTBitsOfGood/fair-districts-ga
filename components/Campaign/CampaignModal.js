@@ -19,23 +19,45 @@ import axios from "axios";
 const modalTitles = {
   0: "Create new campaign",
   1: "Campaign focus",
-  2: "Assignments",
+  2: "Confirm assignments",
 };
 
-const CampaignModal = ({ isOpen, onClose }) => {
+const CampaignModal = ({ appendNewCampaign, isOpen, onClose }) => {
   const [currentPage, setCurrentPage] = useState(0);
+  const [focusTab, setFocusTab] = useState(0);
   const [campaignForm, setCampaignForm] = useState({
-    campaignName: "",
-    campaignDescription: "",
-    campaignStartDate: null,
+    name: "",
+    description: "",
+    startDate: null,
+    focus: {},
   });
-  const [counties, setCounties] = useState([]);
+  const [selectedCounties, setSelectedCounties] = useState([]);
   const [legislators, setLegislators] = useState([]);
+  const [selectedLegislators, setSelectedLegislators] = useState([]);
+
+  const resetModal = () => {
+    setCampaignForm({
+      name: "",
+      description: "",
+      startDate: null,
+      focus: {},
+    });
+    setSelectedCounties([]);
+    setSelectedLegislators([]);
+    setCurrentPage(0);
+  };
+
+  const decrementPage = () => {
+    setCurrentPage(currentPage - 1);
+  };
+
+  const incrementPage = () => {
+    setCurrentPage(currentPage + 1);
+  };
 
   useEffect(async () => {
-    const res = await axios.get("/api/campaign");
-    setCounties(res.data.counties);
-    setLegislators(res.data.legislators);
+    const res = await axios.get("/api/legislator?campaign=true");
+    setLegislators(res.data);
   }, []);
 
   return (
@@ -48,28 +70,39 @@ const CampaignModal = ({ isOpen, onClose }) => {
           <Switch>
             <Case condition={currentPage === 0}>
               <CampaignInfo
-                setCurrentPage={setCurrentPage}
+                incrementPage={incrementPage}
                 campaignForm={campaignForm}
                 setCampaignForm={setCampaignForm}
               />
             </Case>
             <Case condition={currentPage === 1}>
               <CampaignTarget
-                setCurrentPage={setCurrentPage}
+                focusTab={focusTab}
+                setFocusTab={setFocusTab}
+                decrementPage={decrementPage}
+                incrementPage={incrementPage}
                 campaignForm={campaignForm}
                 setCampaignForm={setCampaignForm}
-                counties={counties}
-                setCounties={setCounties}
+                selectedCounties={selectedCounties}
+                setSelectedCounties={setSelectedCounties}
                 legislators={legislators}
-                setLegislators={setLegislators}
+                selectedLegislators={selectedLegislators}
+                setSelectedLegislators={setSelectedLegislators}
               />
             </Case>
             <Case condition={currentPage === 2}>
-              <CampaignAssignments setCurrentPage={setCurrentPage} />
+              <CampaignAssignments
+                appendNewCampaign={appendNewCampaign}
+                campaignForm={campaignForm}
+                decrementPage={decrementPage}
+                onClose={onClose}
+                resetModal={resetModal}
+              />
             </Case>
           </Switch>
         </ModalBody>
       </ModalContent>
+      {/* Footer can't go here because submit button must be within Formik form tag */}
     </Modal>
   );
 };

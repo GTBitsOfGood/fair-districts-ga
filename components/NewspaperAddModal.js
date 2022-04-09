@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import {
   Box,
   Modal,
@@ -22,10 +23,11 @@ import {
   IconButton,
   Divider,
   Text,
+  Checkbox,
 } from "@chakra-ui/react";
-import { Field, FieldArray, Form, Formik } from "formik";
-import { AddIcon, MinusIcon } from "@chakra-ui/icons";
-import axios from "axios";
+import { Field, Form, Formik } from "formik";
+import { Select } from "chakra-react-select";
+import { georgiaCounties } from "../utils/consts";
 
 const validateName = (value) => {
   let error;
@@ -61,14 +63,17 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
               rating: 50,
               description: "",
               website: "",
-              instagram: "",
-              twitter: "",
-              counties: [""],
+              counties: [],
+              published: false,
+              campus: false, 
+              submissionURL: "",
             }}
             onSubmit={async (values, actions) => {
               const prunedVals = { ...values };
-              prunedVals.counties = prunedVals.counties.filter((e) => e);
+              prunedVals.published = document.getElementById("published").checked;
               prunedVals.rating = parseInt(prunedVals.rating);
+              prunedVals.campus= document.getElementById("campus").checked;
+
               const res = await axios.post("/api/newspaper", {
                 type: "add",
                 formData: prunedVals,
@@ -153,68 +158,68 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
                       </FormControl>
                     )}
                   </Field>
-                  <Field name="instagram">
+                  <Field name="submissionURL">
+                     {({ field, form }) => (
+                       <FormControl
+                         isInvalid={form.errors.submissionURL && form.touched.submissionURL}
+                       >
+                         <FormLabel htmlFor="submissionURL">Submission URL</FormLabel>
+                         <Input
+                           {...field}
+                           id="submissionURL"
+                           placeholder="https://www.submit.com"
+                         />
+                         <FormErrorMessage>
+                           {form.errors.submissionURL}
+                         </FormErrorMessage>
+                       </FormControl>
+                     )}
+                   </Field>
+                  <Field name="counties">
                     {({ field, form }) => (
                       <FormControl>
-                        <FormLabel htmlFor="instagram">Instagram</FormLabel>
-                        <InputGroup>
-                          <InputLeftElement color="gray.400">
-                            @
-                          </InputLeftElement>
-                          <Input {...field} id="instagram" />
-                        </InputGroup>
+                        <FormLabel>Counties</FormLabel>
+                        <Select
+                          isMulti
+                          closeMenuOnSelect={false}
+                          options={georgiaCounties.map((county) => ({
+                            label: county,
+                            value: county,
+                          }))}
+                          onChange={(options) => {
+                            form.setFieldValue(
+                              field.name,
+                              options.map((option) => option.value)
+                            );
+                          }}
+                        />
                       </FormControl>
                     )}
                   </Field>
-                  <Field name="twitter">
+                  <Field name="published">
                     {({ field, form }) => (
                       <FormControl>
-                        <FormLabel htmlFor="twitter">Twitter</FormLabel>
-                        <InputGroup>
-                          <InputLeftElement color="gray.400">
-                            @
-                          </InputLeftElement>
-                          <Input {...field} id="twitter" />
-                        </InputGroup>
+                        <Checkbox size="md" id="published" colorScheme="red">
+                          Published
+                        </Checkbox>
+                        <FormErrorMessage>
+                          {form.errors.published}
+                        </FormErrorMessage>
                       </FormControl>
                     )}
                   </Field>
-                  <Box>
-                    <FieldArray name="counties">
-                      {(arrayHelpers) => (
-                        <>
-                          <Flex direction="row">
-                            <FormLabel htmlFor="counties">Counties</FormLabel>
-                            <Stack direction="row" spacing={1}>
-                              <IconButton
-                                size="xs"
-                                icon={<AddIcon />}
-                                onClick={() => arrayHelpers.push("")}
-                              />
-                            </Stack>
-                          </Flex>
-
-                          <Stack direction="column" spacing={2}>
-                            {props.values.counties.map((county, i) => (
-                              <Field key={i} name={`counties.${i}`}>
-                                {({ field, form }) => (
-                                  <Flex direction="row" alignItems="center">
-                                    <Input {...field} id={`county-${i}`} />
-                                    <IconButton
-                                      m={1}
-                                      size="xs"
-                                      icon={<MinusIcon />}
-                                      onClick={() => arrayHelpers.remove(i)}
-                                    />
-                                  </Flex>
-                                )}
-                              </Field>
-                            ))}
-                          </Stack>
-                        </>
-                      )}
-                    </FieldArray>
-                  </Box>
+                  <Field name="campus">
+                    {({ field, form }) => (
+                      <FormControl>
+                        <Checkbox size="md" id="campus" colorScheme="gray">
+                          Campus Paper
+                        </Checkbox>
+                        <FormErrorMessage>
+                          {form.errors.campus}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
                 </Stack>
                 <Box mt={6} mb={4}>
                   <Divider color="gray.400" mb={4} />

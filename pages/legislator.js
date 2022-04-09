@@ -1,7 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Table, Tbody, Tr, Td, useDisclosure, Flex, Heading, IconButton, Box, HStack, Center } from '@chakra-ui/react'
-import { AddIcon, EditIcon } from '@chakra-ui/icons'
-import { useTable, useRowSelect } from 'react-table'
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  useDisclosure,
+  Flex,
+  Heading,
+  IconButton,
+  Box,
+  HStack,
+  Center,
+} from "@chakra-ui/react";
+import { AddIcon, EditIcon } from "@chakra-ui/icons";
+import { useTable, useRowSelect } from "react-table";
 import LegislatorAddModal from "../components/LegislatorAddModal";
 import LegislatorEditModal from "../components/LegislatorEditModal";
 import axios from "axios";
@@ -9,7 +23,7 @@ import NavBar from "../components/NavBar";
 import SearchBar from "../components/SearchBar";
 import { getSession, useSession } from "next-auth/react"
 import AccessDeniedPage from "../components/AccessDeniedPage";
-import Loader from '../components/Loader';
+import Loader from "../components/Loader";
 import adminEmails from "./api/auth/adminEmails";
 import TableHeader from "../components/TableHeader";
 import useDebounce from "../components/hooks/useDebounce";
@@ -24,18 +38,18 @@ const Legislator = ({ data }) => {
   const [ activeSort, setActiveSort ] = useState('');
   const [ specialUsers, setSpecialUsers] = useState([]);
 
-  const debouncedActiveSort = useDebounce(activeSort, 200)
+  const debouncedActiveSort = useDebounce(activeSort, 200);
   const toggleActiveSort = (target) => {
-    const [sort, order] = activeSort.split('.')
+    const [sort, order] = activeSort.split(".");
     if (sort === undefined || order === undefined) {
-      setActiveSort(`${target}.desc`)
-      return
+      setActiveSort(`${target}.desc`);
+      return;
     }
     if (target === sort) {
-      if (order === 'desc') setActiveSort(`${target}.asc`)
-      else setActiveSort('')
-    } else setActiveSort(`${target}.desc`)
-  }
+      if (order === "desc") setActiveSort(`${target}.asc`);
+      else setActiveSort("");
+    } else setActiveSort(`${target}.desc`);
+  };
 
   const fetchLegislators = async () => {
     const res = await axios.get(
@@ -87,12 +101,12 @@ const Legislator = ({ data }) => {
         Header: "",
         accessor: "edit",
         width: 60,
-        Cell: ({ row }) => (
+        Cell: ({ row: { index } }) => (
           <Center>
-            <HStack spacing='24px'>
+            <HStack spacing="24px">
               <IconButton
                 onClick={() => {
-                  setLegislatorIndex(row.index);
+                  setLegislatorIndex(index);
                   onEditOpen();
                 }}
                 icon={<EditIcon />}
@@ -105,23 +119,50 @@ const Legislator = ({ data }) => {
         ),
       },
       {
-        Header: 'First Name',
-        accessor: 'firstName',
+        Header: "First Name",
+        accessor: "firstName",
       },
       {
-        Header: 'Last Name',
-        accessor: 'lastName',
+        Header: "Last Name",
+        accessor: "lastName",
       },
       {
-        Header: 'Party',
-        accessor: 'party',
+        Header: "Zip Code",
+        accessor: "zip_code"
       },
       {
-        Header: 'Counties',
-        accessor: 'counties'
+        Header: "Senator",
+        accessor: "isSenator",
+        Cell: ({
+          row: {
+            values: { isSenator },
+          },
+        }) => <div>{isSenator ? "Yes" : ""}</div>,
+      },
+      {
+        Header: "Representative",
+        accessor: "isRepresentative",
+        Cell: ({
+          row: {
+            values: { isRepresentative },
+          },
+        }) => <div>{isRepresentative ? "Yes" : ""}</div>,
+      },
+      {
+        Header: "Party",
+        accessor: "party",
+      },
+      {
+        Header: "Counties",
+        accessor: "counties",
+        Cell: ({
+          row: {
+            values: { counties },
+          },
+        }) => <div>{counties.map((c) => c.name).join(", ")}</div>,
       }
     ],
-    [onEditOpen],
+    [onEditOpen]
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -129,13 +170,14 @@ const Legislator = ({ data }) => {
 
   useEffect(() => {
     async function initLegislators() {
-      setLoading(true)
-      const res = await axios.get(`/api/legislator?order_by=${debouncedActiveSort}`);
+      setLoading(true);
+      const res = await axios.get(
+        `/api/legislator?order_by=${debouncedActiveSort}`
+      );
       const legislators = res.data;
-      legislators.forEach((legislator) => legislator.counties = legislator.counties.map((county) => county.name).join(", "));
       setLegislators(legislators);
       let resSpecialUsers = await axios.get(`/api/specialUser`);
-      resSpecialUsers = resSpecialUsers.data.map(u => u.email);
+      resSpecialUsers = resSpecialUsers.data.map((u) => u.email);
       setSpecialUsers(resSpecialUsers);
       setLoading(false);
     }
@@ -143,19 +185,21 @@ const Legislator = ({ data }) => {
   }, [debouncedActiveSort]);
 
   if (!session) {
-    return <AccessDeniedPage />
+    return <AccessDeniedPage />;
   } else {
     if (!adminEmails.includes(session.user.email)) {
       if (!specialUsers.includes(session.user.email)) {
-        return <AccessDeniedPage />
+        return <AccessDeniedPage />;
       }
     }
   }
+  
+  console.log(headerGroups);
 
   return (
     <Flex direction="row" height="100%">
-      <NavBar session={session}/>
-      <Box p={8} flex="1">
+      <NavBar session={session} />
+      <Box p={8} flex="1" overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Legislators</Heading>
           <Flex direction="row">
@@ -167,7 +211,40 @@ const Legislator = ({ data }) => {
               marginLeft={5}
             />
           </Flex>
+          <IconButton
+            colorScheme="blue"
+            icon={<AddIcon />}
+            onClick={onAddOpen}
+          />
         </Flex>
+        <Table {...getTableProps()} size="md">
+          <TableHeader
+            headerGroups={headerGroups}
+            sort={activeSort}
+            toggleSort={toggleActiveSort}
+            disabledIndices={[4]}
+          />
+          <Tbody {...getTableBodyProps()}>
+            {!isLoading &&
+              rows.map((row, ind) => {
+                prepareRow(row);
+                return (
+                  <Tr
+                    key={ind}
+                    {...row.getRowProps()}
+                    _even={{ bgColor: "gray.100" }}
+                  >
+                    {row.cells.map((cell, ind2) => (
+                      <Td key={ind2} {...cell.getCellProps()} maxWidth={14}>
+                        {cell.render("Cell")}
+                      </Td>
+                    ))}
+                  </Tr>
+                );
+              })}
+          </Tbody>
+        </Table>
+        {isLoading && <Loader />}
         <LegislatorAddModal
           isOpen={isAddOpen}
           onClose={onAddClose}
@@ -181,32 +258,9 @@ const Legislator = ({ data }) => {
           legislators={legislators}
           setLegislators={setLegislators}
         />
-        <Table {...getTableProps()} size="md">
-          <TableHeader 
-            headerGroups={headerGroups}
-            sort={activeSort}
-            toggleSort={toggleActiveSort}
-            disabledIndices={[4]}
-          />
-          <Tbody {...getTableBodyProps()}>
-            {!isLoading && rows.map((row, ind) => {
-              prepareRow(row)
-              return (
-                <Tr key={ind} {...row.getRowProps()} _even={{ bgColor: 'gray.100' }}>
-                  {row.cells.map((cell, ind2) => (
-                    <Td key={ind2} {...cell.getCellProps()}>
-                      {cell.render('Cell')}
-                    </Td>
-                  ))}
-                </Tr>
-              )
-            })}
-          </Tbody>
-        </Table>
-        {isLoading && <Loader />}
       </Box>
     </Flex>
-  )
+  );
 };
 
 export default Legislator;

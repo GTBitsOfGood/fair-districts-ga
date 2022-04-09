@@ -11,127 +11,168 @@ import {
   Divider,
   Flex,
   Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
 } from "@chakra-ui/react";
 import axios from "axios";
+import { Select } from "chakra-react-select";
+import { Field, Form, Formik } from "formik";
 import { useEffect, useMemo, useState } from "react";
+import { georgiaCounties } from "../../../utils/consts";
+import CampaignFooter from "../Footer";
+
+const validateEmpty = (value) => {
+  let error;
+  if (value.length === 0) {
+    error = "Please select 1 or more options";
+  }
+  return error;
+};
 
 const CampaignTarget = ({
+  focusTab,
+  setFocusTab,
+  incrementPage,
+  decrementPage,
   setCurrentPage,
   campaignForm,
   setCampaignForm,
-  counties,
-  setCounties,
+  selectedCounties,
+  setSelectedCounties,
   legislators,
-  setLegislators,
+  selectedLegislators,
+  setSelectedLegislators,
 }) => {
   return (
     <>
-      <Tabs variant="soft-rounded" colorScheme="brand" align="center">
+      <Tabs
+        variant="soft-rounded"
+        colorScheme="brand"
+        align="center"
+        defaultIndex={focusTab}
+        onChange={(index) => setFocusTab(index)}
+      >
         <TabList>
           <Tab>Counties</Tab>
           <Tab>Legislators</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
-            <Flex direction="row">
-              <Box flex={1}>
-                <Text fontSize="lg" fontWeight={600} mb={2}>
-                  Choose counties
-                </Text>
-                <Stack direction="column">
-                  {Object.keys(counties).map((county) => (
-                    <Checkbox
-                      key={`checkbox-${county}`}
-                      colorScheme="brand"
-                      isChecked={counties[county]}
-                      onChange={() => {
-                        const newCounties = { ...counties };
-                        newCounties[county] = !newCounties[county];
-                        setCounties(newCounties);
-                      }}
-                    >
-                      {county}
-                    </Checkbox>
-                  ))}
-                </Stack>
-              </Box>
-              <Box flex={1}>
-                <Text fontSize="lg" fontWeight={600} mb={2}>
-                  Selected counties
-                </Text>
-                <Stack direction="column">
-                  {Object.keys(counties)
-                    .filter((county) => counties[county])
-                    .map((county) => (
-                      <Text key={`selected-${county}`}>{county}</Text>
-                    ))}
-                </Stack>
-              </Box>
-            </Flex>
+            <Box>
+              <Text fontSize="lg" fontWeight={600} mb={2}>
+                Choose counties
+              </Text>
+              <Formik
+                initialValues={{
+                  counties:
+                    selectedCounties.length === 0 ? [] : selectedCounties,
+                }}
+                onSubmit={({ counties }) => {
+                  setCampaignForm({
+                    ...campaignForm,
+                    focus: {
+                      counties: counties.map((county) => county.value),
+                    },
+                  });
+                  incrementPage();
+                }}
+              >
+                {(props) => (
+                  <Form>
+                    <Field name="counties" validate={validateEmpty}>
+                      {({ field, form }) => (
+                        <FormControl
+                          isRequired
+                          isInvalid={
+                            form.errors.counties && form.touched.counties
+                          }
+                        >
+                          <Select
+                            name="counties"
+                            isMulti
+                            closeMenuOnSelect={false}
+                            value={props.values.counties}
+                            options={georgiaCounties.map((county) => ({
+                              label: county,
+                              value: county,
+                            }))}
+                            onChange={(options) => {
+                              form.setFieldValue(field.name, options);
+                              setSelectedCounties(options);
+                            }}
+                            onBlur={() => props.setFieldTouched("counties")}
+                          />
+                          <FormErrorMessage>
+                            {form.errors.counties}
+                          </FormErrorMessage>
+                        </FormControl>
+                      )}
+                    </Field>
+                    <CampaignFooter decrementPage={decrementPage} />
+                  </Form>
+                )}
+              </Formik>
+            </Box>
           </TabPanel>
           <TabPanel>
-            <Flex direction="row">
-              <Box flex={1}>
-                <Text fontSize="lg" fontWeight={600} mb={2}>
-                  Choose legislators
-                </Text>
-                <Stack direction="column">
-                  {Object.keys(legislators).map((legislatorId) => (
-                    <Checkbox
-                      key={`checkbox-${legislatorId}`}
-                      colorScheme="brand"
-                      isChecked={legislators[legislatorId].selected}
-                      onChange={() => {
-                        const newLegislators = { ...legislators };
-                        const newLegislator = {
-                          ...legislators[legislatorId],
-                          selected: !legislators[legislatorId].selected,
-                        };
-                        newLegislators[legislatorId] = newLegislator;
-                        setLegislators(newLegislators);
-                      }}
-                    >
-                      {legislators[legislatorId].firstName}{" "}
-                      {legislators[legislatorId].lastName}
-                    </Checkbox>
-                  ))}
-                </Stack>
-              </Box>
-              <Box flex={1}>
-                <Text fontSize="lg" fontWeight={600} mb={2}>
-                  Selected legislators
-                </Text>
-                <Stack direction="column">
-                  {Object.keys(legislators)
-                    .filter(
-                      (legislatorId) => legislators[legislatorId].selected
-                    )
-                    .map((legislatorId) => (
-                      <Text key={`selected-${legislatorId}`}>
-                        {legislators[legislatorId].firstName}{" "}
-                        {legislators[legislatorId].lastName}
-                      </Text>
-                    ))}
-                </Stack>
-              </Box>
-            </Flex>
+            <Box>
+              <Text fontSize="lg" fontWeight={600} mb={2}>
+                Choose legislators
+              </Text>
+              <Formik
+                initialValues={{
+                  legislators:
+                    selectedLegislators.length === 0 ? [] : selectedLegislators,
+                }}
+                onSubmit={({ legislators }) => {
+                  setCampaignForm({
+                    ...campaignForm,
+                    focus: {
+                      legislators: legislators.map(
+                        (legislator) => legislator.value
+                      ),
+                    },
+                  });
+                  incrementPage();
+                }}
+              >
+                {(props) => (
+                  <Form>
+                    <Field name="legislators" validate={validateEmpty}>
+                      {({ field, form }) => (
+                        <FormControl
+                          isRequired
+                          isInvalid={
+                            form.errors.legislators && form.touched.legislators
+                          }
+                        >
+                          <Select
+                            name="legislators"
+                            isMulti
+                            closeMenuOnSelect={false}
+                            value={props.values.legislators}
+                            options={legislators}
+                            onChange={(options) => {
+                              form.setFieldValue(field.name, options);
+                              setSelectedLegislators(options);
+                            }}
+                            onBlur={() => props.setFieldTouched("legislators")}
+                          />
+                          <FormErrorMessage>
+                            {form.errors.legislators}
+                          </FormErrorMessage>
+                        </FormControl>
+                      )}
+                    </Field>
+                    <CampaignFooter decrementPage={decrementPage} />
+                  </Form>
+                )}
+              </Formik>
+            </Box>
           </TabPanel>
         </TabPanels>
       </Tabs>
-      <Box mb={3}>
-        <Divider color="gray.400" mb={4} />
-        <Flex justifyContent="space-between">
-          <Button colorScheme="gray" onClick={() => setCurrentPage(0)}>
-            Back
-          </Button>
-          <Button
-            colorScheme="brand"
-            onClick={() => /* validation */ setCurrentPage(2)}
-          >
-            Next
-          </Button>
-        </Flex>
-      </Box>
     </>
   );
 };
