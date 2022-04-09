@@ -95,6 +95,24 @@ const Legislator = () => {
         accessor: "zip_code"
       },
       {
+        Header: "Senator",
+        accessor: "isSenator",
+        Cell: ({
+          row: {
+            values: { isSenator },
+          },
+        }) => <div>{isSenator ? "Yes" : ""}</div>,
+      },
+      {
+        Header: "Representative",
+        accessor: "isRepresentative",
+        Cell: ({
+          row: {
+            values: { isRepresentative },
+          },
+        }) => <div>{isRepresentative ? "Yes" : ""}</div>,
+      },
+      {
         Header: "Party",
         accessor: "party",
       },
@@ -139,11 +157,13 @@ const Legislator = () => {
       }
     }
   }
+  
+  console.log(headerGroups);
 
   return (
     <Flex direction="row" height="100%">
       <NavBar session={session} />
-      <Box p={8} flex="1" overflowY="auto">
+      <Box p={8} flex="1" overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Legislators</Heading>
           <IconButton
@@ -170,7 +190,7 @@ const Legislator = () => {
                     _even={{ bgColor: "gray.100" }}
                   >
                     {row.cells.map((cell, ind2) => (
-                      <Td key={ind2} {...cell.getCellProps()}>
+                      <Td key={ind2} {...cell.getCellProps()} maxWidth={14}>
                         {cell.render("Cell")}
                       </Td>
                     ))}

@@ -131,9 +131,9 @@ const County = ({ data }) => {
   }
 
   return (
-    <Flex direction="row">
+    <Flex direction="row" height="100%">
       <NavBar session={session} />
-      <Box p={8} flex="1">
+      <Box p={8} flex="1" overflowY={"auto"}>
         <Heading>Counties</Heading>
         <Table {...getTableProps()} variant="striped" size="md">
           <Thead>
@@ -163,7 +163,7 @@ const County = ({ data }) => {
                   {row.cells.map((cell) => {
                     const { key, ...restCellProps } = cell.getCellProps();
                     return (
-                      <Td key={key} {...restCellProps}>
+                      <Td key={key} {...restCellProps} maxWidth={14}>
                         {cell.render("Cell")}
                       </Td>
                     );

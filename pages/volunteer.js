@@ -186,9 +186,9 @@ const Volunteer = () => {
   }
 
   return (
-    <Flex direction="row">
+    <Flex direction="row"  height="100%">
       <NavBar session={session} />
-      <Box p={8} flex="1">
+      <Box p={8} flex="1" width={100} overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Volunteers</Heading>
           <IconButton
@@ -203,6 +203,7 @@ const Volunteer = () => {
             sort={activeSort}
             toggleSort={toggleActiveSort}
             disabledIndices={[4, 5, 10]}
+            padding={0}
           />
           <Tbody {...getTableProps()}>
             {!isLoading &&
@@ -214,7 +215,7 @@ const Volunteer = () => {
                     {row.cells.map((cell) => {
                       const { key, ...restCellProps } = cell.getCellProps();
                       return (
-                        <Td key={key} {...restCellProps}>
+                        <Td key={key} {...restCellProps}  maxWidth={7}>
                           {cell.render("Cell")}
                         </Td>
                       );

@@ -28,6 +28,7 @@ const NavBar = ({ session }) => {
       direction="column"
       borderRightWidth="1px"
       borderColor="gray.200"
+      overflowY="auto"
     >
       <Image
         src="/FairDistrictsGA-Logo.png"

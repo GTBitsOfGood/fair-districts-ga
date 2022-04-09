@@ -65,11 +65,15 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
               website: "",
               counties: [],
               published: false,
+              campus: false, 
+              submissionURL: "",
             }}
             onSubmit={async (values, actions) => {
               const prunedVals = { ...values };
               prunedVals.published = document.getElementById("published").checked;
               prunedVals.rating = parseInt(prunedVals.rating);
+              prunedVals.campus= document.getElementById("campus").checked;
+
               const res = await axios.post("/api/newspaper", {
                 type: "add",
                 formData: prunedVals,
@@ -154,6 +158,23 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
                       </FormControl>
                     )}
                   </Field>
+                  <Field name="submissionURL">
+                     {({ field, form }) => (
+                       <FormControl
+                         isInvalid={form.errors.submissionURL && form.touched.submissionURL}
+                       >
+                         <FormLabel htmlFor="submissionURL">Submission URL</FormLabel>
+                         <Input
+                           {...field}
+                           id="submissionURL"
+                           placeholder="https://www.submit.com"
+                         />
+                         <FormErrorMessage>
+                           {form.errors.submissionURL}
+                         </FormErrorMessage>
+                       </FormControl>
+                     )}
+                   </Field>
                   <Field name="counties">
                     {({ field, form }) => (
                       <FormControl>
@@ -183,6 +204,18 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
                         </Checkbox>
                         <FormErrorMessage>
                           {form.errors.published}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+                  <Field name="campus">
+                    {({ field, form }) => (
+                      <FormControl>
+                        <Checkbox size="md" id="campus" colorScheme="gray">
+                          Campus Paper
+                        </Checkbox>
+                        <FormErrorMessage>
+                          {form.errors.campus}
                         </FormErrorMessage>
                       </FormControl>
                     )}

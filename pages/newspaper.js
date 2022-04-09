@@ -108,6 +108,10 @@ const Newspaper = () => {
         accessor: "website",
       },
       {
+        Header: "Submission URL",
+        accessor: "submissionURL",
+      },
+      {
         Header: "Counties",
         accessor: "counties",
         Cell: ({
@@ -124,6 +128,15 @@ const Newspaper = () => {
             values: { published },
           },
         }) => <div>{published ? "Yes" : "No"}</div>,
+      },
+      {
+        Header: "Campus Paper",
+        accessor: "campus",
+        Cell: ({
+          row: {
+            values: { campus },
+          },
+        }) => <div>{campus ? "Yes" : "No"}</div>,
       },
     ],
     []
@@ -155,7 +168,7 @@ const Newspaper = () => {
   return (
     <Flex direction="row" height="100%">
       <NavBar session={session} />
-      <Box p={8} flex="1" overflowY="auto">
+      <Box p={8} flex="1" overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Newspapers</Heading>
           <IconButton
@@ -170,7 +183,7 @@ const Newspaper = () => {
             sort={activeSort}
             toggleSort={toggleActiveSort}
             disabledIndices={[8]}
-          />
+          /> 
           <Tbody {...getTableProps()}>
             {!isLoading &&
               rows.map((row) => {
@@ -185,7 +198,7 @@ const Newspaper = () => {
                     {row.cells.map((cell) => {
                       const { key, ...restCellProps } = cell.getCellProps();
                       return (
-                        <Td key={key} {...restCellProps}>
+                        <Td key={key} {...restCellProps}  maxWidth={11}>
                           {cell.render("Cell")}
                         </Td>
                       );

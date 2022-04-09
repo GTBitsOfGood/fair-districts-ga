@@ -110,7 +110,7 @@ const Privileges = () => {
   return (
     <Flex direction="row" height="100%">
       <NavBar session={session} />
-      <Box p={8} flex="1" overflowY="auto">
+      <Box p={8} flex="1" overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Special Users</Heading>
           <IconButton
