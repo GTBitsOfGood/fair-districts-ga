@@ -73,6 +73,8 @@ const Legislator = ({ data }) => {
 
     } else {
       setSearchInput(event.target.value);
+      const data = await fetchLegislators();
+
       const filteredLegislators = data.filter((legislator) => {
         return (
           legislator.firstName.toLowerCase().includes(searchInput.toLowerCase()) ||
@@ -204,18 +206,14 @@ const Legislator = ({ data }) => {
           <Heading>Legislators</Heading>
           <Flex direction="row">
             <SearchBar onChange={searchLegislators} />
-            <IconButton 
-              colorScheme="teal"
-              icon={<AddIcon />}
-              onClick={onAddOpen}
-              marginLeft={5}
-            />
-          </Flex>
-          <IconButton
+            <IconButton
+            marginLeft={10}
             colorScheme="blue"
             icon={<AddIcon />}
             onClick={onAddOpen}
           />
+          </Flex>
+         
         </Flex>
         <Table {...getTableProps()} size="md">
           <TableHeader
