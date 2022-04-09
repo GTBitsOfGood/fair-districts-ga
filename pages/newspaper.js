@@ -18,6 +18,7 @@ import AccessDeniedPage from "../components/AccessDeniedPage";
 import useDebounce from "../components/hooks/useDebounce";
 import Loader from "../components/Loader";
 import NavBar from "../components/NavBar";
+import SearchBar from "../components/SearchBar";
 import NewspaperAddModal from "../components/NewspaperAddModal";
 import NewspaperEditModal from "../components/NewspaperEditModal";
 import TableHeader from "../components/TableHeader";
@@ -27,8 +28,12 @@ const Newspaper = () => {
   const { data: session } = useSession();
   const [isLoading, setLoading] = useState(true);
   const [newspapers, setNewspapers] = useState([]);
+
+  const [newspaperToEdit, setNewspaperToEdit] = useState();
+  const [searchInput, setSearchInput] = useState("");
   const [newspaperIndex, setNewspaperIndex] = useState(0);
   const [activeSort, setActiveSort] = useState("");
+
   const [specialUsers, setSpecialUsers] = useState([]);
 
   const debouncedActiveSort = useDebounce(activeSort, 200);
@@ -46,10 +51,8 @@ const Newspaper = () => {
 
   useEffect(() => {
     const initPapers = async () => {
-      setLoading(true);
-      const res = await axios.get(
-        `/api/newspaper?order_by=${debouncedActiveSort}`
-      );
+      setLoading(true)
+      const res = await axios.get(`/api/newspaper?order_by=${debouncedActiveSort}`);
       const data = await res.data;
       setNewspapers(data);
       let resSpecialUsers = await axios.get(`/api/specialUser`);
@@ -59,6 +62,33 @@ const Newspaper = () => {
     };
     initPapers();
   }, [debouncedActiveSort]);
+
+  const fetchNewspapers = async () => {
+    const res = await axios.get(
+      `http://${process.env.NODE_ENV === "production"
+        ? process.env.NEXT_PUBLIC_VERCEL_URL
+        : "localhost:3000"
+      }/api/newspaper`
+    );
+    const data = await res.data;
+    return data
+  }
+
+  const searchNewspapers = async (event) => {
+    // Empty search input
+    if (!event.target.value) {
+      setSearchInput("");
+      const data = await fetchNewspapers();
+      setNewspapers(data);
+
+    } else {
+      setSearchInput(event.target.value);
+      const filteredNewspapers = newspapers.filter((newspaper) =>
+        newspaper.name.toLowerCase().includes(searchInput.toLowerCase())
+      );
+      setNewspapers(filteredNewspapers);
+    }
+  };
 
   const tableCols = useMemo(
     () => [
@@ -147,11 +177,13 @@ const Newspaper = () => {
     onOpen: onAddOpen,
     onClose: onAddClose,
   } = useDisclosure();
+
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
     onClose: onEditClose,
   } = useDisclosure();
+
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: tableCols, data: newspapers }, useRowSelect);
 
@@ -171,11 +203,15 @@ const Newspaper = () => {
       <Box p={8} flex="1" overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Newspapers</Heading>
-          <IconButton
-            colorScheme="blue"
-            icon={<AddIcon />}
-            onClick={onAddOpen}
-          />
+          <Flex direction="row">
+            <SearchBar onChange={searchNewspapers} />
+            <IconButton
+              marginLeft={10}
+              colorScheme="blue"
+              icon={<AddIcon />}
+              onClick={onAddOpen}
+            />
+          </Flex>
         </Flex>
         <Table {...getTableProps()} size="md">
           <TableHeader
