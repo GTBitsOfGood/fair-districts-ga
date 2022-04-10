@@ -48,40 +48,6 @@ const Legislator = () => {
     } else setActiveSort(`${target}.desc`);
   };
 
-  const fetchLegislators = async () => {
-    const res = await axios.get(
-      `https://${
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_VERCEL_URL
-          : "localhost:3000"
-      }/api/legislator`
-    );
-
-    const data = await res.data;
-    return data;
-  }    
-
-  const searchLegislators = async (event) => {
-    // Empty search input
-    if (!event.target.value) {
-      setSearchInput("");
-      const data = await fetchLegislators();
-      setLegislators(data);
-
-    } else {
-      setSearchInput(event.target.value);
-      const data = await fetchLegislators();
-
-      const filteredLegislators = data.filter((legislator) => {
-        return (
-          legislator.firstName.toLowerCase().includes(searchInput.toLowerCase()) ||
-          legislator.lastName.toLowerCase().includes(searchInput.toLowerCase())
-        );
-      });
-      setLegislators(filteredLegislators);
-    }
-  };
-
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,

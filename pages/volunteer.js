@@ -46,42 +46,6 @@ const Volunteer = () => {
     } else setActiveSort(`${target}.desc`);
   };
 
-
-  const fetchVolunteers = async () => {
-    const res = await axios.get(
-      `https://${
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_VERCEL_URL
-          : "localhost:3000"
-      }/api/volunteer`
-    );
-
-    const data = await res.data;
-    return data;
-  }    
-
-  const searchVolunteers = async (event) => {
-    // Empty search input
-    if (!event.target.value) {
-      setSearchInput("");
-      const data = await fetchVolunteers();
-      setVolunteers(data);
-
-    } else {
-      setSearchInput(event.target.value);
-      const data = await fetchVolunteers();
-
-      const filteredVolunteers = data.filter((volunteer) => {
-        return (
-          volunteer.first_name.toLowerCase().includes(searchInput.toLowerCase()) ||
-          volunteer.last_name.toLowerCase().includes(searchInput.toLowerCase())
-        );
-      });
-      setVolunteers(filteredVolunteers);
-    }
-  };
-
-
   useEffect(() => {
     const initVolunteers = async () => {
       setLoading(true);

@@ -180,7 +180,7 @@ const County = ({ data }) => {
 
 export async function getServerSideProps(context) {
   const res = await axios.get(
-    `https://${
+    `http://${
       process.env.NODE_ENV === "production"
         ? process.env.NEXT_PUBLIC_VERCEL_URL
         : "localhost:3000"
