@@ -198,7 +198,6 @@ const Newspaper = () => {
       <Box p={8} flex="1" overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Newspapers</Heading>
-<<<<<<< HEAD
           <Flex direction="row">
           <SearchBar onChange={searchNewspapers} />
             <IconButton
@@ -208,13 +207,6 @@ const Newspaper = () => {
               onClick={onAddOpen}
             />
           </Flex>
-=======
-          <IconButton
-            colorScheme="blue"
-            icon={<AddIcon />}
-            onClick={onAddOpen}
-          />
->>>>>>> 833a4faf6b06ebf31b5de874ffdcbf8e97ed039e
         </Flex>
         <Table {...getTableProps()} size="md">
           <TableHeader

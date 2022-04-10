@@ -227,11 +227,15 @@ const Volunteer = () => {
       <Box p={8} flex="1" width={100} overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Volunteers</Heading>
-          <IconButton
-            colorScheme="blue"
-            icon={<AddIcon />}
-            onClick={onAddOpen}
-          />
+          <Flex direction="row">
+          <SearchBar onChange={searchVolunteers} />
+            <IconButton
+              marginLeft={10}
+              colorScheme="blue"
+              icon={<AddIcon />}
+              onClick={onAddOpen}
+            />
+          </Flex>
         </Flex>
         <Table {...getTableProps()} size="md" variant="striped">
           <TableHeader
