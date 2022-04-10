@@ -20,6 +20,7 @@ import { useTable, useRowSelect } from "react-table";
 import { getSession, useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
 import TableHeader from "../components/TableHeader";
+import SearchBar from "../components/SearchBar";
 import useDebounce from "../components/hooks/useDebounce";
 import AccessDeniedPage from "../components/AccessDeniedPage";
 import adminEmails from "./api/auth/adminEmails";

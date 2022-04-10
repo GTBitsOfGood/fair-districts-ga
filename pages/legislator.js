@@ -22,6 +22,7 @@ import axios from "axios";
 import NavBar from "../components/NavBar";
 import { getSession, useSession } from "next-auth/react";
 import AccessDeniedPage from "../components/AccessDeniedPage";
+import SearchBar from "../components/SearchBar";
 import Loader from "../components/Loader";
 import adminEmails from "./api/auth/adminEmails";
 import TableHeader from "../components/TableHeader";
