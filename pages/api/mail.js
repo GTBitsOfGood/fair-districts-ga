@@ -1,5 +1,6 @@
 import { parse } from "dotenv";
 import nodemailer from "nodemailer";
+import prisma from "../../prisma/prisma";
 
 
 async function handler(req, res) {
