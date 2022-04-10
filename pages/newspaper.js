@@ -65,7 +65,7 @@ const Newspaper = () => {
 
   const fetchNewspapers = async () => {
     const res = await axios.get(
-      `http://${process.env.NODE_ENV === "production"
+      `https://${process.env.NODE_ENV === "production"
         ? process.env.NEXT_PUBLIC_VERCEL_URL
         : "localhost:3000"
       }/api/newspaper`
