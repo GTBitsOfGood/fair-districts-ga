@@ -21,4 +21,5 @@ const SearchBar = ({ onChange }) => {
     );
 };
 
+
 export default SearchBar;
