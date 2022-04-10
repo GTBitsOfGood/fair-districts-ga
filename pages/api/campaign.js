@@ -46,6 +46,8 @@ async function getCampaignById(req, res) {
               submissionURL: true,
             },
           },
+          emailSent: true,
+          id: true 
         },
       },
     },

@@ -20,7 +20,8 @@ function parseAssignments(assignments) {
         } else {
             emails[email] = {
                 "volunteer": assignments[i].volunteer, 
-                "newspaper": [assignments[i].newspaper]
+                "newspaper": [assignments[i].newspaper],
+                "id": assignments[i].id
             }
         }
 
@@ -94,9 +95,16 @@ async function emailVolunteers(req, res) {
             html: createMessage(value)
         };
 
-        const mailInfo = await transporter.sendMail(mailOptions);
-        console.log("Message sent: %s", mailInfo.messageId);
-        console.log('Preview URL: ' + nodemailer.getTestMessageUrl(mailInfo));
+        await transporter.sendMail(mailOptions);
+        
+        await prisma.assignment.update({
+            where: {
+              id: value.id
+            },
+            data: {
+              emailSent: true,
+            },
+        });
     }
 
     res.status(200).json({});

@@ -16,6 +16,7 @@ import NavBar from "../../components/NavBar";
 import { getSession, useSession } from "next-auth/react";
 import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { MdCheckBox, MdCheckBoxOutlineBlank } from "react-icons/md";
+import { AiOutlineCheck } from "react-icons/ai";
 import { BsMailbox } from "react-icons/bs";
 import { ArrowBackIcon, EmailIcon } from "@chakra-ui/icons";
 import Link from "next/link";
@@ -33,11 +34,11 @@ const CampaignDetailsPage = ({
 
   const [recipients, setRecipients] = useState({});
 
-  const addRecipient = (index, volunteer, newspaper) => {
+  const addRecipient = (index, volunteer, newspaper, id) => {
     setRecipients(recipients => {
       return {
         ...recipients,
-        [index]: {volunteer, newspaper}
+        [index]: {volunteer, newspaper, id}
       }
     });
   }
@@ -105,7 +106,7 @@ const CampaignDetailsPage = ({
             <Text>{startDate.split("T")[0]}</Text>
           </Stack>
           <Stack direction="column">
-            {assignments.map(({ volunteer, newspaper }, i) => (
+            {assignments.map(({ volunteer, newspaper, emailSent, id}, i) => (
               <Box
                 key={`assignment-${i}`}
                 bgColor="gray.200"
@@ -117,13 +118,15 @@ const CampaignDetailsPage = ({
                   <Flex height="50" flexDirection="column" justifyContent="center"  paddingRight={6}>
                       <MdCheckBox style={{fontSize: "25px"}}
                                   onClick={() => removeRecipient(i)}
-                                  cursor="pointer"/> 
+                                  cursor="pointer"
+                                  color="blue"
+                                  /> 
                   </Flex>
                 }
                 {!(i in recipients) && // check box should not be active
                   <Flex height="50" flexDirection="column" justifyContent="center"  paddingRight={6}>
                       <MdCheckBoxOutlineBlank style={{fontSize: "25px"}} 
-                                              onClick={() => addRecipient(i, volunteer, newspaper)} 
+                                              onClick={() => addRecipient(i, volunteer, newspaper, id)} 
                                               cursor="pointer"/> 
                   </Flex>
                 }
@@ -155,6 +158,13 @@ const CampaignDetailsPage = ({
                     </Link>
                   </Stack>
                 </Stack>
+
+                {emailSent && 
+                    <Flex flexDirection="column" height="50" justifyContent={"center"} marginLeft="auto" marginRight={10}>
+                      <AiOutlineCheck color="green" fontSize="30px" />
+                    </Flex>              
+                }
+
                 </Flex>
               </Box>
             ))}
