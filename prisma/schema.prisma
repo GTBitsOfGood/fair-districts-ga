@@ -90,6 +90,7 @@ model Assignment {
   newspaperId             String
   campaign                Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   campaignId              String
+  emailSent               Boolean?  @default(false)
 }
 
 model Newspaper {

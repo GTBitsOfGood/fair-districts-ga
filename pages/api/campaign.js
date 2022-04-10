@@ -45,8 +45,11 @@ async function getCampaignById(req, res) {
             select: {
               name: true,
               email: true,
+              submissionURL: true,
             },
           },
+          emailSent: true,
+          id: true 
         },
       },
     },
