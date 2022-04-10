@@ -26,6 +26,7 @@ import { BsNewspaper, BsPersonFill } from "react-icons/bs";
 import * as dayjs from "dayjs";
 import CampaignDeleteDialog from "../../components/Campaign/CampaignDeleteDialog";
 import React, { useState  } from "react";
+import { UiFileInputButton } from "../../components/UiFileInputButton";
 
 const CampaignDetailsPage = ({
   id,
@@ -39,6 +40,8 @@ const CampaignDetailsPage = ({
 
   const cancelRef = useRef();
   const [recipients, setRecipients] = useState({});
+  const [sending, setSending] = useState(false);
+  const [filename, setFilename] = useState("");
 
   const addRecipient = (index, volunteer, newspaper, id) => {
     setRecipients(recipients => {
@@ -59,15 +62,35 @@ const CampaignDetailsPage = ({
 
   async function sendEmails() {
     const production = process.env.NODE_ENV === "production";
+    setSending(true);
     let res;
       if (!production) {
-        res = await axios.post(`http://localhost:3000/api/mail`, recipients);
+        res = await axios.post(`http://localhost:3000/api/mail`, {recipients, filename: filename});
       } else {
-        res = await axios.post(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/mail`, recipients)
+        res = await axios.post(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/mail`, {recipients, filename: filename})
       }
     const data = await res.data;
+    setSending(false);
     setRecipients({});
   }
+
+  const onChange = async (formData) => {
+    const config = {
+      headers: { 'content-type': 'multipart/form-data' },
+      onUploadProgress: (event) => {
+        console.log(`Current progress:`, Math.round((event.loaded * 100) / event.total));
+      },
+    };
+
+    let fileName = "";
+    for (var value of formData.values()) {
+      fileName = value["name"];
+   }
+   
+    const response = await axios.post('/api/upload', formData, config);
+    setFilename(fileName);
+    console.log('response', response.data);
+  };
 
   if (!session) {
     return <AccessDeniedPage />;
@@ -88,12 +111,18 @@ const CampaignDetailsPage = ({
               />
             </Link>
               <Heading>{name}</Heading>
+             
               <Spacer/>
               {Object.keys(recipients).length > 0 && 
                 <Flex flexDirection="row" alignItems='center'>
-                  <Heading marginRight={10} as='h4' size='md'>{Object.keys(recipients).length} selected...</Heading>
+                  <Heading marginRight={3} as='h4' size='md'>{Object.keys(recipients).length} selected...</Heading>
+                  <UiFileInputButton
+                    label="Upload File"
+                    uploadFileName="theFiles"
+                    onChange={onChange}
+                  />
                   <Button leftIcon={<BsMailbox />} colorScheme='pink' variant='solid' onClick={sendEmails}>
-                    Send Mail 
+                    {sending ? "Sending..." : "Send Mail"}
                   </Button>
                 </Flex>
               }
