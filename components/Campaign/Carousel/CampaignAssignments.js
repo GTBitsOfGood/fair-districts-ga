@@ -28,11 +28,6 @@ const CampaignAssignments = ({
   const [assignments, setAssignments] = useState([]);
   const [newspapers, setNewspapers] = useState([]);
 
-  const selectedVolunteers = useMemo(
-    () => new Set(assignments.map(({ volunteer }) => volunteer.value)),
-    [assignments]
-  );
-
   const error = useMemo(() => {
     for (let a of assignments) {
       if (a.newspaper.value === null || a.volunteer.value === null) {
@@ -108,9 +103,7 @@ const CampaignAssignments = ({
                   <Box w="47%">
                     <Select
                       value={volunteer}
-                      options={volunteers.filter(
-                        (v) => !selectedVolunteers.has(v.value)
-                      )}
+                      options={volunteers}
                       onChange={(option) => {
                         const clonedAssignments = [...assignments];
                         clonedAssignments[i] = {
@@ -119,8 +112,8 @@ const CampaignAssignments = ({
                         };
                         setAssignments(clonedAssignments);
                       }}
-                      getOptionLabel={({ label, county }) =>
-                        `${label}: ${county}`
+                      getOptionLabel={({ label, county, value }) =>
+                        value ? `${label}: ${county}` : ""
                       }
                       defaultValue={volunteer}
                     />
@@ -151,15 +144,15 @@ const CampaignAssignments = ({
                         };
                         setAssignments(clonedAssignments);
                       }}
-                      getOptionLabel={({ label, rating }) =>
-                        `${label}: ${rating}`
+                      getOptionLabel={({ label, rating, value }) =>
+                        value ? `${label}: ${rating}` : ""
                       }
                     />
                   </Box>
                 </Flex>
               ))}
             </Stack>
-            <When condition={volunteers.length - assignments.length > 0}>
+            <When condition={assignments.length > 0 && volunteers.length > 0}>
               <Center>
                 <IconButton
                   mt={4}
@@ -170,12 +163,14 @@ const CampaignAssignments = ({
                     const clonedAssignments = [...assignments];
                     clonedAssignments.push({
                       newspaper: {
-                        label: null,
+                        label: "",
                         value: null,
+                        rating: "",
                       },
                       volunteer: {
-                        label: null,
+                        label: "",
                         value: null,
+                        county: "",
                       },
                     });
                     setAssignments(clonedAssignments);
@@ -201,7 +196,7 @@ const CampaignAssignments = ({
           <Button
             colorScheme="brand"
             onClick={async () => {
-              if (error) return;
+              if (error || assignments.length === 0) return;
               const res = await axios.post("/api/campaign", {
                 campaignForm,
                 assignments,

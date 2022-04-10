@@ -1,7 +1,7 @@
+import { useRef } from "react";
 import {
   Card,
   Box,
-  Button,
   Flex,
   Divider,
   Heading,
@@ -10,6 +10,8 @@ import {
   Spacer,
   Text,
   Icon,
+  Button,
+  useDisclosure,
 } from "@chakra-ui/react";
 import axios from "axios";
 import NavBar from "../../components/NavBar";
@@ -21,6 +23,8 @@ import { BsMailbox } from "react-icons/bs";
 import { ArrowBackIcon, EmailIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import { BsNewspaper, BsPersonFill } from "react-icons/bs";
+import * as dayjs from "dayjs";
+import CampaignDeleteDialog from "../../components/Campaign/CampaignDeleteDialog";
 import React, { useState  } from "react";
 
 const CampaignDetailsPage = ({
@@ -30,8 +34,10 @@ const CampaignDetailsPage = ({
   startDate,
   assignments,
 }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: session } = useSession();
 
+  const cancelRef = useRef();
   const [recipients, setRecipients] = useState({});
 
   const addRecipient = (index, volunteer, newspaper, id) => {
@@ -93,20 +99,30 @@ const CampaignDetailsPage = ({
               }
           </Stack>
           <Divider />
-          <Stack direction="row" spacing={5}>
-            <Text>
-              <b>Description: </b>
-            </Text>
-            <Text>{description}</Text>
-          </Stack>
-          <Stack direction="row" spacing={5}>
-            <Text>
-              <b>Start Date: </b>
-            </Text>
-            <Text>{startDate.split("T")[0]}</Text>
-          </Stack>
-          <Stack direction="column">
-            {assignments.map(({ volunteer, newspaper, emailSent, id}, i) => (
+          <Flex
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Stack direction="column">
+              <Text>
+                <b>Description: </b>
+                {description}
+              </Text>
+              <Text>
+                <b>Start Date: </b>
+                {dayjs(startDate).format("MMMM D, YYYY")}
+              </Text>
+              <Text>
+                <b>Assignments: </b>
+              </Text>
+            </Stack>
+            <Button colorScheme="red" onClick={onOpen}>
+              Delete
+            </Button>
+          </Flex>
+          <Stack direction="column" mt={2}>
+            {assignments.map(({ volunteer, newspaper, emailSent, id }, i) => (
               <Box
                 key={`assignment-${i}`}
                 bgColor="gray.200"
@@ -171,6 +187,12 @@ const CampaignDetailsPage = ({
           </Stack>
         </Box>
       </Flex>
+      <CampaignDeleteDialog
+        id={id}
+        isOpen={isOpen}
+        onClose={onClose}
+        cancelRef={cancelRef}
+      />
     </>
   );
 };

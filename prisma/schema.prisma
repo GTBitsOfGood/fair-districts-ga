@@ -88,22 +88,22 @@ model Assignment {
   volunteerId             String
   newspaper               Newspaper @relation(fields: [newspaperId], references: [id])
   newspaperId             String
-  campaign                Campaign  @relation(fields: [campaignId], references: [id])
+  campaign                Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   campaignId              String
   emailSent               Boolean?  @default(false)
 }
 
 model Newspaper {
-  id          String       @id @default(cuid())
-  name        String       @unique
-  email       String?
-  rating      Int?
-  description String?
-  website     String?
-  assignments Assignment[]
-  counties    County[]
-  published   Boolean?
-  campus      Boolean?     @default(false)
+  id            String       @id @default(cuid())
+  name          String       @unique
+  email         String?
+  rating        Int?
+  description   String?
+  website       String?
+  assignments   Assignment[]
+  counties      County[]
+  published     Boolean?
+  campus        Boolean?     @default(false)
   submissionURL String?
 }
 
@@ -124,13 +124,13 @@ model Campaign {
 }
 
 model Legislator {
-  id        String   @id @default(cuid())
-  firstName String
-  lastName  String
-  zip_code  String?
-  counties  County[]
-  party     String?
-  isSenator Boolean?     @default(false)
-  isRepresentative Boolean?     @default(false)
+  id               String   @id @default(cuid())
+  firstName        String
+  lastName         String
+  zip_code         String?
+  counties         County[]
+  party            String?
+  isSenator        Boolean? @default(false)
+  isRepresentative Boolean? @default(false)
 
 }

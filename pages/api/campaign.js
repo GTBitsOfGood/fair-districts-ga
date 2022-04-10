@@ -15,6 +15,8 @@ async function handler(req, res) {
     } else {
       await addCampaign(req, res);
     }
+  } else if (req.method === "DELETE") {
+    await deleteCampaign(req, res);
   }
 }
 
@@ -213,6 +215,18 @@ async function generateAssignments(counties) {
   };
 }
 
+const removeDuplicateAssignments = (assignments) => {
+  return assignments.filter(
+    (assignment, i, self) =>
+      i ===
+      self.findIndex(
+        ({ newspaper, volunteer }) =>
+          assignment.newspaper.value === newspaper.value &&
+          assignment.volunteer.value === volunteer.value
+      )
+  );
+};
+
 async function addCampaign(req, res) {
   const { campaignForm, assignments } = req.body;
   const { name, description, startDate } = campaignForm;
@@ -224,7 +238,7 @@ async function addCampaign(req, res) {
       startDate,
       assignments: {
         createMany: {
-          data: assignments.map(
+          data: removeDuplicateAssignments(assignments).map(
             ({
               newspaper: { value: newspaperId },
               volunteer: { value: volId },
@@ -238,6 +252,16 @@ async function addCampaign(req, res) {
     },
     include: {
       assignments: true,
+    },
+  });
+  res.status(200).json(campaign);
+}
+
+async function deleteCampaign(req, res) {
+  const { id } = req.body;
+  const campaign = await prisma.campaign.delete({
+    where: {
+      id,
     },
   });
   res.status(200).json(campaign);
