@@ -1,7 +1,7 @@
 import { parse } from "dotenv";
 import nodemailer from "nodemailer";
 import prisma from "../../prisma/prisma";
-
+import path from "path";
 
 async function handler(req, res) {
     if (req.method === "POST") {
@@ -74,10 +74,11 @@ function createMessage(email) {
 
 
 async function emailVolunteers(req, res) {
-    const assignments = req.body;
+    const assignments = req.body.recipients;
+    const fileName = req.body.filename;
+
     const emails = parseAssignments(assignments);
 
-    const testAccount = await nodemailer.createTestAccount();
     const transporter = nodemailer.createTransport({
         host: "smtp.zoho.com",
         port: 465,
@@ -88,12 +89,26 @@ async function emailVolunteers(req, res) {
         }
     });
 
+    let pathname = "";
+    const production = process.env.NODE_ENV === "production";
+    if (!production) {
+        pathname = "http://localhost:3000/tmp/" + fileName;
+    } else {
+        pathname = "https://${process.env.NEXT_PUBLIC_VERCEL_URL}/tmp/" + fileName;
+    }
+
+    console.log(pathname);
     for (const [key, value] of Object.entries(emails)) {
         const mailOptions = {
             from: '"Fair Districts" <fair_districts@zohomail.com>',
             to: key,
             subject: "Letter-to-the-editor Submission",
-            html: createMessage(value)
+            html: createMessage(value),
+            attachments: [
+                {
+                    path: path.join(process.cwd(), 'tmp/' + fileName),
+                }
+            ]
         };
 
         await transporter.sendMail(mailOptions);
