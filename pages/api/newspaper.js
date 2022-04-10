@@ -17,20 +17,29 @@ async function handler(req, res) {
 }
 
 async function getNewspapers(req, res) {
-  const [field, order] = req.query.order_by?.split(".");
-  const orderBy = {};
-  if (field && order) {
-    if (order === "asc" || order === "desc") {
-      if (field != "counties") orderBy[field] = order;
-    }
+  if (req.query.length > 0) {
+      const [field, order] = req.query.order_by?.split(".");
+      const orderBy = {};
+      if (field && order) {
+        if (order === "asc" || order === "desc") {
+          if (field != "counties") orderBy[field] = order;
+        }
+      }
+      const allNewspapers = await prisma.newspaper.findMany({
+        orderBy,
+        include: {
+          counties: true,
+        },
+      });
+      res.status(200).json(allNewspapers);
+  } else {
+    const allNewspapers = await prisma.newspaper.findMany({
+      include: {
+        counties: true,
+      },
+    });
+    res.status(200).json(allNewspapers);
   }
-  const allNewspapers = await prisma.newspaper.findMany({
-    orderBy,
-    include: {
-      counties: true,
-    },
-  });
-  res.status(200).json(allNewspapers);
 }
 
 async function addNewspaper(req, res) {

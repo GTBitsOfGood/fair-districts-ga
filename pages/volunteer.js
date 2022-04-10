@@ -20,6 +20,7 @@ import { useTable, useRowSelect } from "react-table";
 import { getSession, useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
 import TableHeader from "../components/TableHeader";
+import SearchBar from "../components/SearchBar";
 import useDebounce from "../components/hooks/useDebounce";
 import AccessDeniedPage from "../components/AccessDeniedPage";
 import adminEmails from "./api/auth/adminEmails";
@@ -32,6 +33,8 @@ const Volunteer = () => {
   const [volunteerIndex, setVolunteerIndex] = useState(0);
   const [activeSort, setActiveSort] = useState("");
   const [specialUsers, setSpecialUsers] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
+
 
   const debouncedActiveSort = useDebounce(activeSort, 200);
   const toggleActiveSort = (target) => {
@@ -45,6 +48,42 @@ const Volunteer = () => {
       else setActiveSort("");
     } else setActiveSort(`${target}.desc`);
   };
+
+
+  const fetchVolunteers = async () => {
+    const production = process.env.NODE_ENV === "production";
+    let res;
+    if (!production) {
+      res = await axios.get("http://localhost:3000/api/volunteer");
+    } else {
+      res = await axios.get(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/volunteer`)
+    }
+
+    const data = await res.data;
+    return data;
+  }    
+
+  const searchVolunteers = async (event) => {
+    // Empty search input
+    if (!event.target.value) {
+      setSearchInput("");
+      const data = await fetchVolunteers();
+      setVolunteers(data);
+
+    } else {
+      setSearchInput(event.target.value);
+      const data = await fetchVolunteers();
+
+      const filteredVolunteers = data.filter((volunteer) => {
+        return (
+          volunteer.first_name.toLowerCase().includes(searchInput.toLowerCase()) ||
+          volunteer.last_name.toLowerCase().includes(searchInput.toLowerCase())
+        );
+      });
+      setVolunteers(filteredVolunteers);
+    }
+  };
+
 
   useEffect(() => {
     const initVolunteers = async () => {
@@ -191,11 +230,15 @@ const Volunteer = () => {
       <Box p={8} flex="1" width={100} overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Volunteers</Heading>
-          <IconButton
-            colorScheme="blue"
-            icon={<AddIcon />}
-            onClick={onAddOpen}
-          />
+          <Flex direction="row">
+          <SearchBar onChange={searchVolunteers} />
+            <IconButton
+              marginLeft={10}
+              colorScheme="blue"
+              icon={<AddIcon />}
+              onClick={onAddOpen}
+            />
+          </Flex>
         </Flex>
         <Table {...getTableProps()} size="md" variant="striped">
           <TableHeader

@@ -18,6 +18,7 @@ import AccessDeniedPage from "../components/AccessDeniedPage";
 import useDebounce from "../components/hooks/useDebounce";
 import Loader from "../components/Loader";
 import NavBar from "../components/NavBar";
+import SearchBar from "../components/SearchBar";
 import NewspaperAddModal from "../components/NewspaperAddModal";
 import NewspaperEditModal from "../components/NewspaperEditModal";
 import TableHeader from "../components/TableHeader";
@@ -30,6 +31,7 @@ const Newspaper = () => {
   const [newspaperIndex, setNewspaperIndex] = useState(0);
   const [activeSort, setActiveSort] = useState("");
   const [specialUsers, setSpecialUsers] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
 
   const debouncedActiveSort = useDebounce(activeSort, 200);
   const toggleActiveSort = (target) => {
@@ -59,6 +61,33 @@ const Newspaper = () => {
     };
     initPapers();
   }, [debouncedActiveSort]);
+
+  const fetchNewspapers = async () => {
+    const production = process.env.NODE_ENV === "production";
+    let res;
+    if (!production) {
+      res = await axios.get("http://localhost:3000/api/newspaper");
+    } else {
+      res = await axios.get(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/newspaper`)
+    }
+    const data = await res.data;
+    return data
+  }
+
+  const searchNewspapers = async (event) => {
+    if (!event.target.value) {
+      setSearchInput("");
+      const data = await fetchNewspapers();
+      setNewspapers(data);
+
+    } else {
+      setSearchInput(event.target.value);
+      const filteredNewspapers = newspapers.filter((newspaper) =>
+        newspaper.name.toLowerCase().includes(searchInput.toLowerCase())
+      );
+      setNewspapers(filteredNewspapers);
+    }
+  };
 
   const tableCols = useMemo(
     () => [
@@ -171,11 +200,15 @@ const Newspaper = () => {
       <Box p={8} flex="1" overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Newspapers</Heading>
-          <IconButton
-            colorScheme="blue"
-            icon={<AddIcon />}
-            onClick={onAddOpen}
-          />
+          <Flex direction="row">
+          <SearchBar onChange={searchNewspapers} />
+            <IconButton
+              marginLeft={10}
+              colorScheme="blue"
+              icon={<AddIcon />}
+              onClick={onAddOpen}
+            />
+          </Flex>
         </Flex>
         <Table {...getTableProps()} size="md">
           <TableHeader

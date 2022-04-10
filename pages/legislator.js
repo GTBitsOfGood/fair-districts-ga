@@ -22,6 +22,7 @@ import axios from "axios";
 import NavBar from "../components/NavBar";
 import { getSession, useSession } from "next-auth/react";
 import AccessDeniedPage from "../components/AccessDeniedPage";
+import SearchBar from "../components/SearchBar";
 import Loader from "../components/Loader";
 import adminEmails from "./api/auth/adminEmails";
 import TableHeader from "../components/TableHeader";
@@ -34,6 +35,7 @@ const Legislator = () => {
   const [isLoading, setLoading] = useState(true);
   const [activeSort, setActiveSort] = useState("");
   const [specialUsers, setSpecialUsers] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
 
   const debouncedActiveSort = useDebounce(activeSort, 200);
   const toggleActiveSort = (target) => {
@@ -46,6 +48,40 @@ const Legislator = () => {
       if (order === "desc") setActiveSort(`${target}.asc`);
       else setActiveSort("");
     } else setActiveSort(`${target}.desc`);
+  };
+
+  const fetchLegislators = async () => {
+    const production = process.env.NODE_ENV === "production";
+    let res;
+    if (!production) {
+      res = await axios.get("http://localhost:3000/api/legislator");
+    } else {
+      res = await axios.get(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/legislator`)
+    }
+
+    const data = await res.data;
+    return data;
+  }    
+
+  const searchLegislators = async (event) => {
+    // Empty search input
+    if (!event.target.value) {
+      setSearchInput("");
+      const data = await fetchLegislators();
+      setLegislators(data);
+
+    } else {
+      setSearchInput(event.target.value);
+      const data = await fetchLegislators();
+
+      const filteredLegislators = data.filter((legislator) => {
+        return (
+          legislator.firstName.toLowerCase().includes(searchInput.toLowerCase()) ||
+          legislator.lastName.toLowerCase().includes(searchInput.toLowerCase())
+        );
+      });
+      setLegislators(filteredLegislators);
+    }
   };
 
   const {
@@ -166,11 +202,15 @@ const Legislator = () => {
       <Box p={8} flex="1" overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Legislators</Heading>
-          <IconButton
-            colorScheme="blue"
-            icon={<AddIcon />}
-            onClick={onAddOpen}
-          />
+          <Flex direction="row">
+          <SearchBar onChange={searchLegislators} />
+            <IconButton
+              marginLeft={10}
+              colorScheme="blue"
+              icon={<AddIcon />}
+              onClick={onAddOpen}
+            />
+          </Flex>
         </Flex>
         <Table {...getTableProps()} size="md">
           <TableHeader

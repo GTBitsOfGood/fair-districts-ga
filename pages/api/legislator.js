@@ -19,20 +19,29 @@ async function handler(req, res) {
 }
 
 async function getLegislators(req, res) {
-  const [field, order] = req.query.order_by?.split(".");
-  const orderBy = {};
-  if (field && order) {
-    if (order === "asc" || order === "desc") {
-      if (field != "counties") orderBy[field] = order;
+  if (req.query.length > 0) {
+    const [field, order] = req.query.order_by?.split(".");
+    const orderBy = {};
+    if (field && order) {
+      if (order === "asc" || order === "desc") {
+        if (field != "counties") orderBy[field] = order;
+      }
     }
+    const legislators = await prisma.legislator.findMany({
+      orderBy,
+      include: {
+        counties: true,
+      },
+    });
+    res.status(200).json(legislators);
+  } else {
+    const legislators = await prisma.legislator.findMany({
+      include: {
+        counties: true,
+      },
+    });
+    res.status(200).json(legislators);
   }
-  const legislators = await prisma.legislator.findMany({
-    orderBy,
-    include: {
-      counties: true,
-    },
-  });
-  res.status(200).json(legislators);
 }
 
 // Fetches all legislators for campaign legislator select
