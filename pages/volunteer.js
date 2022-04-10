@@ -33,6 +33,8 @@ const Volunteer = () => {
   const [volunteerIndex, setVolunteerIndex] = useState(0);
   const [activeSort, setActiveSort] = useState("");
   const [specialUsers, setSpecialUsers] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
+
 
   const debouncedActiveSort = useDebounce(activeSort, 200);
   const toggleActiveSort = (target) => {
