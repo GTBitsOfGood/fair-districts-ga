@@ -11,6 +11,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import axios from "axios";
+import { AiFillStar } from "react-icons/ai"
 import { useSession } from "next-auth/react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useRowSelect, useTable } from "react-table";
@@ -227,7 +228,7 @@ const Newspaper = () => {
                     key={key}
                     {...restRowProps}
                     _even={{ bgColor: "gray.100" }}
-                  >
+                  > 
                     {row.cells.map((cell) => {
                       const { key, ...restCellProps } = cell.getCellProps();
                       return (
