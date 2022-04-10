@@ -25,7 +25,7 @@ const CampaignDeleteDialog = ({ id, isOpen, onClose, cancelRef }) => {
           </AlertDialogHeader>
 
           <AlertDialogBody>
-            Are you sure? You can\'t undo this action afterwards.
+            {"Are you sure? You can't undo this action afterwards."}
           </AlertDialogBody>
 
           <AlertDialogFooter>
