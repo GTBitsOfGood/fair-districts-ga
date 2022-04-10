@@ -204,7 +204,7 @@ const Newspaper = () => {
         <Flex direction="row" justifyContent="space-between">
           <Heading>Newspapers</Heading>
           <Flex direction="row">
-            <SearchBar onChange={searchNewspapers} />
+          <SearchBar onChange={searchNewspapers} />
             <IconButton
               marginLeft={10}
               colorScheme="blue"
