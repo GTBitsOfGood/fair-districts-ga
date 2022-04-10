@@ -36,7 +36,7 @@ function createMessage(email) {
                 <div dir="ltr">Thanks, ${email.volunteer.first_name}, for agreeing to submit some LTE’s. 
                 We have assigned you the following for this weekend.  
                 Please submit the attached letter to the newspapers listed below.  
-                If you want to pass, please email me asap. Additional instructions:<br><br><ul><li> Feel free to edit the letter if you wish to suit your style, etc.
+                If you want to pass, please email me asap (julia.h.leon@gmail.com). Additional instructions:<br><br><ul><li> Feel free to edit the letter if you wish to suit your style, etc.
                         </li>
                         <li> Provide your contact information (name, city/state, phone number and email) with the submissions for verification purposes.  The newspapers will only print your name and city.</li><li> I recommend that you copy and paste this LTE into the body of your email to the newspaper.  Some editors may be concerned about a virus with an attachment.</li><li> Do NOT send this letter to any other newspapers without checking with me first. It is embarrassing to have the same letter sent to a paper from multiple people.</li><li>Sunday is usually the best time to submit.</li><li>Please email me to let me know that the letter has been submitted.</li></ul><br>Here are the papers:<br>`
                         
@@ -77,19 +77,20 @@ async function emailVolunteers(req, res) {
 
     const testAccount = await nodemailer.createTestAccount();
     const transporter = nodemailer.createTransport({
-        host: "smtp.mandrillapp.com",
+        host: "smtp.zoho.com",
         port: 465,
         secure: true,
         auth: {
-            api_key: process.env.MAIL_API_KEY
+            user: "fair_districts@zohomail.com", 
+            pass: process.env.MAIL_PASS 
         }
     });
 
     for (const [key, value] of Object.entries(emails)) {
         const mailOptions = {
-            from: '"Julia Leon" >julia.h.leon@gmail.com>',
+            from: '"Fair Districts" <fair_districts@zohomail.com>',
             to: key,
-            subject: " Letter-to-the-editor Submission",
+            subject: "Letter-to-the-editor Submission",
             html: createMessage(value)
         };
 
@@ -97,7 +98,7 @@ async function emailVolunteers(req, res) {
         console.log("Message sent: %s", mailInfo.messageId);
         console.log('Preview URL: ' + nodemailer.getTestMessageUrl(mailInfo));
     }
-    
+
     res.status(200).json({});
 };
 
