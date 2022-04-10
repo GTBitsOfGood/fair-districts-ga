@@ -31,6 +31,7 @@ async function getNewspapers(req, res) {
           counties: true,
         },
       });
+      res.status(200).json(allNewspapers);
   } else {
     const allNewspapers = await prisma.newspaper.findMany({
       include: {
