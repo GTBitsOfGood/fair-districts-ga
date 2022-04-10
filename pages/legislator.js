@@ -20,23 +20,20 @@ import LegislatorAddModal from "../components/LegislatorAddModal";
 import LegislatorEditModal from "../components/LegislatorEditModal";
 import axios from "axios";
 import NavBar from "../components/NavBar";
-import SearchBar from "../components/SearchBar";
-import { getSession, useSession } from "next-auth/react"
+import { getSession, useSession } from "next-auth/react";
 import AccessDeniedPage from "../components/AccessDeniedPage";
 import Loader from "../components/Loader";
 import adminEmails from "./api/auth/adminEmails";
 import TableHeader from "../components/TableHeader";
 import useDebounce from "../components/hooks/useDebounce";
 
-
 const Legislator = () => {
   const { data: session } = useSession();
-  const [ legislators, setLegislators ] = useState([]);
-  const [ legislatorIndex, setLegislatorIndex ] = useState(0);
-  const [ searchInput, setSearchInput ] = useState("");
-  const [ isLoading,  setLoading ] = useState(true);
-  const [ activeSort, setActiveSort ] = useState('');
-  const [ specialUsers, setSpecialUsers] = useState([]);
+  const [legislators, setLegislators] = useState([]);
+  const [legislatorIndex, setLegislatorIndex] = useState(0);
+  const [isLoading, setLoading] = useState(true);
+  const [activeSort, setActiveSort] = useState("");
+  const [specialUsers, setSpecialUsers] = useState([]);
 
   const debouncedActiveSort = useDebounce(activeSort, 200);
   const toggleActiveSort = (target) => {
@@ -90,7 +87,6 @@ const Legislator = () => {
     onOpen: onAddOpen,
     onClose: onAddClose,
   } = useDisclosure();
-
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
@@ -204,16 +200,11 @@ const Legislator = () => {
       <Box p={8} flex="1" overflowY={"auto"} overflowX={"auto"}>
         <Flex direction="row" justifyContent="space-between">
           <Heading>Legislators</Heading>
-          <Flex direction="row">
-            <SearchBar onChange={searchLegislators} />
-            <IconButton
-            marginLeft={10}
+          <IconButton
             colorScheme="blue"
             icon={<AddIcon />}
             onClick={onAddOpen}
           />
-          </Flex>
-         
         </Flex>
         <Table {...getTableProps()} size="md">
           <TableHeader
