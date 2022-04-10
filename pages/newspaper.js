@@ -64,18 +64,18 @@ const Newspaper = () => {
   }, [debouncedActiveSort]);
 
   const fetchNewspapers = async () => {
-    const res = await axios.get(
-      `https://${process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_VERCEL_URL
-        : "localhost:3000"
-      }/api/newspaper`
-    );
+    const production = process.env.NODE_ENV === "production";
+    let res;
+    if (!production) {
+      res = await axios.get("http://localhost:3000/api/newspaper");
+    } else {
+      res = await axios.get(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/newspaper`)
+    }
     const data = await res.data;
     return data
   }
 
   const searchNewspapers = async (event) => {
-    // Empty search input
     if (!event.target.value) {
       setSearchInput("");
       const data = await fetchNewspapers();

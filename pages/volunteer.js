@@ -50,13 +50,13 @@ const Volunteer = () => {
 
 
   const fetchVolunteers = async () => {
-    const res = await axios.get(
-      `https://${
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_VERCEL_URL
-          : "localhost:3000"
-      }/api/volunteer`
-    );
+    const production = process.env.NODE_ENV === "production";
+    let res;
+    if (!production) {
+      res = await axios.get("http://localhost:3000/api/volunteer");
+    } else {
+      res = await axios.get(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/volunteer`)
+    }
 
     const data = await res.data;
     return data;

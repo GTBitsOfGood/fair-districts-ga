@@ -52,13 +52,13 @@ const Legislator = () => {
   };
 
   const fetchLegislators = async () => {
-    const res = await axios.get(
-      `https://${
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_VERCEL_URL
-          : "localhost:3000"
-      }/api/legislator`
-    );
+    const production = process.env.NODE_ENV === "production";
+    let res;
+    if (!production) {
+      res = await axios.get("http://localhost:3000/api/legislator");
+    } else {
+      res = await axios.get(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/legislator`)
+    }
 
     const data = await res.data;
     return data;
