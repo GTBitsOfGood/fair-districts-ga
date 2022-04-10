@@ -111,6 +111,7 @@ const LegislatorAddModal = ({
                     {({ field, form }) => (
                       <FormControl
                         isInvalid={form.errors.zip_code && form.touched.zip_code}
+                        isRequired
                       >
                         <FormLabel htmlFor="zip_code">Zip Code</FormLabel>
                         <Input

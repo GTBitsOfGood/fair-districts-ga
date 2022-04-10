@@ -39,6 +39,7 @@ const CampaignDetailsPage = ({
 
   const cancelRef = useRef();
   const [recipients, setRecipients] = useState({});
+  const [sending, setSending] = useState(false);
 
   const addRecipient = (index, volunteer, newspaper, id) => {
     setRecipients(recipients => {
@@ -59,6 +60,7 @@ const CampaignDetailsPage = ({
 
   async function sendEmails() {
     const production = process.env.NODE_ENV === "production";
+    setSending(true);
     let res;
       if (!production) {
         res = await axios.post(`http://localhost:3000/api/mail`, recipients);
@@ -66,6 +68,7 @@ const CampaignDetailsPage = ({
         res = await axios.post(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/mail`, recipients)
       }
     const data = await res.data;
+    setSending(false);
     setRecipients({});
   }
 
@@ -93,7 +96,7 @@ const CampaignDetailsPage = ({
                 <Flex flexDirection="row" alignItems='center'>
                   <Heading marginRight={10} as='h4' size='md'>{Object.keys(recipients).length} selected...</Heading>
                   <Button leftIcon={<BsMailbox />} colorScheme='pink' variant='solid' onClick={sendEmails}>
-                    Send Mail 
+                    {sending ? "Sending..." : "Send Mail"}
                   </Button>
                 </Flex>
               }
