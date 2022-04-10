@@ -179,13 +179,13 @@ const County = ({ data }) => {
 };
 
 export async function getServerSideProps(context) {
-  const res = await axios.get(
-    `https://${
-      process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_VERCEL_URL
-        : "localhost:3000"
-    }/api/county`
-  );
+  const production = process.env.NODE_ENV === "production";
+  let res;
+  if (!production) {
+    res = await axios.get("http://localhost:3000/api/county");
+  } else {
+    res = await axios.get(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/county`)
+  }
   const data = await res.data;
   return {
     props: {
