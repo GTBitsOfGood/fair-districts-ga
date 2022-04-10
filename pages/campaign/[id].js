@@ -111,7 +111,7 @@ export async function getServerSideProps(context) {
     query: { id },
   } = context;
   const res = await axios.get(
-    `http://${
+    `https://${
       process.env.NODE_ENV === "production"
         ? process.env.NEXT_PUBLIC_VERCEL_URL
         : "localhost:3000"
