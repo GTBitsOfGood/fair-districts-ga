@@ -20,7 +20,7 @@ const CampaignCard = ({ id, description, name, startDate }) => {
         <Flex direction="column" justifyContent="space-between">
           <Text fontSize="xl">{dayjs(startDate).format("MM/DD/YYYY")}</Text>
           <Center>
-            <Link href={`/campaign/${id}`}>
+            <Link href={"/campaign/[id]"} as={`/campaign/${id}`} key={id}>
               <Button variant="ghost" size="sm" colorScheme="brand">
                 View Details
               </Button>

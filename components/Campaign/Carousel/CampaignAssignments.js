@@ -196,7 +196,7 @@ const CampaignAssignments = ({
           <Button
             colorScheme="brand"
             onClick={async () => {
-              if (error) return;
+              if (error || assignments.length === 0) return;
               const res = await axios.post("/api/campaign", {
                 campaignForm,
                 assignments,

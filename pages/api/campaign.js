@@ -15,6 +15,8 @@ async function handler(req, res) {
     } else {
       await addCampaign(req, res);
     }
+  } else if (req.method === "DELETE") {
+    await deleteCampaign(req, res);
   }
 }
 
@@ -247,6 +249,16 @@ async function addCampaign(req, res) {
     },
     include: {
       assignments: true,
+    },
+  });
+  res.status(200).json(campaign);
+}
+
+async function deleteCampaign(req, res) {
+  const { id } = req.body;
+  const campaign = await prisma.campaign.delete({
+    where: {
+      id,
     },
   });
   res.status(200).json(campaign);

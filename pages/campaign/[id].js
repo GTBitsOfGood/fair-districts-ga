@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import {
   Card,
   Box,
@@ -8,6 +9,8 @@ import {
   Stack,
   Text,
   Icon,
+  Button,
+  useDisclosure,
 } from "@chakra-ui/react";
 import axios from "axios";
 import NavBar from "../../components/NavBar";
@@ -16,6 +19,8 @@ import AccessDeniedPage from "../../components/AccessDeniedPage";
 import { ArrowBackIcon, EmailIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import { BsNewspaper, BsPersonFill } from "react-icons/bs";
+import * as dayjs from "dayjs";
+import CampaignDeleteDialog from "../../components/Campaign/CampaignDeleteDialog";
 
 const CampaignDetailsPage = ({
   id,
@@ -24,7 +29,11 @@ const CampaignDetailsPage = ({
   startDate,
   assignments,
 }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: session } = useSession();
+
+  const cancelRef = useRef();
+
   if (!session) {
     return <AccessDeniedPage />;
   }
@@ -46,22 +55,29 @@ const CampaignDetailsPage = ({
             <Heading>{name}</Heading>
           </Stack>
           <Divider />
-          <Stack direction="row" spacing={5}>
-            <Text>
-              <b>Description: </b>
-            </Text>
-            <Text>{description}</Text>
-          </Stack>
-          <Stack direction="row" spacing={5}>
-            <Text>
-              <b>Start Date: </b>
-            </Text>
-            <Text>{startDate.split("T")[0]}</Text>
-          </Stack>
-          <Text>
-            <b>Assignments: </b>
-          </Text>
-          <Stack direction="column">
+          <Flex
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Stack direction="column">
+              <Text>
+                <b>Description: </b>
+                {description}
+              </Text>
+              <Text>
+                <b>Start Date: </b>
+                {dayjs(startDate).format("MMMM D, YYYY")}
+              </Text>
+              <Text>
+                <b>Assignments: </b>
+              </Text>
+            </Stack>
+            <Button colorScheme="red" onClick={onOpen}>
+              Delete
+            </Button>
+          </Flex>
+          <Stack direction="column" mt={2}>
             {assignments.map(({ volunteer, newspaper }, i) => (
               <Box
                 key={`assignment-${i}`}
@@ -102,6 +118,12 @@ const CampaignDetailsPage = ({
           </Stack>
         </Box>
       </Flex>
+      <CampaignDeleteDialog
+        id={id}
+        isOpen={isOpen}
+        onClose={onClose}
+        cancelRef={cancelRef}
+      />
     </>
   );
 };
@@ -111,7 +133,7 @@ export async function getServerSideProps(context) {
     query: { id },
   } = context;
   const res = await axios.get(
-    `https://${
+    `http${process.env.NODE_ENV === "production" ? "s" : ""}://${
       process.env.NODE_ENV === "production"
         ? process.env.NEXT_PUBLIC_VERCEL_URL
         : "localhost:3000"
