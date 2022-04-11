@@ -68,7 +68,7 @@ const CampaignDetailsPage = ({
       if (!production) {
         res = await axios.post(`http://localhost:3000/api/mail`, {recipients, file: (file ? file.name : "")});
       } else {
-        res = await axios.post(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/mail`, {recipient, file: (file ? file.name: "")})
+        res = await axios.post(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/mail`, {recipients, file: (file ? file.name: "")})
       }
     const data = await res.data;
     setSending(false);
