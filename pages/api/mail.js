@@ -75,7 +75,7 @@ function createMessage(email) {
 
 async function emailVolunteers(req, res) {
     const assignments = req.body.recipients;
-    const fileName = req.body.filename;
+    const fileName = req.body.file;
 
     const emails = parseAssignments(assignments);
 
@@ -89,27 +89,31 @@ async function emailVolunteers(req, res) {
         }
     });
 
-    let pathname = "";
-    const production = process.env.NODE_ENV === "production";
-    if (!production) {
-        pathname = "http://localhost:3000/tmp/" + fileName;
-    } else {
-        pathname = "https://${process.env.NEXT_PUBLIC_VERCEL_URL}/tmp/" + fileName;
-    }
+    
 
-    console.log(pathname);
     for (const [key, value] of Object.entries(emails)) {
-        const mailOptions = {
-            from: '"Fair Districts" <fair_districts@zohomail.com>',
-            to: key,
-            subject: "Letter-to-the-editor Submission",
-            html: createMessage(value),
-            attachments: [
-                {
-                    path: path.join(process.cwd(), 'tmp/' + fileName),
-                }
-            ]
-        };
+        let mailOptions;
+        if (fileName !== "") {
+            mailOptions = {
+                from: '"Fair Districts" <fair_districts@zohomail.com>',
+                to: key,
+                subject: "Letter-to-the-editor Submission",
+                html: createMessage(value),
+                attachments: [
+                    {
+                        filename: fileName,
+                        path: `https://fairdistricts.blob.core.windows.net/files/${fileName}`
+                    }
+                ]
+            }
+         } else {
+             mailOptions = {
+                from: '"Fair Districts" <fair_districts@zohomail.com>',
+                to: key,
+                subject: "Letter-to-the-editor Submission",
+                html: createMessage(value),
+             }
+         }
 
         await transporter.sendMail(mailOptions);
         
