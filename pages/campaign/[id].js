@@ -26,7 +26,7 @@ import { BsNewspaper, BsPersonFill } from "react-icons/bs";
 import * as dayjs from "dayjs";
 import CampaignDeleteDialog from "../../components/Campaign/CampaignDeleteDialog";
 import React, { useState  } from "react";
-import { UiFileInputButton } from "../../components/UiFileInputButton";
+import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
 
 const CampaignDetailsPage = ({
   id,
@@ -41,7 +41,8 @@ const CampaignDetailsPage = ({
   const cancelRef = useRef();
   const [recipients, setRecipients] = useState({});
   const [sending, setSending] = useState(false);
-  const [filename, setFilename] = useState("");
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const addRecipient = (index, volunteer, newspaper, id) => {
     setRecipients(recipients => {
@@ -65,32 +66,45 @@ const CampaignDetailsPage = ({
     setSending(true);
     let res;
       if (!production) {
-        res = await axios.post(`http://localhost:3000/api/mail`, {recipients, filename: filename});
+        res = await axios.post(`http://localhost:3000/api/mail`, {recipients, file: (file ? file.name : "")});
       } else {
-        res = await axios.post(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/mail`, {recipients, filename: filename})
+        res = await axios.post(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/mail`, {recipient, file: (file ? file.name: "")})
       }
     const data = await res.data;
     setSending(false);
     setRecipients({});
+    setFile(null);
   }
 
-  const onChange = async (formData) => {
-    const config = {
-      headers: { 'content-type': 'multipart/form-data' },
-      onUploadProgress: (event) => {
-        console.log(`Current progress:`, Math.round((event.loaded * 100) / event.total));
-      },
-    };
+  const onFileChange = (event) => {
+    setFile(event.target.files[0]);
+  }
 
-    let fileName = "";
-    for (var value of formData.values()) {
-      fileName = value["name"];
-   }
-   
-    const response = await axios.post('/api/upload', formData, config);
-    setFilename(fileName);
-    console.log('response', response.data);
-  };
+  async function uploadFile() {
+    if (file) {
+      const blobService = new BlobServiceClient(
+        `https://fairdistricts.blob.core.windows.net/?sv=2020-08-04&ss=bfqt&srt=sco&sp=rwdlacupitfx&se=2022-04-11T07:28:26Z&st=2022-04-10T23:28:26Z&spr=https,http&sig=Epx2E4%2BdBVRBnTEOwFOcFLPVFxB5w%2F%2ByQ9DV2PyQ0k0%3D`
+      )
+
+      const containerClient = blobService.getContainerClient('files');
+    /* await containerClient.createIfNotExists({
+        access: 'container'
+      }); */
+
+      const blobClient = containerClient.getBlockBlobClient(file.name);
+
+      const options = {
+        blobHTTPHeaders: {
+          blobContentType: file.type,
+        }
+      }
+
+      setUploading(true);
+      let res = await blobClient.uploadBrowserData(file, options);
+      setUploading(false);
+  }
+  }
+
 
   if (!session) {
     return <AccessDeniedPage />;
@@ -116,12 +130,11 @@ const CampaignDetailsPage = ({
               {Object.keys(recipients).length > 0 && 
                 <Flex flexDirection="row" alignItems='center'>
                   <Heading marginRight={3} as='h4' size='md'>{Object.keys(recipients).length} selected...</Heading>
-                  <UiFileInputButton
-                    label="Upload File"
-                    uploadFileName="theFiles"
-                    onChange={onChange}
-                  />
-                  <Button leftIcon={<BsMailbox />} colorScheme='pink' variant='solid' onClick={sendEmails}>
+                  <input onChange={onFileChange} type="file" style={{marginRight: 20}}></input>
+                  <button onClick={uploadFile}
+                      style={{backgroundColor: "blue", padding: "8px", borderRadius: "5px", paddingLeft: "20px", paddingRight: "20px", color:"white", fontWeight: 500}}
+                      >{uploading ? "Uploading..." : "Upload File"} </button>
+                  <Button leftIcon={<BsMailbox />} colorScheme='pink' variant='solid' onClick={sendEmails} marginLeft={4}>
                     {sending ? "Sending..." : "Send Mail"}
                   </Button>
                 </Flex>
