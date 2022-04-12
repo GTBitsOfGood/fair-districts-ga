@@ -83,7 +83,7 @@ const CampaignDetailsPage = ({
   async function uploadFile() {
     if (file) {
       const blobService = new BlobServiceClient(
-        `https://fairdistricts.blob.core.windows.net/?sv=2020-08-04&ss=bfqt&srt=sco&sp=rwdlacupitfx&se=2022-04-11T07:28:26Z&st=2022-04-10T23:28:26Z&spr=https,http&sig=Epx2E4%2BdBVRBnTEOwFOcFLPVFxB5w%2F%2ByQ9DV2PyQ0k0%3D`
+        `https://fairdistricts.blob.core.windows.net/?sv=2020-08-04&ss=bfqt&srt=sco&sp=rwdlacupitfx&se=2025-09-18T11:48:42Z&st=2022-04-12T03:48:42Z&spr=https&sig=b%2F4ReDm74U1D7FC%2Fc6fLvUpol0FXCj3OsalzD5tOp2I%3D`
       )
 
       const containerClient = blobService.getContainerClient('files');
