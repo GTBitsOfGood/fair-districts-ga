@@ -34,7 +34,7 @@ const validateName = (value) => {
     error = "Required field";
   }
   return error;
-};
+}
 
 const validateEmail = (value) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

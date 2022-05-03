@@ -63,7 +63,8 @@ const LegislatorEditModal = ({
                   onSubmit={async (values, actions) => {
                     values["isSenator"] = document.getElementById("senator").checked;
                     values["isRepresentative"] = document.getElementById("representative").checked;
-
+                    values["reapportionment"] = document.getElementById("reapportionment").checked;
+                    
                     const res = await axios.post("/api/legislator", {
                       type: "edit",
                       id: legislator.id,
@@ -232,6 +233,29 @@ const LegislatorEditModal = ({
                             </FormControl>
                           )}
                         </Field>
+
+                        <Field name="reapportionment">
+                          {({ field, form }) => (
+                            <FormControl
+                              isInvalid={
+                                form.errors.reapportionment && form.touched.reapportionment
+                              }
+                            >
+                              <FormLabel htmlFor="reapportionment">Reapportionment Commmittee</FormLabel>
+                              <Checkbox
+                                id="reapportionment"
+                                defaultChecked={field.value}
+                              />
+                              <FormErrorMessage>
+                                {form.errors.reapportionment}
+                              </FormErrorMessage>
+                            </FormControl> 
+                          )}
+                        </Field>
+
+       
+
+                        
                         <Box>{props.errors.api && props.errors.api}</Box>
                       </Stack>
                       <Box mt={6} mb={4}>
