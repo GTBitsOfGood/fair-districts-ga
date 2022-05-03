@@ -33,6 +33,7 @@ const LegislatorAddModal = ({
   const handleAddSubmit = async (values, actions) => {
     values["isSenator"] = document.getElementById("senator").checked;
     values["isRepresentative"] = document.getElementById("representative").checked;
+    values["reapportionment"] = document.getElementById("reapportionment").checked;
 
     const res = await axios.post("/api/legislator", {
       type: "add",
@@ -67,6 +68,7 @@ const LegislatorAddModal = ({
               isSenator: false,
               isRepresentative: false, 
               counties: [],
+              reapportionment: false,
             }}
             onSubmit={handleAddSubmit}
           >
@@ -183,6 +185,20 @@ const LegislatorAddModal = ({
                         </Checkbox>
                         <FormErrorMessage>
                           {form.errors.isRepresentative}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                    </Field>
+
+                 
+                    <Field name="reapportionment">
+                    {({ field, form }) => (
+                      <FormControl>
+                        <Checkbox size="md" id="reapportionment" colorScheme="gray">
+                          Reapportionment Commmittee
+                        </Checkbox>
+                        <FormErrorMessage>
+                          {form.errors.reapportionment}
                         </FormErrorMessage>
                       </FormControl>
                     )}

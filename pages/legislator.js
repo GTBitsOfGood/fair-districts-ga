@@ -149,6 +149,15 @@ const Legislator = () => {
         }) => <div>{isRepresentative ? "Yes" : ""}</div>,
       },
       {
+        Header: "Reapportionment Committee",
+        accessor: "reapportionment",
+        Cell: ({
+          row: {
+            values: { reapportionment },
+          },
+        }) => <div>{ reapportionment ? "Yes" : ""}</div>,
+      },
+      {
         Header: "Party",
         accessor: "party",
       },
