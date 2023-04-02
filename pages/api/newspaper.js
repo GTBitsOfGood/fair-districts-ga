@@ -2,9 +2,7 @@ import prisma from "../../prisma/prisma";
 
 async function handler(req, res) {
   if (req.method === "GET") {
-    console.log("got newspaper get");
     await getNewspapers(req, res);
-    console.log("got");
   } else if (req.method === "POST") {
     if (req.body.type === "add") {
       await addNewspaper(req, res);
@@ -17,7 +15,7 @@ async function handler(req, res) {
 }
 
 async function getNewspapers(req, res) {
-  if (req.query.length > 0) {
+  if (Object.keys(req.query).length > 0) {
       const [field, order] = req.query.order_by?.split(".");
       const orderBy = {};
       if (field && order) {

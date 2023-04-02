@@ -41,12 +41,12 @@ const Legislator = () => {
   const toggleActiveSort = (target) => {
     const [sort, order] = activeSort.split(".");
     if (sort === undefined || order === undefined) {
-      setActiveSort(`${target}.desc`);
+      setActiveSort(`${target}.asc`);
       return;
     }
     if (target === sort) {
       if (order === "desc") setActiveSort(`${target}.asc`);
-      else setActiveSort("");
+      else setActiveSort(`${target}.desc`);
     } else setActiveSort(`${target}.desc`);
   };
 
@@ -203,8 +203,6 @@ const Legislator = () => {
     }
   }
   
-  console.log(headerGroups);
-
   return (
     <Flex direction="row" height="100%">
       <NavBar session={session} />

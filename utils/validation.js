@@ -24,4 +24,26 @@ const validateZipCode = (value) => {
     }
 };
 
-export { validateReq, validateEmail, validateZipCode };
+const validatePhone = (value) => {
+    const re = /^\d{10}$/;
+    let error;
+    if (!value) {
+      return error; // not required
+    } else if (!re.test(value)) {
+      error = "Not a valid phone number";
+    }
+    return error;
+};
+
+const validateURL = (value) => {
+    const re = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+    let error;
+    if (!value) {
+      return error; // not required
+    } else if (!re.test(value)) {
+      error = "Not a valid URL";
+    }
+    return error;
+};
+
+export { validateReq, validateEmail, validateZipCode, validatePhone, validateURL };

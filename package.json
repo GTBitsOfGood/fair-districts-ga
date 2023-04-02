@@ -9,7 +9,8 @@
     "test": "jest --watch",
     "prebuild": "npx prisma generate",
     "ci:test": "jest --ci --passWithNoTests",
-    "prisma:generate": "npx prisma generate"
+    "prisma:generate": "npx prisma generate",
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.9.0",
@@ -52,7 +53,7 @@
     "eslint": "8.7.0",
     "eslint-config-next": "12.0.8",
     "jest": "^27.4.7",
-    "prisma": "^3.10.0",
+    "prisma": "^3.15.2",
     "tailwindcss": "^3.0.18",
     "vercel": "^23.1.2"
   },
