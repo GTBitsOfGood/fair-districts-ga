@@ -1,10 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Table,
-  Thead,
   Tbody,
   Tr,
-  Th,
   Td,
   useDisclosure,
   Flex,
@@ -20,7 +18,7 @@ import LegislatorAddModal from "../components/LegislatorAddModal";
 import LegislatorEditModal from "../components/LegislatorEditModal";
 import axios from "axios";
 import NavBar from "../components/NavBar";
-import { getSession, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import AccessDeniedPage from "../components/AccessDeniedPage";
 import SearchBar from "../components/SearchBar";
 import Loader from "../components/Loader";
