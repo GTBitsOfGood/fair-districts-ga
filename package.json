@@ -9,7 +9,11 @@
     "test": "jest --watch",
     "prebuild": "npx prisma generate",
     "ci:test": "jest --ci --passWithNoTests",
-    "prisma:generate": "npx prisma generate"
+    "prisma:generate": "npx prisma generate",
+    "secrets": "npm run secrets:logout && cross-env-shell BW_SESSION=`bw login product@bitsofgood.org --raw` \"npm run secrets:sync\"",
+    "secrets:logout": "(bw logout || exit 0)",
+    "secrets:login": "bw login product@bitsofgood.org",
+    "secrets:sync": "bw sync && bw get item fair-districts-ga/development/.env | fx .notes > \".env\""
   },
   "dependencies": {
     "@azure/storage-blob": "^12.9.0",
