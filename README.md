@@ -63,7 +63,7 @@ NODE_COMMAND=build docker-compose up --build
     brew update
     brew doctor
     ```
-3. Run the command below to install PostgreSQL.
+3. Run the command below to install MySQL.
     ```
     brew install mysql
     ```
@@ -97,7 +97,7 @@ NODE_COMMAND=build docker-compose up --build
     sudo apt-get update
     sudo apt-get install mysql
     ```
-2. Run this command to access the postgres user
+2. Run this command to access the mysql user
     ```
     sudo -i -u mysql
     ```
