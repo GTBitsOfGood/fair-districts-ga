@@ -1,5 +1,8 @@
 version: "3"
 
+networks:
+  mysql:
+
 services:
   db:
     image: mysql:8.0
@@ -15,6 +18,8 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
+    networks:
+      - mysql
 
   app:
     build:
@@ -30,6 +35,8 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    networks:
+      - mysql
 
 volumes:
   db_data:
