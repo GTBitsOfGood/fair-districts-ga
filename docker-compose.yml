@@ -37,6 +37,7 @@ services:
       - /usr/src/app/node_modules
     networks:
       - mysql
+    command: tail -f /dev/null
 
 volumes:
   db_data:

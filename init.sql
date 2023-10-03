@@ -1,3 +1,3 @@
 CREATE DATABASE IF NOT EXISTS fair_districts;
-GRANT ALL PRIVILEGES ON fair_districts.* TO 'mysql'@'%';
+GRANT ALL PRIVILEGES ON *.* TO 'mysql'@'%';
 FLUSH PRIVILEGES;
