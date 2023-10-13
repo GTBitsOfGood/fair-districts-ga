@@ -1,5 +1,6 @@
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import Image from 'next/image';
 import React, {useState, useEffect} from 'react';
 import NavBar from '../components/NavBar';
 import Loader from '../components/Loader';
@@ -12,8 +13,8 @@ import {
   Button,
   Center,
   Divider,
+  HStack,
   Heading,
-  Image,
   Stack,
   Text,
   VStack,
@@ -134,21 +135,27 @@ export default function Component() {
   }
 
   return (
-    <Center width="100%" height="40%">
+    <Center width="100%" height="100%">
+    <VStack height="40%" width="100%" gap="1em">
       <VStack
-        borderWidth="4px"
-        borderRadius="lg"
-        borderColor="#39449d"
-        flexDirection="column"
-        alignItems="center"
-        width="40%"
-        justifyContent="center"
-        p="10px"
-        spacing="10px"
-      >
-        <Heading>Fair Districts GA</Heading>
-        <Text fontSize="xl">You are not signed in.</Text>
-        <SignInOrOutButton signIn={signIn}>Sign In</SignInOrOutButton>
+          borderWidth="4px"
+          borderRadius="lg"
+          borderColor="#39449d"
+          flexDirection="column"
+          alignItems="center"
+          width="40%"
+          justifyContent="center"
+          p="10px"
+          spacing="10px"
+        >
+          <Heading>Fair Districts GA</Heading>
+          <Text fontSize="xl">You are not signed in.</Text>
+          <SignInOrOutButton signIn={signIn}>Sign In</SignInOrOutButton>
+        </VStack>
+        <HStack gap="1em">
+          <Image src="/bits-of-good-logo.svg" alt="Bits of Good Logo" height={536/8} width={1022/8} />
+          <Image src="/netlify-logo.jpg" alt="Built with Netlify" height={536/8} width={1022/8} />
+        </HStack>
       </VStack>
     </Center>
   );

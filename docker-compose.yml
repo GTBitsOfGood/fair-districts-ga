@@ -1,0 +1,43 @@
+version: "3"
+
+networks:
+  mysql:
+
+services:
+  db:
+    image: mysql:8.0
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - mysql
+
+  app:
+    build:
+      context: .
+    environment:
+      NODE_COMMAND: "${NODE_COMMAND:-dev}"
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - mysql
+    command: tail -f /dev/null
+
+volumes:
+  db_data:
