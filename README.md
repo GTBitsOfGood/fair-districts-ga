@@ -73,7 +73,7 @@ Run `git clone https://github.com/bitsofgood/fair-districts-ga.git` to clone the
    ```
 3. Run the following command
    ```
-   psql
+   mysql
    ```
 4. Now, we will create a database called `fair_districts`, so run the following
    ```
