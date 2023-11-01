@@ -15,7 +15,7 @@ async function handler(req, res) {
 }
 
 async function getVolunteers(req, res) {
-  if (req.query.length > 0) {
+  if (Object.keys(req.query).length > 0) {
     const [field, order] = req.query.order_by?.split(".");
     const orderBy = {};
     if (field && order) {

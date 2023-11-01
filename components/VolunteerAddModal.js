@@ -13,19 +13,17 @@ import {
   Button,
   Input,
   Flex,
-  IconButton,
   Divider,
   Checkbox,
   NumberInput,
   NumberInputField,
 } from "@chakra-ui/react";
-import { Field, FieldArray, Form, Formik } from "formik";
-import { AddIcon, MinusIcon } from "@chakra-ui/icons";
+import { Field, Form, Formik } from "formik";
 import axios from "axios";
-import React, { useState } from "react";
+import React from "react";
 import { Select } from "chakra-react-select";
 import { georgiaCounties } from "../utils/consts";
-import { validateReq, validateEmail, validateZipCode } from "../utils/validation";
+import { validateReq, validateEmail, validateZipCode, validatePhone } from "../utils/validation";
 
 
 const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
@@ -136,9 +134,11 @@ const VolunteerAddModal = ({ isOpen, onClose, volunteers, setVolunteers }) => {
                     )}
                   </Field>
 
-                  <Field name="phone">
+                  <Field name="phone" validate={validatePhone}>
                     {({ field, form }) => (
-                      <FormControl>
+                      <FormControl
+                        isInvalid={form.errors.phone && form.touched.phone}
+                      >
                         <FormLabel htmlFor="phone">Phone</FormLabel>
                         <Input {...field} id="phone" placeholder="4044044040" />
                         <FormErrorMessage>{form.errors.phone}</FormErrorMessage>

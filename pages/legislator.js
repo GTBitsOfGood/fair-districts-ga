@@ -1,10 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Table,
-  Thead,
   Tbody,
   Tr,
-  Th,
   Td,
   useDisclosure,
   Flex,
@@ -20,7 +18,7 @@ import LegislatorAddModal from "../components/LegislatorAddModal";
 import LegislatorEditModal from "../components/LegislatorEditModal";
 import axios from "axios";
 import NavBar from "../components/NavBar";
-import { getSession, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import AccessDeniedPage from "../components/AccessDeniedPage";
 import SearchBar from "../components/SearchBar";
 import Loader from "../components/Loader";
@@ -41,12 +39,12 @@ const Legislator = () => {
   const toggleActiveSort = (target) => {
     const [sort, order] = activeSort.split(".");
     if (sort === undefined || order === undefined) {
-      setActiveSort(`${target}.desc`);
+      setActiveSort(`${target}.asc`);
       return;
     }
     if (target === sort) {
       if (order === "desc") setActiveSort(`${target}.asc`);
-      else setActiveSort("");
+      else setActiveSort(`${target}.desc`);
     } else setActiveSort(`${target}.desc`);
   };
 
@@ -203,8 +201,6 @@ const Legislator = () => {
     }
   }
   
-  console.log(headerGroups);
-
   return (
     <Flex direction="row" height="100%">
       <NavBar session={session} />

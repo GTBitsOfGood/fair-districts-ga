@@ -7,7 +7,6 @@ import {
   Flex,
   Button,
   Stack,
-  AlertDialogOverlay,
   Center,
   Spinner,
   IconButton,
@@ -27,8 +26,10 @@ const CampaignAssignments = ({
   const [volunteers, setVolunteers] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [newspapers, setNewspapers] = useState([]);
+  const [options, setOptions] = useState(false);
 
   const error = useMemo(() => {
+    if (!options && assignments.length === 0) return "No volunteers or newspapers corresponding to chosen focus. Please reselect counties or legislators.";
     for (let a of assignments) {
       if (a.newspaper.value === null || a.volunteer.value === null) {
         return "Resolve empty field";
@@ -59,6 +60,7 @@ const CampaignAssignments = ({
     setAssignments(initialAssignments);
     setVolunteers(allVolunteers);
     setLoading(false);
+    if (initialAssignments.length > 0) setOptions(true);
   }, []);
 
   return (
@@ -152,7 +154,7 @@ const CampaignAssignments = ({
                 </Flex>
               ))}
             </Stack>
-            <When condition={assignments.length > 0 && volunteers.length > 0}>
+            <When condition={options || assignments.length > 0 && volunteers.length > 0}>
               <Center>
                 <IconButton
                   mt={4}
@@ -179,10 +181,12 @@ const CampaignAssignments = ({
               </Center>
             </When>
             <When condition={error}>
-              <Text color="red" fontSize="sm" mt={3}>
+            <Center>
+              <Text color="red" fontSize="m" mt={3} textAlign="center">
                 {error}
               </Text>
-            </When>
+            </Center>
+          </When>
           </Box>
         </Else>
       </If>
@@ -194,7 +198,7 @@ const CampaignAssignments = ({
             Back
           </Button>
           <Button
-            colorScheme="brand"
+            colorScheme={ (error || assignments.length === 0) ? "gray" : "brand"}
             onClick={async () => {
               if (error || assignments.length === 0) return;
               const res = await axios.post("/api/campaign", {

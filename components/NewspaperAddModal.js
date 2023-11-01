@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import axios from "axios";
 import {
   Box,
@@ -14,13 +14,10 @@ import {
   Stack,
   Button,
   Input,
-  InputGroup,
-  InputLeftElement,
   NumberInput,
   NumberInputField,
   Textarea,
-  Flex,
-  IconButton,
+  Flex, 
   Divider,
   Text,
   Checkbox,
@@ -28,25 +25,7 @@ import {
 import { Field, Form, Formik } from "formik";
 import { Select } from "chakra-react-select";
 import { georgiaCounties } from "../utils/consts";
-
-const validateName = (value) => {
-  let error;
-  if (!value) {
-    error = "Required field";
-  }
-  return error;
-};
-
-const validateEmail = (value) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  let error;
-  if (!value) {
-    error = "Required field";
-  } else if (!re.test(value)) {
-    error = "Not a valid email";
-  }
-  return error;
-};
+import { validateName, validateEmail, validateURL } from "../utils/validation";
 
 const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
   return (
@@ -150,15 +129,20 @@ const NewspaperAddModal = ({ isOpen, onClose, newspapers, setNewspapers }) => {
                       </FormControl>
                     )}
                   </Field>
-                  <Field name="website">
+                  <Field name="website" validate={validateURL}>
                     {({ field, form }) => (
-                      <FormControl>
+                      <FormControl
+                      isInvalid={form.errors.website && form.touched.website}
+                      >
                         <FormLabel htmlFor="website">Website</FormLabel>
                         <Input {...field} id="website" />
+                        <FormErrorMessage>
+                          {form.errors.website}
+                        </FormErrorMessage>
                       </FormControl>
                     )}
                   </Field>
-                  <Field name="submissionURL">
+                  <Field name="submissionURL" validate={validateURL}>
                      {({ field, form }) => (
                        <FormControl
                          isInvalid={form.errors.submissionURL && form.touched.submissionURL}
